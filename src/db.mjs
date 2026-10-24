@@ -128,18 +128,23 @@ export function openDb(path = process.env.DATABASE_PATH || 'data/agentmeter.sqli
   return db;
 }
 
-/** Synchronous savepoints compose atomically; never hold a transaction across I/O. */
+const transactionDepth = new WeakMap();
+/** Acquire the writer lock before reading balances; nested operations use savepoints. */
 export function transaction(db, fn) {
   const name = `tx_${randomUUID().replaceAll('-', '')}`;
-  db.exec(`SAVEPOINT ${name}`);
+  const depth = transactionDepth.get(db) || 0;
+  db.exec(depth ? `SAVEPOINT ${name}` : 'BEGIN IMMEDIATE');
+  transactionDepth.set(db, depth + 1);
   try {
     const value = fn();
     if (value?.then) throw new TypeError('database transactions must be synchronous');
-    db.exec(`RELEASE ${name}`);
+    db.exec(depth ? `RELEASE ${name}` : 'COMMIT');
     return value;
   } catch (error) {
-    db.exec(`ROLLBACK TO ${name}; RELEASE ${name}`);
+    db.exec(depth ? `ROLLBACK TO ${name}; RELEASE ${name}` : 'ROLLBACK');
     throw error;
+  } finally {
+    transactionDepth.set(db, depth);
   }
 }
 

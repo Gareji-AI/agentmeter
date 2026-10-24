@@ -13,7 +13,7 @@ const db=openDb(':memory:');const paypal=createPayPal(env,{db});
 if(!mock&&paypal.mode!=='live')throw new Error('Configure sandbox credentials, or use --mock for clearly labelled simulations');
 const results=[];const evidence={mode:mock?'mock':'sandbox',at:nowIso(),checks:results};
 const record=(check,result,notes,details)=>{results.push({check,result,notes,...(details?{details}:{})});};
-async function check(name,fn){try{await fn();}catch(error){record(name,'FAIL',error.message,{http_status:error.status});}}
+async function check(name,fn){try{await fn();}catch(error){record(name,'FAIL',error.message,{http_status:error.status,response:error.body?JSON.parse(error.body):undefined});}}
 let orderId=value('--order-id');let captured;
 try {
   if(mock){

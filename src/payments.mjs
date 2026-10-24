@@ -143,7 +143,8 @@ export async function reconcile(db,paypal) {
     const raw=JSON.parse(payout.raw||'{}');if(raw.seed)continue;
     const ref=raw.items?.[0]?.transaction_id;const external=transactions.get(ref);
     const amount=external?.transaction_amount?.currency_code==='USD'?paypalAmountToMicro(external.transaction_amount.value):null;
-    rows.push({id:payout.id,reference:ref||payout.paypal_batch_id,kind:'Payout',gross_micro:-payout.amount_micro,fee_micro:payout.fee_micro,net_micro:-payout.amount_micro-payout.fee_micro,rail_micro:amount,status:external?.transaction_status==='S'&&amount===-payout.amount_micro?'MATCH':external?'MISMATCH':'PENDING_REPORT'});
+    const fee=external?.fee_amount?Math.abs(paypalAmountToMicro(external.fee_amount.value)):null;
+    rows.push({id:payout.id,reference:ref||payout.paypal_batch_id,kind:'Payout',gross_micro:-payout.amount_micro,fee_micro:payout.fee_micro,net_micro:-payout.amount_micro-payout.fee_micro,rail_micro:amount,status:external?.transaction_status==='S'&&amount===-payout.amount_micro&&fee===payout.fee_micro?'MATCH':external?'MISMATCH':'PENDING_REPORT'});
   }
   return {source:paypal.mode==='mock'?'Mock PayPal reporting (simulated)':source,error,rows,matched:rows.filter(r=>r.status==='MATCH').length};
 }

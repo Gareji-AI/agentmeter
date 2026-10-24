@@ -32,12 +32,13 @@ export function reserve(db, { accountId, toolName, args = {}, idempotencyKey, at
     const account = db.prepare("SELECT * FROM accounts WHERE id = ? AND kind = 'consumer'").get(accountId);
     if (!account) throw new MeteringError(-32001, 'CONSUMER_REQUIRED');
     const tool = db.prepare('SELECT * FROM tools WHERE name = ? OR slug = ?').get(toolName, toolName);
-    if (!tool || !tool.enabled) throw new MeteringError(-32602, 'UNKNOWN_TOOL');
+    if (!tool) throw new MeteringError(-32602, 'UNKNOWN_TOOL');
     const previous = db.prepare('SELECT * FROM calls WHERE idempotency_key = ?').get(key);
     if (previous) {
       if (previous.tool_id !== tool.id || previous.request_args !== requestArgs) throw new MeteringError(-32003, 'IDEMPOTENCY_CONFLICT');
       return { call: previous, tool, reused: true };
     }
+    if (!tool.enabled) throw new MeteringError(-32602, 'TOOL_DISABLED');
     const owner = db.prepare("SELECT id FROM accounts WHERE id = ? AND kind = 'provider'").get(tool.owner_account_id);
     if (!owner) throw new MeteringError(-32603, 'TOOL_OWNER_INVALID');
     const price = integer(tool.price_micro);
