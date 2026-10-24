@@ -92,3 +92,20 @@ test('stored successful receipts do not substitute for a failed fresh API read',
   const report=await reconcile(db,{...rail,mode:'live',listTransactions:unavailable,getOrder:unavailable,getPayout:unavailable});
   assert.equal(report.api_verified,0);assert.equal(report.matched,0);assert.ok(report.rows.every(r=>r.api_status==='UNAVAILABLE'));assertLedger(db);
 });
+
+test('an omitted reporting payout fee requires a fresh item receipt and explicit source',async t=>{
+  const db=fixture(0);t.after(()=>db.close());const rail=await completedRail(db);
+  const live={...rail,mode:'live',async listTransactions(args){const report=structuredClone(await rail.listTransactions(args));for(const row of report.transaction_details)if(row.transaction_info.transaction_amount.value.startsWith('-'))delete row.transaction_info.fee_amount;return report;}};
+  const report=await reconcile(db,live),payout=report.rows.find(r=>r.kind==='Payout');
+  assert.equal(report.matched,2);assert.equal(payout.api_status,'VERIFIED');assert.equal(payout.reporting_fee_micro,null);assert.match(payout.fee_source,/PayPal Payouts GET/);
+  live.getPayout=async()=>{throw new Error('Unavailable');};
+  const missing=(await reconcile(db,live)).rows.find(r=>r.kind==='Payout');assert.equal(missing.status,'PENDING_FEE');assert.equal(missing.api_status,'UNAVAILABLE');assert.equal(missing.fee_source,null);
+  live.getPayout=async id=>{const batch=structuredClone(await rail.getPayout(id));batch.items[0].payout_item_fee.value='0.01';return batch;};
+  assert.equal((await reconcile(db,live)).rows.find(r=>r.kind==='Payout').status,'MISMATCH');assertLedger(db);
+});
+test('a present reporting fee in another currency cannot be replaced with a matching payout API fee',async t=>{
+  const db=fixture(0);t.after(()=>db.close());const rail=await completedRail(db);
+  const report=await reconcile(db,{...rail,mode:'live',async listTransactions(args){const report=structuredClone(await rail.listTransactions(args));for(const row of report.transaction_details)if(row.transaction_info.transaction_amount.value.startsWith('-'))row.transaction_info.fee_amount.currency_code='JPY';return report;}});
+  assert.equal(report.rows.find(r=>r.kind==='Payout').status,'MISMATCH');
+});
+

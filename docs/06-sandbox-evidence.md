@@ -17,7 +17,7 @@ The repository contains no passwords, secrets or operator access tokens.
 | Payout | Actual $0.03 batch SUCCESS **and** single item SUCCESS; USD payout-item fee $0.00 |
 | Final ledger | Buyer $4.9700; author $0.0000; both reservations $0.0000; invariants pass |
 | Fresh receipt comparison | Independent Orders GET and Payouts GET verify capture amount/currency/fee/net and payout batch/item/transaction/receiver/amount/fee |
-| Transaction Search | **PENDING**: new receipts not yet included; no reporting MATCH is claimed |
+| Transaction Search | **PASS**: capture and outgoing payout are reported with matching USD gross and successful status; explicit fee sources are described below |
 
 The in-app browser rendered the SDK button but could not open its approval popup.
 The completed checkout used native Google Chrome. The order created by the earlier
@@ -53,18 +53,25 @@ from the $0.03 author earnings. No production transfer occurred.
 
 ## Reconciliation boundaries
 
-`MATCH` means Transaction Search returned a successful USD transaction with the
-expected signed gross and fee. `VERIFIED` in **Live API check** means a fresh,
-read-only Orders/Payouts request independently agreed with the ledger. A stored
-successful response alone cannot produce either result. A failed fresh request is
-`UNAVAILABLE`; contradictory data is `MISMATCH`. A mismatch in either source keeps
-the summary in a review state.
+`MATCH` requires Transaction Search to return a successful USD transaction with
+the expected signed gross. Its fee must agree with the ledger. The fee source is
+shown explicitly: Search reports the capture's -$0.48 fee; for the payout it omits
+`fee_amount`, so a fresh Payouts GET independently verifies USD $0.00 before a
+match is allowed. An omitted field alone is not evidence of a zero fee. A failed
+lookup stays `PENDING_FEE`; a contradictory fee/currency/receiver/amount fails.
 
-On the latest verification, Transaction Search's refresh watermark still preceded
-the capture and payout. PayPal documents up to three hours before a new transaction
-appears in [Transaction Search](https://developer.paypal.com/api/transaction-search/v1/search-get).
-V5 stays PENDING until that report actually includes both records. The reconciliation
-screen shows the reporting watermark and keeps the pending rows visible.
+Both actual transactions were present on recheck at **06:43 UTC** with reporting
+watermark **2026-10-24T04:59:59Z**. V5 is now PASS. The first run's delay was real,
+not an application crediting problem. PayPal's [Search schema](https://developer.paypal.com/api/transaction-search/v1/schema.json)
+documents that its fee field has a value only for an applied and processed fee.
+The app additionally requires the independent Payouts receipt when that field is
+absent, rather than making a zero-fee assumption.
+
+`VERIFIED` in **Live API check** means a fresh Orders/Payouts request independently
+agreed with the ledger. A stored response cannot produce that state, and fresh API
+verification alone cannot match a transaction missing from Search. Fresh request
+failure is `UNAVAILABLE`; conflicting data is `MISMATCH`. These checks never move
+money. A mismatch keeps the summary in a review state.
 
 Repeat the existing flow verification without creating any additional payment:
 

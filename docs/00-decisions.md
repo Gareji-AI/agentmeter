@@ -9,7 +9,7 @@ AG Grid is the primary sponsor target; actual licensed Studio verification is pe
 **AgentMeter is a metered billing rail for AI tools: an agent spends prepaid credit per tool
 call, with PayPal sandbox funding and traceable author payout settlement. The current
 verified demonstrations cover simulated funds and actual sandbox capture, signed
-webhook delivery and successful author payout. Transaction Search matching is pending.**
+webhook delivery, successful author payout and Transaction Search reconciliation.**
 
 ## 2. Locked decisions
 
@@ -56,12 +56,15 @@ webhook delivery and successful author payout. Transaction Search matching is pe
   SUCCESS after USD platform test prefunding. No dry-run is used for this evidence.
 - Fresh GET Orders/Payouts reads independently agree with the ledger.
 
-**Still pending:** Transaction Search has not reported the new capture/payout yet.
-A fresh API verification is displayed separately from `MATCH`, which means actual
-Transaction Search amount, status and fee agreement. Stored receipts alone cannot
-produce either an API verification or a reporting match. API failures remain visible;
-checks are read-only and bounded to 20 non-matched records per refresh. See
-`06-sandbox-evidence.md` for observed evidence, prefunding and hosting limitations.
+**Transaction Search verified — 2026-10-24:** both the $5 capture and -$0.03
+payout now appear with successful status and matching USD gross. The capture fee
+is reported as -$0.48. Search omits the payout's optional fee field; a fresh Payouts
+GET independently verifies its USD $0.00 fee. The fee source is explicit in the UI.
+A missing fee is never silently normalized to zero. Failed fee lookup stays
+`PENDING_FEE`; contradictory receipts stay `MISMATCH`. A missing Search transaction
+still cannot become `MATCH` through an API fallback alone. Stored receipts cannot
+produce an API verification. Read-only API checks are bounded to 20 non-matched
+records per refresh. See `06-sandbox-evidence.md` for observed evidence and limits.
 
 ## 4. Architecture
 

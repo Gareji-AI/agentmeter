@@ -6,8 +6,8 @@ PayPal sandbox test funds only**; production PayPal hosts are rejected.
 
 The complete local mock demo works without accounts, API keys, a package install,
 network access, or a build step. Actual sandbox funding, SDK v6 approval, verified
-webhooks and author payout have also passed; Transaction Search is still catching
-up. See the evidence table below.
+webhooks, author payout and Transaction Search reconciliation have also passed.
+See the evidence table below.
 
 ## Run in one minute
 
@@ -125,7 +125,7 @@ Manual checks remain MANUAL; simulated passes never count as real PayPal passes.
 | V2 JS SDK v6 | Separate browser step | **PASS**: Google Chrome SDK 6.70.0 buyer approval and server capture |
 | V3 webhook / signature | PASS for replay logic only | **PASS**: actual signed capture event accepted through public HTTPS; no double credit |
 | V4 $0.03 payout | PASS; also exercised in browser | **PASS**: actual batch SUCCESS and item SUCCESS; author balance and reservation both zero |
-| V5 Transaction Search | PASS; gross/fee/net match | **PENDING**: delayed reporting; two fresh Orders/Payouts API receipt checks VERIFIED separately |
+| V5 Transaction Search | PASS; gross/fee/net match | **PASS**: capture and outgoing transaction reported; capture fee from Search, omitted payout fee independently verified by fresh Payouts GET |
 | V6 PayPal Agent Toolkit | SKIP | SKIP: direct REST selected; Toolkit use is not claimed |
 | V7 account reset | Local reset implemented | MANUAL: PayPal account reset not executed |
 
@@ -134,9 +134,12 @@ Converting **JPY 1,000 of existing fake sandbox funds to USD 6.16** in the busin
 wallet resolved USD prefunding; a new payout succeeded. This is separate platform
 test funding, not evidence that the captured $5 became available cash immediately.
 The buyer received $5 credit, spent exactly $0.03 and retained $4.97. Actual fresh
-API reads verify the capture and outgoing payout; they **do not** upgrade pending
-Transaction Search rows to reporting matches. PayPal documents up to three hours of
-[reporting delay](https://developer.paypal.com/api/transaction-search/v1/search-get).
+API reads verified the capture and outgoing payout before delayed reporting arrived.
+Both transactions now appear in Transaction Search with matching USD amounts and
+successful status. Its payout row omits `fee_amount`; the displayed zero fee is
+independently checked using fresh Payouts GET, with that source shown explicitly.
+An absent transaction never becomes a reporting match. PayPal documents
+[optional fee fields and reporting delay](https://developer.paypal.com/api/transaction-search/v1/schema.json).
 See [actual sandbox evidence and restart instructions](docs/06-sandbox-evidence.md).
 
 A Cloudflare Quick Tunnel currently exposes the local sandbox backend for verified
@@ -229,7 +232,8 @@ For hosting, use one Node process, `HOST=0.0.0.0`, `PORT` from the host, a backe
 startup does not remove platform wake-up time. On Render free hosting, **the first
 load may take up to a minute**, and filesystem changes are ephemeral. Use free
 hosting only for an explicitly resettable mock demo; a persistent sandbox ledger
-needs durable storage. No paid backend has been provisioned.
+needs durable storage. No paid backend has been provisioned. A single-process Render Blueprint and a
+validated, non-overwriting ledger import are ready; see [cutover instructions](docs/07-hosting.md).
 
 Public information: [project](https://dotfield.xyz/apps/agentmeter/),
 [privacy](https://dotfield.xyz/apps/agentmeter/privacy/),

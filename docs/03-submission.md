@@ -132,11 +132,13 @@ package install or credentials. Actual PayPal sandbox verification also complete
 SDK v6 buyer approval, $5.00 capture, three $0.01 calls, $4.97 remaining buyer credit,
 $0.03 author earnings and a successful Payouts batch and item. A signed Webhook
 arrived through public HTTPS and did not duplicate the credit. Fresh Orders/Payouts
-API reads agree with both ledger receipts. Sandbox funds are test funds only.
+API reads agree with both ledger receipts. Transaction Search subsequently reported
+both matching transactions; the omitted outgoing fee is independently verified with
+a fresh Payouts item receipt. Sandbox funds are test funds only.
 
-**Actual sandbox limitations:** Transaction Search has not yet included the new
-capture/payout; reporting rows stay pending and fresh API verification is separately
-labeled. The $5 capture had a $0.48 fee and $4.52 net cash. The platform absorbs
+**Actual sandbox limitations:** Search omits the outgoing payout fee. A fresh Payouts
+GET verifies it with its source shown explicitly, while the capture fee comes from
+Search. Missing reporting transactions still remain pending. The $5 capture had a $0.48 fee and $4.52 net cash. The platform absorbs
 funding fees; tool credit is not cash received. An initial payout was rejected for
 insufficient USD funds, preserving author earnings. Converting JPY 1,000 of existing
 fake sandbox funds to USD 6.16 prefunded the business wallet before successful
@@ -162,8 +164,8 @@ must retain their reservation and external identity. Tool prices and budget deci
 must use exact integers, while external fees and capture receipts remain distinct
 from purchased tool credit.
 
-**Next:** Recheck Transaction Search after reporting refreshes, verify licensed Studio
-and optional Gemini, then record the English video. Durable
+**Next:** Complete durable hosting, verify licensed Studio and optional Gemini,
+then record the English video. Durable
 hosting, refunds, FX and production account onboarding are future work.
 
 Copy this draft only after updating it against the final evidence. See README for the

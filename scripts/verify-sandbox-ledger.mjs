@@ -32,7 +32,7 @@ try {
     {check:'V2',result:browserMatches?'PASS':'MANUAL',notes:browserMatches?'Recorded browser observation: Google Chrome SDK '+browser.observed_sdk_version+' approval; matching captured order':'Browser checkout observation must be recorded separately'},
     {check:'V3',result:captureEvents.length?'PASS':'PENDING',notes:'Signature-verified capture events: '+captureEvents.length+'; verified duplicate deliveries: '+duplicateEvents+'; ledger invariant checked'},
     {check:'V4',result:payoutRows.length&&payoutRows.every(confirmed)?'PASS':'FAIL',notes:'Existing payout batch/item SUCCESS, amount, receiver, transaction id and USD fee checked'},
-    {check:'V5',result:report.rows.length&&report.matched===report.rows.length?'PASS':report.rows.some(r=>r.status==='MISMATCH')?'FAIL':'PENDING',notes:report.matched+'/'+report.rows.length+' Transaction Search matches; '+report.api_verified+' fresh API verifications are separate. Reporting as of '+report.reporting_as_of},
+    {check:'V5',result:report.rows.length&&report.matched===report.rows.length?'PASS':report.rows.some(r=>r.status==='MISMATCH')?'FAIL':'PENDING',notes:report.matched+'/'+report.rows.length+' Reporting transactions reconciled; fee sources: '+[...new Set(report.rows.map(r=>r.fee_source||'Unverified'))].join(', ')+'. Reporting as of '+report.reporting_as_of},
     {check:'V6',result:'SKIP',notes:'Direct REST integration; PayPal Agent Toolkit is not claimed'},
     {check:'V7',result:'MANUAL',notes:'PayPal account reset not executed; preserve test evidence'},
     {check:'FLOW',result:flow?'PASS':'FAIL',notes:'One $5 capture, three $0.01 calls, one $0.03 successful payout; buyer $4.97, author $0, reserved $0'}

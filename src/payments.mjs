@@ -173,16 +173,22 @@ export async function reconcile(db,paypal) {
     const amount=external?.transaction_amount?.currency_code==='USD'?paypalAmountToMicro(external.transaction_amount.value):null;
     const fee=external?.fee_amount?.currency_code==='USD'?Math.abs(paypalAmountToMicro(external.fee_amount.value)):null;
     const match=external?.transaction_status==='S'&&amount===topup.amount_micro&&fee===topup.fee_micro;
-    check({id:topup.id,reference:topup.paypal_capture_id||topup.paypal_order_id,kind:'Top-up',gross_micro:topup.amount_micro,fee_micro:topup.fee_micro,net_micro:topup.amount_micro-topup.fee_micro,rail_micro:amount,status:match?'MATCH':error&&capture?'RECEIPT_ONLY':external?'MISMATCH':'PENDING_REPORT'},topup);
+    check({id:topup.id,reference:topup.paypal_capture_id||topup.paypal_order_id,kind:'Top-up',gross_micro:topup.amount_micro,fee_micro:topup.fee_micro,net_micro:topup.amount_micro-topup.fee_micro,rail_micro:amount,reporting_fee_micro:fee,fee_source:fee===null?null:'Transaction Search',status:match?'MATCH':error&&capture?'RECEIPT_ONLY':external?'MISMATCH':'PENDING_REPORT'},topup);
   }
   for(const payout of db.prepare("SELECT * FROM payouts WHERE status='SUCCESS' ORDER BY created_at DESC").all()) {
     const raw=JSON.parse(payout.raw||'{}');if(raw.seed)continue;
     const ref=raw.items?.[0]?.transaction_id;const external=transactions.get(ref);
     const amount=external?.transaction_amount?.currency_code==='USD'?paypalAmountToMicro(external.transaction_amount.value):null;
     const fee=external?.fee_amount?.currency_code==='USD'?Math.abs(paypalAmountToMicro(external.fee_amount.value)):null;
-    check({id:payout.id,reference:ref||payout.paypal_batch_id,kind:'Payout',gross_micro:-payout.amount_micro,fee_micro:payout.fee_micro,net_micro:-payout.amount_micro-payout.fee_micro,rail_micro:amount,status:external?.transaction_status==='S'&&amount===-payout.amount_micro&&fee===payout.fee_micro?'MATCH':external?'MISMATCH':'PENDING_REPORT'},payout);
+    check({id:payout.id,reference:ref||payout.paypal_batch_id,kind:'Payout',gross_micro:-payout.amount_micro,fee_micro:payout.fee_micro,net_micro:-payout.amount_micro-payout.fee_micro,rail_micro:amount,reporting_fee_micro:fee,fee_source:fee===null?null:'Transaction Search',status:external?.transaction_status==='S'&&amount===-payout.amount_micro?(fee===payout.fee_micro?'MATCH':external.fee_amount===undefined?'PENDING_FEE':'MISMATCH'):external?'MISMATCH':'PENDING_REPORT'},payout);
   }
   // Bound network fan-out when old records fall outside the reporting window.
   await Promise.all(checks.slice(0,20).map(run=>run()));
+  // Reporting can omit a payout's optional fee. Require a fresh matching item
+  // receipt instead of assuming that an omitted fee means zero. Keep its source.
+  for(const row of rows)if(row.status==='PENDING_FEE'){
+    if(row.api_status==='VERIFIED'&&row.api_fee_micro===row.fee_micro){row.status='MATCH';row.fee_source='PayPal Payouts GET (report omitted fee)';}
+    else if(row.api_status==='MISMATCH')row.status='MISMATCH';
+  }
   return {source:paypal.mode==='mock'?'Mock PayPal reporting (simulated)':source,error,rows,matched:rows.filter(r=>r.status==='MATCH').length,api_verified:rows.filter(r=>r.api_status==='VERIFIED').length,reporting_as_of:remote.last_refreshed_datetime||remote.end_date||null};
 }
