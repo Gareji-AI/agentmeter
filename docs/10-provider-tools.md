@@ -140,3 +140,11 @@ PENDING_REPORT. Without it, every rail receipt must independently match Transact
 Search. Reporting can advance between restart snapshots; permanent receipt identities,
 amounts and fees must remain the same. Tests: **79 passing**; the legacy demo,
 personal workspace and provider mock verification commands also pass.
+
+## Later actual-model filming
+
+The direct-transport evidence above remains historical. A later filmed Codex
+`gpt-6.1-sol` run executed three synthetic invoice calls across two model turns.
+Buyer credit moved from $4.94 to $4.91, and this provider earned $0.03. Those new
+earnings remain unpaid. The privacy-filtered capture uses a three-input MCP gateway
+with fixed execution IDs and one-cent maximum prices. See [filming evidence](12-live-codex-filming.md).

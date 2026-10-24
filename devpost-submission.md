@@ -70,8 +70,11 @@ and `complete_task` tools. The visible chat records delegation and hand-back.
 The workspace combines a forest theme, a custom exact-USD receipt widget, editable
 layout and AG Grid custom money/status cells. It is a working analytics workflow.
 
-Models never select prices, approve transfers or change balances. The buyer's
-three-call plan is scripted. Other Gemini adapters exist, but live budget,
+Models do not set prices or approve PayPal transfers. A filmed Codex model run
+requests three hosted tool calls; deterministic gateway checks reserve and settle
+their charges. A local capture gateway binds three approved inputs to stable
+execution IDs and a one-cent price cap. The offline buyer plan remains scripted.
+Other Gemini adapters exist, but live budget,
 narration and classification inference are not represented as verified; the
 recording profile uses deterministic behavior for those paths.
 
@@ -150,10 +153,13 @@ alone does not satisfy that requirement.
 
 YouTube URL: **pending presenter face/voice recording, composition, final inspection and public upload**.
 Actual Chrome screens are recorded and edited to a measured 170-second silent 1080p master.
-Recorded outline: 0:00 overview; 0:08 provider registration/test/publication;
-0:36 three actual scripted Codex MCP calls and receipts; 1:00 zero-charge failure;
-1:10 own mock payout; 1:24 mock reconciliation; 1:36 real Gemini/Studio and themed
-Grid; 2:20 separate completed hosted sandbox evidence; 2:42 close; end at 2:50.
+Revised outline: 0:00 overview; 0:06 local provider registration/test/publication;
+0:26 actual Codex model calls the hosted registered tool, buyer $4.94 → $4.91 and
+provider $0 → $0.03; 1:10 separate local zero-charge failure; 1:18 mock payout;
+1:32 mock reconciliation; 1:40 real Gemini/Studio and themed Grid; 2:24 earlier
+completed hosted sandbox payout evidence; 2:42 close; end at 2:50. The filtered
+Codex capture client shows actual results and receipts, across two model turns
+with idle waits cut. New hosted earnings remain unpaid.
 English narration and shot actions: `docs/01-demo-script.md`.
 
 ## Screenshot Shot List
@@ -213,3 +219,15 @@ upstreams run on this same backend and are publicly free demonstration endpoints
 The original capture and payout remain Transaction Search matches. The new payout
 is independently verified through fresh Payouts GET and remains visibly pending in
 Transaction Search. See `docs/10-provider-tools.md` for the exact evidence boundary.
+
+## Actual-model tool-use filming update
+
+A later bounded capture used the real `gpt-6.1-sol` model through installed Codex
+app-server. Across two ephemeral model turns, three synthetic invoices reached the
+registered HTTP API through MCP and settled for 30000 micro-USD total. Buyer credit
+changed from $4.94 to $4.91 and that provider earned $0.03; hosted receipt reads
+independently confirm all three IDs. There was no new capture or payout in this
+take. The app-server client is our local privacy-filtered filming UI, not the stock
+Codex application UI. The source label discloses shortened waits and two turns.
+This verifies model execution of a requested tool, not autonomous price selection
+or payment approval. See `docs/12-live-codex-filming.md`.

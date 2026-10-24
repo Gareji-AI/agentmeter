@@ -89,7 +89,9 @@ re-researches them.
 
 AgentMeter meters deterministic tool execution and transfers internal credits to
 one author account. It uses PayPal for prepaid funding, accumulated author payouts
-and independent reporting. The buyer demo is scripted; agents do not negotiate.
+and independent reporting. The offline buyer plan is scripted; the later filmed
+Codex model executes a requested hosted tool under a bounded three-cent allowance.
+Agents do not negotiate prices or approve PayPal transfers.
 There is no implemented platform/author revenue split, autonomous payment approval
 or ACP integration. Do not quote broader inspiration examples as shipped behavior.
 AG Grid is the single intended sponsor target; other used tools belong in the

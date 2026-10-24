@@ -4,7 +4,9 @@
 
 - [x] Record actual Chrome interactions using a new isolated mock ledger.
 - [x] Register/test/publish a one-cent invoice API; retain the original source clips.
-- [x] Verify actual scripted Codex MCP client execution, three receipts, free retry and zero-charge failure.
+- [x] Preserve the earlier direct Codex transport proof, free retry and mock zero-charge failure.
+- [x] Record actual gpt-6.1-sol tool calls across two ephemeral turns, hosted $4.94 → $4.91 / provider $0 → $0.03, and independently read all three stored receipts.
+- [x] Replace the scripted transport scene with the privacy-filtered live model client; label two turns, cut waits and separate mock/past payout sources.
 - [x] Show the new provider's own $0.03 mock payout and two simulated rail matches.
 - [x] Capture actual Gemini intent, Studio Page-agent delegation/hand-back, generated chart, custom receipt and themed Grid.
 - [x] Capture a separate, read-only real PayPal sandbox success and honest pending Search status.
@@ -24,9 +26,9 @@
 - [ ] Put the presenter in the lower-right corner and adjust placement wherever money/receipt evidence would be covered.
 - [ ] Play the entire composed video with sound and captions. Check reading size, voice level, privacy and every narrated outcome.
 - [ ] Measure the entire final export, including titles/closing, below 180 seconds. The silent master's duration is not proof of a future composite's duration.
-- [ ] Keep simulated money, real model execution, direct scripted Codex transport and the separate actual sandbox evidence clearly distinguished.
+- [ ] Keep actual hosted Codex credit consumption, separate mock scenes and the earlier completed sandbox payout clearly distinguished. New hosted earnings remain unpaid.
 - [ ] Publicly upload the inspected English video to YouTube only in the separately authorized publishing step; verify signed-out playback.
 - [ ] Complete source-release/judge-access and live Devpost-form checks. No public repository visibility change or Devpost transmission is implied by filming.
 
 Reproduce the timing check with `npm run verify:recording`. The core app still passes
-79 tests. Local demo/workspace/provider proofs remain separate from any real PayPal evidence.
+81 tests. Local demo/workspace/provider proofs remain separate from any real PayPal evidence.

@@ -96,7 +96,8 @@ plus replay, cap, isolation and revocation. Global mock reporting has three matc
 the seeded operator top-up, personal top-up and author payout. Personal funding
 receipts are scoped and do not claim independent Transaction Search verification.
 Actual Codex app-server Bearer authentication and discovery of six tools were also
-verified locally and against the hosted endpoint; model-driven Codex execution has not yet been filmed/verified.
+verified locally and against the hosted endpoint. A separate actual-model filming run
+now verifies three hosted registered-tool calls; see [live Codex evidence](docs/12-live-codex-filming.md).
 See [workspace evidence and usage](docs/09-personal-workspaces.md).
 
 ## Register your own paid API or MCP tool
@@ -130,7 +131,10 @@ This starts an isolated mock ledger, registers/tests/publishes both HTTP and MCP
 runs three paid calls, proves replay/failure charge zero, pays the new provider
 $0.03, and matches both mock rail receipts. On Render, the installed Codex MCP client
 also ran API → MCP → API; a real sandbox $0.03 payout succeeded and survived restart.
-This is direct Codex transport verification, without a model turn. See [provider protocol and evidence](docs/10-provider-tools.md).
+That earlier check used direct transport without a model turn. A later filmed
+`gpt-6.1-sol` run made three successful calls through a bounded MCP capture gateway:
+buyer $4.94 → $4.91 and provider $0 → $0.03. These new earnings remain unpaid.
+See [provider evidence](docs/10-provider-tools.md) and [actual-model filming](docs/12-live-codex-filming.md).
 
 ## Record the English demo
 
@@ -138,8 +142,10 @@ The [2:50 script](docs/01-demo-script.md), [voiceover](docs/demo-voiceover.txt),
 [filming checklist](docs/08-recording-checklist.md) and
 [English Devpost draft](devpost-submission.md) are prepared. Actual Chrome screen
 footage has now been recorded and cut to a measured **170-second silent 1080p master**.
-It includes provider registration, actual scripted Codex MCP receipts, mock payout/
-reconciliation, real Gemini/Studio and a separate completed PayPal sandbox evidence scene.
+The revised cut includes provider registration, actual Codex model-driven calls and
+hosted receipts, separate mock payout/reconciliation, real Gemini/Studio and an earlier
+completed PayPal sandbox payout. Its Codex capture client hides private fields and
+labels the two model turns and shortened waits. It also has a standalone 44-second clip.
 The [presenter packet](docs/video/presenter-guide-ja.md) includes English copy and
 an offline rehearsal player. Real presenter footage/narration, final composition,
 public YouTube upload, judge access and the live Devpost form check remain open.
