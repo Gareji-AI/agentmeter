@@ -10,6 +10,7 @@ import { toMicro } from './money.mjs';
 import { handleMcp } from './mcp.mjs';
 import { bodyJson, bodyText, json, validOrigin } from './http.mjs';
 import { renderPage } from './views/index.mjs';
+import { interpretWidget,interpretBudget,narrate,classifySyntheticHistory } from './ai.mjs';
 
 const equal=(a,b)=>typeof a==='string'&&typeof b==='string'&&Buffer.byteLength(a)===Buffer.byteLength(b)&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
 
@@ -103,7 +104,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
       if(path.startsWith('/api/')&&req.method==='POST'&&!req.headers['content-type']?.startsWith('application/json'))return json(res,415,{error:'Use application/json'});
       if(path==='/api/state'&&req.method==='GET') {
         if(!operator(req))return json(res,401,{error:'Sign in to the demo'});
-        assertLedger(db);return json(res,200,{...snapshot(db,paypal),payoutMode:env.PAYOUT_MODE==='dry-run'&&paypal.mode!=='mock'?'dry-run':'sandbox',clientId:paypal.mode==='live'?paypal.config.clientId:null});
+        assertLedger(db);return json(res,200,{...snapshot(db,paypal),aiEnabled:Boolean(env.GEMINI_API_KEY),payoutMode:env.PAYOUT_MODE==='dry-run'&&paypal.mode!=='mock'?'dry-run':'sandbox',clientId:paypal.mode==='live'?paypal.config.clientId:null});
       }
       if(path==='/api/call'&&req.method==='POST') {
         const buyer=account(req,'consumer');const input=await bodyJson(req);
@@ -118,8 +119,26 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
       }
       if(path==='/api/budget'&&req.method==='POST') {
         const buyer=account(req,'consumer');const input=await bodyJson(req);
-        const intent=parseBudget(db,input.text);const id=setBudget(db,buyer.id,intent);
-        return json(res,200,{id,intent,source:'validated rule parser'});
+        if(typeof input.text!=='string'||input.text.length>500)throw new MeteringError(-32602,'Enter a short budget instruction');
+        const intent=await interpretBudget(env,input.text,db.prepare('SELECT * FROM tools').all(),()=>parseBudget(db,input.text));const id=setBudget(db,buyer.id,intent);
+        return json(res,200,{id,intent,source:env.GEMINI_API_KEY?'validated budget intent':'validated rule parser'});
+      }
+      if(path==='/api/widget'&&req.method==='POST') {
+        if(!operator(req))return json(res,401,{error:'Sign in to the demo'});
+        const input=await bodyJson(req);
+        return json(res,200,await interpretWidget(env,input.text,db.prepare('SELECT name,slug FROM tools').all()));
+      }
+      if(path==='/api/narrate'&&req.method==='POST') {
+        const buyer=account(req,'consumer');const input=await bodyJson(req);
+        if(!Array.isArray(input.call_ids)||input.call_ids.length>3)throw new MeteringError(-32602,'At most three call ids are supported');
+        const calls=input.call_ids.map(id=>db.prepare("SELECT price_micro,author_credit_micro FROM calls WHERE id=? AND account_id=? AND status='SETTLED'").get(id,buyer.id));
+        if(calls.some(c=>!c))throw new MeteringError(-32602,'Unknown settled call');
+        return json(res,200,await narrate(env,{calls:calls.length,total_micro:calls.reduce((n,c)=>n+c.price_micro,0),author_credit_micro:calls.reduce((n,c)=>n+c.author_credit_micro,0)}));
+      }
+      if(path==='/api/classify'&&req.method==='POST') {
+        if(!operator(req))return json(res,401,{error:'Sign in to the demo'});
+        await bodyJson(req);const samples=db.prepare("SELECT t.name tool_name,t.description,MIN(c.request_args) example FROM tools t JOIN calls c ON c.tool_id=t.id WHERE c.id LIKE 'seed_call_%' GROUP BY t.id").all();
+        return json(res,200,await classifySyntheticHistory(env,samples));
       }
       if(path==='/api/topup'&&req.method==='POST') {
         const buyer=account(req,'consumer');const input=await bodyJson(req);
