@@ -32,6 +32,11 @@ remain available. These keys authorize evaluation only, not commercial productio
 
 Chart axes retain integer micro-USD; captions state the unit. Money tooltips and
 the receipt use exact USD formatting. Counts and monetary mappings are distinguished.
+Recording rehearsal subsequently pinned numeric chart-axis formatting to avoid
+browser-locale compact suffixes (such as Japanese 万) in an English demo. The
+pinned Studio chart wrapper passes widget options through to AG Charts; its
+[formatter API](https://www.ag-grid.com/charts/javascript/formatters/) supports
+the explicit x/y callbacks. Chrome verified the generated chart after this change.
 The custom runner uses Studio's shipped harness, delegation, Page agent definition,
 tools and chat events. This initial analytics check used the deterministic rule
 parser. Subsequent Gemini widget inference was verified separately; see

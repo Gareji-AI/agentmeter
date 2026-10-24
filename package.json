@@ -24,7 +24,9 @@
     "verify:demo": "node scripts/smoke.mjs",
     "verify:sandbox:ledger": "node scripts/verify-sandbox-ledger.mjs",
     "verify:deployment": "node scripts/verify-deployment.mjs",
-    "verify:ai": "node scripts/verify-ai.mjs"
+    "verify:ai": "node scripts/verify-ai.mjs",
+    "demo:record": "node scripts/recording.mjs",
+    "verify:recording": "node scripts/verify-recording.mjs"
   },
   "dependencies": {},
   "files": [

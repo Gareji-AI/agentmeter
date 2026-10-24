@@ -1,0 +1,17 @@
+AgentMeter gives agent tool calls a spending limit and a receipt. This take uses simulated funds for the money flow and real Gemini for analytics.
+
+One click runs a scripted three-call plan. Each call costs one cent. The ledger reserves before execution, settles successful calls, and credits the author. Five dollars becomes four ninety-seven; the author earns three cents.
+
+This deliberately failing tool releases its reservation. The buyer stays at four ninety-seven, and the receipt says released with zero charge. Retries reuse receipts.
+
+The author can now pay out the three cents. This take uses the mock payment rail. A successful batch and item receipt reduce the author balance to zero.
+
+Reconciliation matches the funding and payout receipts. Gross credit, fees, and net cash stay separate. These two matches are simulated here; the separate PayPal sandbox evidence uses actual sandbox APIs.
+
+Now I ask: plot what I paid each calendar day during the current month. Gemini Flash-Lite turns that wording into a structured intent. The server validates the metric, grouping, period, and tool. Our custom analyst delegates to Studio’s Page agent, which adds the chart and returns the task. The source explicitly names Gemini.
+
+This is our own receipt widget, alongside the themed Grid and custom money and status cells. I can resize the Studio layout. Charting reads the ledger; it never moves funds.
+
+This separate, completed PayPal sandbox run shows two independent reporting matches: capture and author payout. Signed webhook redelivery and a service restart preserved the same balances and receipt identities.
+
+Clone and run npm start. No package installation. AgentMeter: meter, settle, verify.

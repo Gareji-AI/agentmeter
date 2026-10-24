@@ -30,15 +30,27 @@ rejection bodies are distinguished from ambiguous transport and batch-lookup err
 The SDK is not installed as an AgentMeter dependency. The Context Plugin supported
 implementation review; no PayPal MCP connection or SDK runtime usage is claimed.
 
-## Verification boundaries
+## Verification progression
 
-- Local browser: three $0.01 calls changed $5.00 to $4.97, credited $0.03 to the
-  provider, completed a simulated payout, and showed two matching external mock rows.
-- Actual PayPal sandbox: app/OAuth/Reporting accessible; order created; payout
-  rejected with HTTP 422 `INSUFFICIENT_FUNDS`. Seller funding was JPY, while the
-  integration requires USD. Capture approval, webhook delivery and actual USD payout
-  success remain unproven.
-- AG Studio and Gemini: adapters implemented; no license/API key supplied, so no
-  successful licensed Studio session or model response is claimed.
-- Raw sandbox evidence is local under ignored `data/verification/`; credentials,
-  account passwords, access tokens and private account records are not published.
+Initial checks found HTTP 422 `INSUFFICIENT_FUNDS` because the sandbox wallet held
+JPY and the integration requires USD. At that point capture/webhook/payout success,
+licensed Studio and real Gemini had not yet been proven. Those were historical
+blockers, not the final state.
+
+Subsequent evidence supersedes those early boundaries:
+
+- [PayPal sandbox](06-sandbox-evidence.md): USD prefunding, SDK v6 buyer approval,
+  $5 capture, three one-cent calls, successful $0.03 payout, signed webhook replay
+  and both independent Transaction Search matches, with an explicit payout fee source.
+- [Hosting](07-hosting.md): stable Render HTTPS, persistent SQLite disk, webhook
+  destination switch and unchanged balances/receipt identities after restart.
+- [Analytics](04-analytics-verification.md): actual licensed Grid/Studio, theme,
+  custom receipt/cells, layout resize and framework delegation/hand-back in Chrome.
+- [Gemini](05-gemini-verification.md): actual structured widget intent locally and
+  on Render. Other live model paths remain outside the verified scope.
+- [Recording](08-recording-checklist.md): isolated mock money rehearsal with real
+  Gemini/Studio, without writing the archived or hosted sandbox ledger.
+
+Raw evidence remains under ignored `data/verification/` and `data/recordings/`.
+Credentials, account passwords, access tokens and private account records are not
+published. A prepared script is not an exported video or a delivered Devpost entry.

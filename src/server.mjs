@@ -42,6 +42,7 @@ export function parseBudget(db,text) {
 }
 
 export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.PUBLIC_BASE_URL||env.RENDER_EXTERNAL_URL||`http://localhost:${env.PORT||8787}`,render}={}) {
+  const generalAiEnv=env.GEMINI_WIDGETS_ONLY==='1'?{...env,GEMINI_API_KEY:''}:env;
   const config=paypalConfigFromEnv(env);
   db ||= openDb(env.DATABASE_PATH||`data/agentmeter-${config.mode==='mock'?'mock':'sandbox'}.sqlite`);
   paypal ||= createPayPal(env,{db});
@@ -105,7 +106,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
       if(path.startsWith('/api/')&&req.method==='POST'&&!req.headers['content-type']?.startsWith('application/json'))return json(res,415,{error:'Use application/json'});
       if(path==='/api/state'&&req.method==='GET') {
         if(!operator(req))return json(res,401,{error:'Sign in to the demo'});
-        assertLedger(db);return json(res,200,{...snapshot(db,paypal),aiEnabled:Boolean(env.GEMINI_API_KEY),payoutMode:env.PAYOUT_MODE==='dry-run'&&paypal.mode!=='mock'?'dry-run':'sandbox',clientId:paypal.mode==='live'?paypal.config.clientId:null});
+        assertLedger(db);return json(res,200,{...snapshot(db,paypal),aiEnabled:Boolean(generalAiEnv.GEMINI_API_KEY),widgetAiEnabled:Boolean(env.GEMINI_API_KEY),payoutMode:env.PAYOUT_MODE==='dry-run'&&paypal.mode!=='mock'?'dry-run':'sandbox',clientId:paypal.mode==='live'?paypal.config.clientId:null});
       }
       if(path==='/api/call'&&req.method==='POST') {
         const buyer=account(req,'consumer');const input=await bodyJson(req);
@@ -121,8 +122,8 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
       if(path==='/api/budget'&&req.method==='POST') {
         const buyer=account(req,'consumer');const input=await bodyJson(req);
         if(typeof input.text!=='string'||input.text.length>500)throw new MeteringError(-32602,'Enter a short budget instruction');
-        const intent=await interpretBudget(env,input.text,db.prepare('SELECT * FROM tools').all(),()=>parseBudget(db,input.text));const id=setBudget(db,buyer.id,intent);
-        return json(res,200,{id,intent,source:env.GEMINI_API_KEY?'validated budget intent':'validated rule parser'});
+        const intent=await interpretBudget(generalAiEnv,input.text,db.prepare('SELECT * FROM tools').all(),()=>parseBudget(db,input.text));const id=setBudget(db,buyer.id,intent);
+        return json(res,200,{id,intent,source:generalAiEnv.GEMINI_API_KEY?'validated budget intent':'validated rule parser'});
       }
       if(path==='/api/widget'&&req.method==='POST') {
         if(!operator(req))return json(res,401,{error:'Sign in to the demo'});
@@ -134,12 +135,12 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
         if(!Array.isArray(input.call_ids)||input.call_ids.length>3)throw new MeteringError(-32602,'At most three call ids are supported');
         const calls=input.call_ids.map(id=>db.prepare("SELECT price_micro,author_credit_micro FROM calls WHERE id=? AND account_id=? AND status='SETTLED'").get(id,buyer.id));
         if(calls.some(c=>!c))throw new MeteringError(-32602,'Unknown settled call');
-        return json(res,200,await narrate(env,{calls:calls.length,total_micro:calls.reduce((n,c)=>n+c.price_micro,0),author_credit_micro:calls.reduce((n,c)=>n+c.author_credit_micro,0)}));
+        return json(res,200,await narrate(generalAiEnv,{calls:calls.length,total_micro:calls.reduce((n,c)=>n+c.price_micro,0),author_credit_micro:calls.reduce((n,c)=>n+c.author_credit_micro,0)}));
       }
       if(path==='/api/classify'&&req.method==='POST') {
         if(!operator(req))return json(res,401,{error:'Sign in to the demo'});
         await bodyJson(req);const samples=db.prepare("SELECT t.name tool_name,t.description,MIN(c.request_args) example FROM tools t JOIN calls c ON c.tool_id=t.id WHERE c.id LIKE 'seed_call_%' GROUP BY t.id").all();
-        return json(res,200,await classifySyntheticHistory(env,samples));
+        return json(res,200,await classifySyntheticHistory(generalAiEnv,samples));
       }
       if(path==='/api/topup'&&req.method==='POST') {
         const buyer=account(req,'consumer');const input=await bodyJson(req);
@@ -178,7 +179,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
         if(!authenticated&&paypal.mode==='mock'){establish(res);authenticated=true;}
         const data=authenticated?snapshot(db,paypal):{};
         const rendering=render||renderPage;
-        const html=await rendering(path,{...data,authenticated,report:authenticated&&path==='/reconcile'?await reconcile(db,paypal):null,mode:paypal.mode==='mock'?'mock':'sandbox',payoutMode:env.PAYOUT_MODE||'sandbox',clientId:paypal.mode==='live'?paypal.config.clientId:null,query:Object.fromEntries(url.searchParams),studioLicense:authenticated&&path==='/grid'?availableAnalyticsLicense(env.AG_STUDIO_LICENSE_KEY):'',gridLicense:authenticated&&path==='/grid'?availableAnalyticsLicense(env.AG_GRID_LICENSE_KEY):'',geminiConfigured:Boolean(env.GEMINI_API_KEY)});
+        const html=await rendering(path,{...data,authenticated,report:authenticated&&path==='/reconcile'?await reconcile(db,paypal):null,mode:paypal.mode==='mock'?'mock':'sandbox',payoutMode:env.PAYOUT_MODE||'sandbox',clientId:paypal.mode==='live'?paypal.config.clientId:null,query:Object.fromEntries(url.searchParams),studioLicense:authenticated&&path==='/grid'?availableAnalyticsLicense(env.AG_STUDIO_LICENSE_KEY):'',gridLicense:authenticated&&path==='/grid'?availableAnalyticsLicense(env.AG_GRID_LICENSE_KEY):'',geminiConfigured:Boolean(env.GEMINI_API_KEY),geminiGeneralConfigured:Boolean(generalAiEnv.GEMINI_API_KEY)});
         res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});return res.end(html);
       }
       return json(res,404,{error:'Not found'});

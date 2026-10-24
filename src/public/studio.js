@@ -52,7 +52,9 @@ export async function enableStudio({licenseKey,gridLicense,data}) {
   document.querySelector('#studio-panel').hidden=false;
   studio=ag.createStudio(document.querySelector('#ag-studio'),{
     mode:'edit',data:source(data),theme:ag.studioTheme.withParams({accentColor:'#156e5d',backgroundColor:'#ffffff',foregroundColor:'#172c2b',textColor:'#172c2b',subtleTextColor:'#546966',borderColor:'#dce4e1',fontFamily:'system-ui',chartPaletteFills1Color:'#156e5d',chartPaletteStrokes1Color:'#156e5d'}),
-    widgets:()=>ag.createWidgets({additionalTypes:[custom],menu:[...base.menu,{label:'AgentMeter',widgetIds:['metered-receipt']}]}),
+    // Chart options pass through to AG Charts. Pin display formatting for English recordings;
+    // Studio's default compact formatter inherits the browser locale (for example, 万).
+    widgets:()=>ag.createWidgets({overrides:[{id:'column-chart-grouped',options:{formatter:{x:({value})=>value instanceof Date?value.toISOString().slice(0,10):String(value),y:({value})=>String(value)}}}],additionalTypes:[custom],menu:[...base.menu,{label:'AgentMeter',widgetIds:['metered-receipt']}]}),
     initialState:{pages:[{id:'usage',widgets:{receipt:{type:'metered-receipt',dataMapping:{value:[{id:'usage.spend_micro',aggregation:'sum'}]}}},widgetLayout:{receipt:{xTrack:0,yTrack:0,xSpan:24,ySpan:9}}}],selectedPageId:'usage',panels:{filters:{collapsed:true},edit:{collapsed:true},data:{collapsed:true},ai:{collapsed:false,width:300}}},
     ai:({api:studioApi})=>{
       harness=ag.createAiHarness(studioApi,({builtIn,tools})=>({

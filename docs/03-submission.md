@@ -85,94 +85,28 @@ concrete instead of a claim.
 AG Grid remains the sponsor target; Render now hosts the persistent sandbox backend. The rest are recorded so nobody
 re-researches them.
 
-## 6. PayPal's own "Inspiration" list — direct hit
+## 6. Position the implemented product accurately
 
-The resources page names, under *AI Agents or Automation*:
+AgentMeter meters deterministic tool execution and transfers internal credits to
+one author account. It uses PayPal for prepaid funding, accumulated author payouts
+and independent reporting. The buyer demo is scripted; agents do not negotiate.
+There is no implemented platform/author revenue split, autonomous payment approval
+or ACP integration. Do not quote broader inspiration examples as shipped behavior.
+AG Grid is the single intended sponsor target; other used tools belong in the
+Tools inventory without implying multiple sponsor awards.
 
-> "two agents negotiating and settling a payment between themselves (**agent-to-agent
-> commerce**)"
+## 7. Canonical English submission copy
 
-and under *Business Solutions*:
+The finalized local draft is [devpost-submission.md](../devpost-submission.md).
+It includes the product story, actual AI and Codex usage, judge testing instructions,
+links, screenshot plan, evidence boundaries and explicit remaining asset/access steps.
+The timed English video plan is [01-demo-script.md](01-demo-script.md), with the
+[recording/export checklist](08-recording-checklist.md).
 
-> "a marketplace checkout flow that **splits payment automatically between a platform and
-> its sellers**"
-
-AgentMeter is both of those at once: a metered, agent-to-agent payment rail that splits
-each call's price between the platform and the tool author. **Quote these two lines in the
-submission text.** It is the cheapest possible evidence that the project is on-brief.
-
-Also confirmed as first-class docs the judges will recognise:
-PayPal JavaScript SDK v6, REST API, Payouts, Disputes, Subscriptions, Invoicing, Webhooks,
-PayPal MCP server quickstart, Agent tools reference, `github.com/paypal/AI-Toolkit`.
-
-## 7. English submission draft — implemented scope
-
-**Title:** AgentMeter
-
-**Tagline:** Every agent tool call gets a price, a budget check, and a receipt.
-
-**Problem and audience:** Developers publishing small AI tools need usage accounting
-that works below a conventional checkout's useful granularity. Agent developers need
-to bound spending and explain what each result cost. AgentMeter brings both sides
-into one inspectable ledger.
-
-**What it does:** A consumer prepays tool credit, an agent calls deterministic tools,
-and AgentMeter reserves, executes, then settles or releases each charge. A repeated
-request replays its result rather than charging again. Monthly caps include reserved
-funds. Authors accumulate earnings and request a payout. A separate reconciliation
-screen compares ledger entries with external receipts and exposes fees.
-
-**Why PayPal is central:** Orders creates and captures prepaid funding; Payouts sends
-accumulated author earnings; Transaction Search supplies the independent comparison;
-verified webhooks provide an idempotent event path. PayPal is the funding and payout
-rail, rather than a decorative checkout beside an unrelated application.
-
-**What is proven:** A local simulation runs with Node 26 and `npm start`, without a
-package install or credentials. Actual PayPal sandbox verification also completed:
-SDK v6 buyer approval, $5.00 capture, three $0.01 calls, $4.97 remaining buyer credit,
-$0.03 author earnings and a successful Payouts batch and item. A signed Webhook
-arrived through public HTTPS and did not duplicate the credit. Fresh Orders/Payouts
-API reads agree with both ledger receipts. Transaction Search subsequently reported
-both matching transactions; the omitted outgoing fee is independently verified with
-a fresh Payouts item receipt. Sandbox funds are test funds only.
-
-**Actual sandbox limitations:** Search omits the outgoing payout fee. A fresh Payouts
-GET verifies it with its source shown explicitly, while the capture fee comes from
-Search. Missing reporting transactions still remain pending. The $5 capture had a $0.48 fee and $4.52 net cash. The platform absorbs
-funding fees; tool credit is not cash received. An initial payout was rejected for
-insufficient USD funds, preserving author earnings. Converting JPY 1,000 of existing
-fake sandbox funds to USD 6.16 prefunded the business wallet before successful
-payout. The backend now runs on Render with a persistent SQLite disk, stable HTTPS and
-operator-token access. Signed Webhook redelivery and restart persistence are proven.
-
-**Tools used:** Native Node.js 26, `node:sqlite`, native fetch, `node:test`; PayPal Orders,
-Payouts, Transaction Search, Webhook Verification REST and optional JS SDK v6 approval;
-MCP Streamable HTTP; Codex; APIMatic Context Plugin for PayPal as a source-grounded
-coding reference (native REST remains the runtime). Dotfield/Cloudflare hosts public
-information pages. Render hosts the Node sandbox and persistent SQLite ledger.
-
-**Optional AI and analytics:** Gemini adapters for constrained intent, narration and
-synthetic labels are implemented, with deterministic fallbacks. Gemini 3.5 Flash-Lite
-widget interpretation was verified via direct API, local Chrome and Render using
-three structured-intent checks; the ledger remained unchanged. Other live model
-paths remain unverified. AG Grid 36.2.0 and AG Studio 3.0.0
-adapters implement theming, custom cells, a receipt widget, layout and a custom Studio
-agent delegating to the built-in Page agent. Licensed execution was verified locally
-and on Render in Chrome on 2026-10-24: exact receipt totals, month-filtered charts,
-chat-driven delegation and task hand-back, custom cells, and layout resizing. The
-runner validates Gemini intent and retains rule-based fallback. Absent or expired trials
-retain the offline table, CSV and rule-driven widgets. See analytics verification.
-
-**What we learned:** A timeout is not a failed transfer. Unresolved payout requests
-must retain their reservation and external identity. Tool prices and budget decisions
-must use exact integers, while external fees and capture receipts remain distinct
-from purchased tool credit.
-
-**Next:** Record the English video with verified Studio and Gemini widget interpretation.
-Refunds, FX, high availability and production account onboarding are future work.
-
-Copy this draft only after updating it against the final evidence. See README for the
-full Tools inventory and `01-demo-script.md` for the under-three-minute recording plan.
+Devpost authentication was unavailable during this final preparation pass. The
+live form, current requirements and exact field limits have not been rechecked;
+the historical strategy notes above are not a substitute. Nothing has been sent.
+The actual public video URL and judge access remain to be supplied.
 
 ## 8. Submission checklist (tick at submit time)
 
@@ -193,9 +127,10 @@ full Tools inventory and `01-demo-script.md` for the under-three-minute recordin
 - Trial dates are explicit: Grid/Charts expires 2026-11-23; Studio expires 2026-12-08.
   Do not assume the judging window fits either trial. The server suppresses expired
   keys and `/grid` retains its plain table, CSV and rule-driven widgets.
-- Render free instances sleep. A judge clicking a cold URL and waiting 50 seconds is a
-  Design score risk. Mitigation: keep the app's cold start under a second with no heavy
-  imports, and say "first load may take up to a minute" in the README.
+- The current sandbox uses a paid Render instance and persistent 1 GB disk, with
+  a base estimate of $7.25/month. A free-instance alternative sleeps and has
+  ephemeral storage; do not describe it as the deployed configuration. A deployment
+  or restart may briefly interrupt requests. See `07-hosting.md`.
 
 ## 10. Public website and information URLs
 

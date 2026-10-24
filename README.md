@@ -44,12 +44,32 @@ PAYPAL_MODE=mock PORT=8788 npm start
 
 Existing `.env` credentials select sandbox unless `PAYPAL_MODE=mock` is explicit.
 Modes use separate SQLite files under ignored `data/`, and reject a database marked
-for the other mode. Seed is idempotent. To prepare another fresh demo without
-changing existing data:
+for the other mode. Seed is idempotent.
+
+## Record the English demo
+
+The [2:50 script](docs/01-demo-script.md), [voiceover](docs/demo-voiceover.txt),
+[filming checklist](docs/08-recording-checklist.md) and
+[English Devpost draft](devpost-submission.md) are prepared. Actual video recording,
+public YouTube upload, judge access and the live Devpost form check remain open.
 
 ```sh
-PAYPAL_MODE=mock DATABASE_PATH=data/recording-1.sqlite npm start
+npm run verify:recording
+npm run demo:record
 ```
+
+The recording launcher needs a private Gemini key and active Grid/Studio licenses.
+It prints a free loopback URL and creates a **fresh mock ledger for every take**,
+even if `.env` points to the hosted sandbox archive. Sandbox payment credentials,
+hosted origin and payout settings are overridden. Real Gemini is used only for
+widget intent in this profile; the other AI surfaces stay deterministic. The
+rehearsal and the final take never share a ledger. Stop a take with Ctrl-C and
+launch again; files remain under ignored `data/recordings/` for inspection.
+
+The no-key offline demo still uses `npm start` from a clean clone. When an existing
+`.env` defines a hosted URL, explicitly override both origin and port for local use;
+never open a sandbox archive as a mock database. `verify:recording` checks the
+script's word/time budget, not the duration of an actual exported file.
 
 To erase the selected **mock** ledger, stop its server first, then run
 `PAYPAL_MODE=mock npm run reset -- --confirm`. This command never resets sandbox.
