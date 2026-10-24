@@ -22,6 +22,13 @@ payout footage. See [retake evidence](13-full-demo-retake.md).
 
 ## Record the presenter
 
+The [provisional edit](14-narrated-demo-edit.md) is now available for rehearsal:
+
+- [x] Open Design chapter motion and separate English caption band.
+- [x] Replaceable generic English voice; original Earshot music and eleven audited effects.
+- [x] 162-second H.264/AAC export, full decode, all source timestamps compared and separate stems retained.
+- [x] Editable source archive and reviewed proof frames retained outside Git.
+
 - [ ] Read [the Japanese filming notes](video/presenter-guide-ja.md) and rehearse with the latest offline player.
 - [ ] Record real face and English voice with lead/tail room. Chapter takes are allowed.
 - [ ] Provide original presenter files preserving microphone audio. No music.

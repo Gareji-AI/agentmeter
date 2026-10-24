@@ -164,6 +164,12 @@ stdout/stderr is streamed into a privacy-filtered Chrome terminal; its 26-second
 input-to-answer interval is continuous, at normal speed, in one invocation.
 English narration and shot actions: `docs/01-demo-script.md`.
 
+A local 2026-10-25 provisional edit adds English captions, restrained chapter
+motion made through Open Design MCP, a replaceable generic synthetic narrator,
+and an original score/effects synthesized locally with Earshot 0.4.0. It is still
+162 seconds. The participant's own face/voice will replace the rehearsal voice;
+the film has not been publicly uploaded. See `docs/14-narrated-demo-edit.md`.
+
 ## Screenshot Shot List
 
 Capture app-only English images after checking for private data:
@@ -181,8 +187,9 @@ are prepared. Chrome rehearsals verified the money loop and actual Gemini/Studio
 path. Recorded sandbox evidence covers SDK v6 approval, $5 capture, three $0.01
 calls, $0.03 successful payout, signed webhook replay, both Search matches and
 unchanged ledger identities after service restart. Raw evidence stays Git-ignored.
-The silent screen master exists; presenter footage and the final spoken composition
-do not exist yet. The live form has not been checked in this pass.
+The silent master and a narrated provisional composition exist; real presenter
+footage and the final presenter composition remain open. The live form has not
+been checked in this pass.
 
 ## Known Limitations
 

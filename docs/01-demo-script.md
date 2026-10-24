@@ -1,5 +1,9 @@
 # AgentMeter — full retake and presenter plan
 
+The [2026-10-25 provisional edit](14-narrated-demo-edit.md) adds a temporary
+English narrator, original Earshot audio and Open Design motion/captions to this
+same 162-second story. The participant's real face/voice remains a later replacement.
+
 Latest silent screen master: **162 seconds (2:42), 1920 × 1080, H.264, 30 fps**.
 All selected footage was newly recorded in Chrome on 2026-10-24. The older masters
 are archives. The updated English narration has **277 words**. Real presenter

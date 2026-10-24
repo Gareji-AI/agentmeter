@@ -153,8 +153,10 @@ terminal because native terminal automation is restricted. The actual input,
 three named MCP calls and final answer are retained continuously at normal speed.
 Fresh Gemini/Studio and the themed Grid complete the story. See [retake evidence](docs/13-full-demo-retake.md).
 The [presenter packet](docs/video/presenter-guide-ja.md) has updated English copy
-and an offline rehearsal player. Real presenter footage/narration, final composition,
-public YouTube upload, judge access and the live Devpost form check remain open.
+and an offline rehearsal player. A [provisional narrated edit](docs/14-narrated-demo-edit.md)
+adds Open Design chapter motion, English captions, a replaceable generic narrator
+and original Earshot sound. Real presenter footage/narration, public YouTube
+upload, judge access and the live Devpost form check remain open.
 
 ```sh
 npm run verify:recording
@@ -366,7 +368,13 @@ Payment routes: `/api/topup`, `/api/topup/:id/capture`, `/api/payout`,
   [development evidence](docs/04-development-evidence.md).
 - **Open Design 0.19.1 (MCP)**: five-screen audit and design-polish reference; its
   visual system was adapted into the live SSR views and browser renderers. Prototype
-  fixtures remain outside the application. See [design notes](docs/05-ui-design.md).
+  fixtures remain outside the application. A dedicated MCP project also edits the
+  162-second narrated demo with chapter motion and captions. See
+  [design notes](docs/05-ui-design.md) and [video production](docs/14-narrated-demo-edit.md).
+- **Earshot 0.4.0 (MIT)**: offline procedural music and eleven sound accents for
+  the provisional demo, with measured sync, take audits and loudness checks.
+  Generic macOS Samantha supplies replaceable rehearsal narration. These are
+  optional video-production tools, not application dependencies or runtime AI.
 - **Codex**: implementation and browser-assisted checks. **Dotfield / Cloudflare**:
   public information pages. **Render**: persistent sandbox Node backend, 1 GB SQLite
   disk, stable HTTPS, verified Webhooks and restart persistence.
