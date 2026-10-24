@@ -151,3 +151,23 @@ PayPal MCP server quickstart, Agent tools reference, `github.com/paypal/AI-Toolk
 - Render free instances sleep. A judge clicking a cold URL and waiting 50 seconds is a
   Design score risk. Mitigation: keep the app's cold start under a second with no heavy
   imports, and say "first load may take up to a minute" in the README.
+
+## 10. Public website and information URLs
+
+Use the English AgentMeter pages on Dotfield for public project information:
+
+- Website: https://dotfield.xyz/apps/agentmeter/
+- Privacy: https://dotfield.xyz/apps/agentmeter/privacy/
+- Terms: https://dotfield.xyz/apps/agentmeter/terms/
+- Support: https://dotfield.xyz/apps/agentmeter/support/
+
+The website is an information page, not a working demo. Supply a separately
+verified application URL in any submission field asking for an interactive demo.
+Webhook delivery also needs the deployed backend's HTTPS endpoint; the static
+Dotfield pages cannot receive or verify PayPal events. Keep payment credentials
+out of Dotfield source and static assets.
+
+Hosting clarification: fast Node startup does not remove Render's platform
+spin-up delay. Its free instances also lose local filesystem changes, including
+SQLite, on sleep/restart/redeploy. Use durable backend storage for persistent
+sandbox records, or explicitly identify a resettable mock-only deployment.

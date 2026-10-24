@@ -24,7 +24,7 @@ call in PayPal, and tool authors get paid out automatically.**
 | D9 | Top-up | **PayPal JS SDK v6 buttons** (client-side) + server capture | Judges click a real PayPal button. This is the strongest "PayPal is central" signal. |
 | D10 | Payouts | Payouts API, one batch at a time, dry-run flag default **off**, `sandbox` only | Live payouts need approval; sandbox only. |
 | D11 | Reconciliation | AgentMeter ledger vs PayPal Transaction Search, **explicit fee column** | Shows we understand that `order total ≠ money received`. This is the highest-credibility screen in the demo. |
-| D12 | Hosting | Render free tier (sponsor prize) + "run locally" in README | Hosted URL is the safer demo path; local instructions satisfy the rules regardless. |
+| D12 | Hosting | Public information pages on Dotfield; Node backend deployed separately, with "run locally" in README | Dotfield provides stable public URLs; the backend needs a Node runtime and durable ledger storage. Render free instances lose local SQLite data on sleep/restart, so a persistent hosted ledger requires a paid instance with a disk or another suitable host. |
 
 ## 3. Verified vs. unverified PayPal surface
 
@@ -221,3 +221,23 @@ Invariant enforced in code and asserted by a test:
   state changes is the failure mode.
 - Empty states explain what to click.
 - The three screens a judge touches are reachable from `/` in one click.
+
+## 10. Public information pages
+
+The project website and English information pages live on the existing Dotfield site:
+
+| Purpose | URL |
+|---|---|
+| Project website | https://dotfield.xyz/apps/agentmeter/ |
+| Privacy | https://dotfield.xyz/apps/agentmeter/privacy/ |
+| Terms | https://dotfield.xyz/apps/agentmeter/terms/ |
+| Support | https://dotfield.xyz/apps/agentmeter/support/ |
+
+These Astro pages are static. They are not the interactive demo or a PayPal webhook
+listener. Keep `PUBLIC_BASE_URL` pointed at the AgentMeter server, not Dotfield.
+Register `<backend HTTPS origin>/api/webhooks/paypal` once the server is deployed.
+Payment secrets stay on the backend and must never enter Dotfield's static build.
+
+Update the project website with a verified demo link when the application is ready.
+Until then, the public pages describe a prototype in development and label the
+balance example as illustrative.
