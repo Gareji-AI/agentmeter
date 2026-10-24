@@ -43,6 +43,10 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
   const config=paypalConfigFromEnv(env);
   db ||= openDb(env.DATABASE_PATH||`data/agentmeter-${config.mode==='mock'?'mock':'sandbox'}.sqlite`);
   paypal ||= createPayPal(env,{db});
+  db.exec('CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY,value TEXT NOT NULL)');
+  const storedMode=db.prepare("SELECT value FROM metadata WHERE key='payment_mode'").get()?.value;
+  if(storedMode&&storedMode!==paypal.mode)throw new Error('This database belongs to a different payment mode. Use a separate DATABASE_PATH.');
+  db.prepare("INSERT OR IGNORE INTO metadata (key,value) VALUES ('payment_mode',?)").run(paypal.mode);
   const sessions=new Map();
   const accessToken=env.DEMO_ACCESS_TOKEN||randomUUID();
   const ctx={db,paypal,publicBaseUrl,sessions,accessToken,env};
