@@ -11,13 +11,19 @@
 // decides which driver runs.
 
 import { randomUUID } from 'node:crypto';
+import { feeOf, microToPayPalAmount, paypalAmountToMicro, integer } from './money.mjs';
 
 const SANDBOX_BASE = 'https://api-m.sandbox.paypal.com';
 
 export function paypalConfigFromEnv(env = process.env) {
   const clientId = (env.PAYPAL_CLIENT_ID || '').trim();
   const clientSecret = (env.PAYPAL_CLIENT_SECRET || '').trim();
-  const configured = Boolean(clientId && clientSecret);
+  const requestedMode = env.PAYPAL_MODE || '';
+  if (requestedMode && !['mock','sandbox'].includes(requestedMode)) throw new Error('PAYPAL_MODE must be mock or sandbox');
+  if (requestedMode !== 'mock' && Boolean(clientId) !== Boolean(clientSecret)) throw new Error('Both PayPal sandbox credentials are required');
+  const configured = requestedMode !== 'mock' && Boolean(clientId && clientSecret);
+  if (requestedMode === 'sandbox' && !configured) throw new Error('Sandbox credentials are missing');
+  if (env.PAYPAL_API_BASE && env.PAYPAL_API_BASE.replace(/\/+$/, '') !== SANDBOX_BASE) throw new Error('Only PayPal sandbox API endpoints are allowed');
   return {
     configured,
     mode: configured ? 'live' : 'mock',
@@ -56,6 +62,7 @@ async function tokenFor({ clientId, clientSecret, base }, cache) {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: 'grant_type=client_credentials',
+    signal: AbortSignal.timeout(20_000),
   });
   const text = await response.text();
   if (!response.ok) {
@@ -79,7 +86,10 @@ export class PayPalError extends Error {
 // Mock driver
 // ---------------------------------------------------------------------------
 
-function createMockDriver(config) {
+function createMockDriver(config, db) {
+  db?.exec('CREATE TABLE IF NOT EXISTS mock_paypal_state (id TEXT PRIMARY KEY, payload TEXT NOT NULL)');
+  const saved = db?.prepare("SELECT payload FROM mock_paypal_state WHERE id='state'").get();
+  const restored = saved ? JSON.parse(saved.payload) : null;
   const state = {
     orders: new Map(),
     captures: new Map(),
@@ -87,18 +97,24 @@ function createMockDriver(config) {
     transactions: [],
   };
 
+  if (restored) {
+    for (const key of ['orders','captures','payouts']) state[key] = new Map(restored[key]);
+    state.transactions = restored.transactions;
+  }
+  const persist = () => db?.prepare("INSERT INTO mock_paypal_state (id,payload) VALUES ('state',?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload").run(JSON.stringify({ orders:[...state.orders], captures:[...state.captures], payouts:[...state.payouts], transactions:state.transactions }));
   const feeFor = (micro) => {
-    // Mirrors the sandbox commercial rate closely enough to make the
-    // reconciliation screen honest: percentage plus a fixed component.
-    const pct = Math.floor(micro * 0.0349);
-    const fixed = 49_000; // $0.049
-    return Math.min(micro, pct + fixed);
+    // Illustrative demo fee, not a quote of PayPal's current pricing.
+    return Math.min(micro, paypalAmountToMicro(microToPayPalAmount(feeOf(micro,349) + 490_000)));
   };
 
   return {
     mode: 'mock',
     configured: config.configured,
     async createOrder({ amountMicro, currency = 'USD', reference, description }) {
+      integer(amountMicro);
+      if (amountMicro <= 0 || amountMicro % 10_000 || currency !== 'USD') throw new Error('Orders require positive whole USD cents');
+      const existing=[...state.orders.values()].find(entry=>entry.order.purchase_units[0].reference_id===reference);
+      if(existing) return existing.order;
       const id = `MOCK-ORDER-${randomUUID().slice(0, 12).toUpperCase()}`;
       const order = {
         id,
@@ -108,7 +124,7 @@ function createMockDriver(config) {
           {
             reference_id: reference,
             description,
-            amount: { currency_code: currency, value: (amountMicro / 1_000_000).toFixed(2) },
+            amount: { currency_code: currency, value: microToPayPalAmount(amountMicro) },
           },
         ],
         links: [
@@ -119,6 +135,7 @@ function createMockDriver(config) {
         create_time: new Date().toISOString(),
       };
       state.orders.set(id, { order, amountMicro });
+      persist();
       return order;
     },
 
@@ -126,13 +143,16 @@ function createMockDriver(config) {
     async approveOrder(orderId) {
       const entry = state.orders.get(orderId);
       if (!entry) throw new PayPalError('order not found', 404, orderId);
-      entry.order.status = 'APPROVED';
+      if(entry.order.status !== 'COMPLETED') entry.order.status = 'APPROVED';
+      persist();
       return entry.order;
     },
 
     async captureOrder(orderId) {
       const entry = state.orders.get(orderId);
       if (!entry) throw new PayPalError('order not found', 404, orderId);
+      if(entry.captureResponse) return entry.captureResponse;
+      if(entry.order.status !== 'APPROVED') throw new PayPalError('Order approval required',422,'ORDER_NOT_APPROVED');
       const captureId = `MOCK-CAPTURE-${randomUUID().slice(0, 12).toUpperCase()}`;
       const fee = feeFor(entry.amountMicro);
       const net = entry.amountMicro - fee;
@@ -141,12 +161,12 @@ function createMockDriver(config) {
         status: 'COMPLETED',
         amount: {
           currency_code: 'USD',
-          value: (entry.amountMicro / 1_000_000).toFixed(2),
+          value: microToPayPalAmount(entry.amountMicro),
         },
         seller_receivable_breakdown: {
-          gross_amount: { currency_code: 'USD', value: (entry.amountMicro / 1_000_000).toFixed(2) },
-          paypal_fee: { currency_code: 'USD', value: (fee / 1_000_000).toFixed(2) },
-          net_amount: { currency_code: 'USD', value: (net / 1_000_000).toFixed(2) },
+          gross_amount: { currency_code: 'USD', value: microToPayPalAmount(entry.amountMicro) },
+          paypal_fee: { currency_code: 'USD', value: microToPayPalAmount(fee) },
+          net_amount: { currency_code: 'USD', value: microToPayPalAmount(net) },
         },
         create_time: new Date().toISOString(),
         mock: true,
@@ -158,13 +178,13 @@ function createMockDriver(config) {
           transaction_id: captureId,
           transaction_event_code: 'T0006',
           transaction_status: 'S',
-          transaction_amount: { currency_code: 'USD', value: (entry.amountMicro / 1_000_000).toFixed(2) },
-          fee_amount: { currency_code: 'USD', value: (fee / 1_000_000).toFixed(2) },
-          available_balance: { currency_code: 'USD', value: (net / 1_000_000).toFixed(2) },
+          transaction_amount: { currency_code: 'USD', value: microToPayPalAmount(entry.amountMicro) },
+          fee_amount: { currency_code: 'USD', value: microToPayPalAmount(fee) },
+          available_balance: { currency_code: 'USD', value: microToPayPalAmount(net) },
           transaction_initiation_date: new Date().toISOString(),
         },
       });
-      return {
+      entry.captureResponse = {
         id: orderId,
         status: 'COMPLETED',
         payer: { email_address: 'sb-buyer@business.example.com', payer_id: 'MOCKPAYER' },
@@ -177,9 +197,13 @@ function createMockDriver(config) {
         ],
         mock: true,
       };
+      persist();
+      return entry.captureResponse;
     },
 
     async createPayout({ items, senderBatchId, emailSubject, emailMessage }) {
+      const existing=[...state.payouts.values()].find(batch=>batch.batch_header.sender_batch_header.sender_batch_id===senderBatchId);
+      if(existing) return existing;
       const batchId = `MOCK-BATCH-${randomUUID().slice(0, 12).toUpperCase()}`;
       const batch = {
         batch_header: {
@@ -201,6 +225,8 @@ function createMockDriver(config) {
         mock: true,
       };
       state.payouts.set(batchId, batch);
+      for (const item of batch.items) state.transactions.push({transaction_info:{transaction_id:item.transaction_id,transaction_event_code:'T1503',transaction_status:'S',transaction_amount:{currency_code:'USD',value:'-'+item.payout_item.amount.value},fee_amount:{currency_code:'USD',value:'0.00'},transaction_initiation_date:new Date().toISOString()}});
+      persist();
       return batch;
     },
 
@@ -258,6 +284,7 @@ function createLiveDriver(config) {
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
+      signal: AbortSignal.timeout(20_000),
     });
     const text = await response.text();
     if (!response.ok) throw new PayPalError(`${method} ${path} failed`, response.status, text);
@@ -268,7 +295,9 @@ function createLiveDriver(config) {
     mode: 'live',
     configured: true,
     async createOrder({ amountMicro, currency = 'USD', reference, description }) {
-      const value = (amountMicro / 1_000_000).toFixed(2);
+      integer(amountMicro);
+      if (amountMicro <= 0 || amountMicro % 10_000 || currency !== 'USD') throw new Error('Orders require positive whole USD cents');
+      const value = microToPayPalAmount(amountMicro);
       return call('/v2/checkout/orders', {
         method: 'POST',
         idempotencyKey: reference,
@@ -279,6 +308,8 @@ function createLiveDriver(config) {
             brand_name: 'AgentMeter',
             user_action: 'PAY_NOW',
             shipping_preference: 'NO_SHIPPING',
+            return_url: `${config.publicBaseUrl}/paypal/return`,
+            cancel_url: `${config.publicBaseUrl}/app?checkout=cancelled`,
           },
         },
       });
@@ -336,9 +367,9 @@ function createLiveDriver(config) {
 
 // ---------------------------------------------------------------------------
 
-export function createPayPal(env = process.env) {
+export function createPayPal(env = process.env, { db } = {}) {
   const config = paypalConfigFromEnv(env);
-  const driver = config.configured ? createLiveDriver(config) : createMockDriver(config);
+  const driver = config.configured ? createLiveDriver(config) : createMockDriver(config, db);
   return { ...driver, config };
 }
 
@@ -356,6 +387,7 @@ export async function verifyWebhookSignature({ config, headers, rawBody }) {
     method: 'POST',
     headers: { Authorization: `Basic ${basic}`, 'Content-Type': 'application/x-www-form-urlencoded' },
     body: 'grant_type=client_credentials',
+    signal: AbortSignal.timeout(20_000),
   });
   if (!tokenResponse.ok) return { verified: false, reason: `token request failed: ${tokenResponse.status}` };
   const { access_token: token } = await tokenResponse.json();
@@ -372,10 +404,11 @@ export async function verifyWebhookSignature({ config, headers, rawBody }) {
       webhook_id: config.webhookId,
       webhook_event: JSON.parse(rawBody),
     }),
+    signal: AbortSignal.timeout(20_000),
   });
   const json = await verification.json().catch(() => ({}));
   return {
-    verified: json.verification_status === 'SUCCESS',
+    verified: verification.ok && json.verification_status === 'SUCCESS',
     reason: json.verification_status || `http ${verification.status}`,
   };
 }
