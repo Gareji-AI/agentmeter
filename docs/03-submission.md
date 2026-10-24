@@ -53,7 +53,7 @@ AG Grid requirements to satisfy explicitly (from `/details/aggrid`):
 
 So the AG Grid surface must be a **themed analytics view with at least one custom cell
 renderer and a natural-language → widget path**, not a `<AgGridReact/>` with CSV export.
-Free 45-day trial licence covers the build window. Starter repo:
+Studio’s 45-day trial covers the build window; the Grid/Charts bundle trial is 30 days. Starter repo:
 `github.com/paypaldev/hackathon-paypal-ag-grid`.
 
 ## 4. APIMatic: a prize that pays out without winning
@@ -72,7 +72,7 @@ concrete instead of a claim.
 | Sponsor | What | How |
 |---|---|---|
 | Render | $50 credits | `https://credits-portal-mmdm.onrender.com/claim/paypal-ai-hackathon` |
-| AG Grid | 45-day trial licence | `/studio/license-pricing/` |
+| AG Grid / Studio | Grid + Charts: 30-day trial; Studio Pro + AI: 45 days | `/studio/license-pricing/` |
 | APIMatic | 1 month Basic (Context Plugin use) | claim form on `/details/apimatic` |
 | Channel3 | 20,000 API credits | promo code `PAYPAL-HACKATHON-2026` at `trychannel3.com/developers` |
 | Elastic | 14-day trial, self-extend +30 | `ela.st/elastic-paypal-hackathon` |
@@ -155,17 +155,18 @@ information pages. Render hosts the Node sandbox and persistent SQLite ledger.
 synthetic labels are implemented, with deterministic fallbacks. No Gemini key has
 been supplied: real model use is not yet verified. AG Grid 36.2.0 and AG Studio 3.0.0
 adapters implement theming, custom cells, a receipt widget, layout and a custom Studio
-agent delegating to the built-in page agent. No license has been supplied: successful
-licensed execution and AG Grid sponsor readiness remain pending. The offline analytics
-table, CSV and rule-driven widgets are working. Do not submit optional integrations
-as verified until they are exercised.
+agent delegating to the built-in Page agent. Licensed execution was verified locally
+and on Render in Chrome on 2026-10-24: exact receipt totals, month-filtered charts,
+chat-driven delegation and task hand-back, custom cells, and layout resizing. The
+runner uses validated rules; no LLM inference is claimed. Absent or expired trials
+retain the offline table, CSV and rule-driven widgets. See analytics verification.
 
 **What we learned:** A timeout is not a failed transfer. Unresolved payout requests
 must retain their reservation and external identity. Tool prices and budget decisions
 must use exact integers, while external fees and capture receipts remain distinct
 from purchased tool credit.
 
-**Next:** Verify licensed Studio and optional Gemini, then record the English video.
+**Next:** Record the English video with verified Studio. Optional Gemini remains unverified.
 Refunds, FX, high availability and production account onboarding are future work.
 
 Copy this draft only after updating it against the final evidence. See README for the
@@ -187,9 +188,9 @@ full Tools inventory and `01-demo-script.md` for the under-three-minute recordin
 
 ## 9. Risks recorded from the sponsor pages
 
-- AG Grid trial is 45 days and the hackathon ends 2026-11-12 — the trial expires after the
-  judging period, so the hosted demo must keep working. Mitigation: the `/grid` view
-  degrades to a plain HTML table when the AG Grid licence is absent, and the README says so.
+- Trial dates are explicit: Grid/Charts expires 2026-11-23; Studio expires 2026-12-08.
+  Do not assume the judging window fits either trial. The server suppresses expired
+  keys and `/grid` retains its plain table, CSV and rule-driven widgets.
 - Render free instances sleep. A judge clicking a cold URL and waiting 50 seconds is a
   Design score risk. Mitigation: keep the app's cold start under a second with no heavy
   imports, and say "first load may take up to a minute" in the README.

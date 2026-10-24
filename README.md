@@ -208,7 +208,7 @@ Payment routes: `/api/topup`, `/api/topup/:id/capture`, `/api/payout`,
   from pinned CDN versions. Quartz theming, custom money/status cells, a micro-USD
   receipt widget, editable layout, and a custom Studio agent delegating to the built-in
   Page agent run through Studio's Agent Framework. Licensed execution was verified
-  in Chrome on 2026-10-24: exact receipt totals, monthly chart filters, delegation,
+  locally and on Render in Chrome on 2026-10-24: exact receipt totals, monthly filters, delegation,
   task completion, and widget resizing. Intent interpretation currently uses the
   validated rule parser; no LLM inference is claimed. Without active licenses, the
   SSR table, CSV, rule-based widgets and local card layout work offline. Expired

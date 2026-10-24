@@ -2,7 +2,7 @@
 
 Target: PayPal AI Hackathon (submission deadline 2026-11-12 12:00 PST).
 Prize strategy: one Grand Prize or Honorable Mention, plus at most one Sponsor Prize.
-AG Grid is the primary sponsor target; actual licensed Studio verification is pending.
+AG Grid is the primary sponsor target; licensed Grid and Studio Agent Framework execution was verified in Chrome on 2026-10-24.
 
 ## 1. One-line pitch
 
@@ -134,8 +134,11 @@ requests use a documented rule parser and narration is literal. No actual Gemini
 response has been verified as of 2026-10-24.
 
 Optional AG Studio uses a custom analyst agent delegating to the built-in page agent.
-Its adapter is implemented but requires a trial/license key and browser verification.
-The offline table and local widgets are the verified analytics path today.
+Licensed Grid, the custom receipt widget, month-filtered charts, layout resizing and
+custom analyst delegation through Studio’s Page agent were verified locally and on
+Render on 2026-10-24. This custom runner uses validated rules, not an LLM response.
+Expired or absent trial keys retain the offline table and local widget path.
+See `docs/04-analytics-verification.md` for evidence and trial expiration dates.
 
 ## 6. Data model
 

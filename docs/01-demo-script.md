@@ -38,9 +38,9 @@ Reconciliation.
 | 0:40–0:58 | Click **Try a tool failure**. Hold the notice, RELEASED row and unchanged $4.9700. | “A tool can fail after funds are reserved. This failure releases its two-cent reservation and charges nothing. The event trail shows the change. Retrying the same request key also reuses its receipt instead of billing twice; that behavior is covered by the tests.” |
 | 0:58–1:20 | Provider. Show $0.0300, click **Pay out earnings**. Show SUCCESS and $0.0000 available. | “The author has earned three cents from those successful calls. Paying out uses one stable batch identity. Here the simulated rail returns a successful batch and item receipt, then the ledger debits the earnings. Ambiguous failures hold the funds until their outcome is known.” |
 | 1:20–1:45 | Reconcile. Refresh if needed. Show 2 matches and gross / fee / net columns. | “Reconciliation compares our ledger with independent reporting from the selected rail. Both current mock receipts match. The five-dollar top-up has a separate illustrative fee and net cash amount. Tool credit and cash received are different quantities. Synthetic history is excluded from this comparison.” |
-| 1:45–2:10 | Analytics. Submit **Show daily spend this month**. Show the widget; move a card if available. | “The analytics workspace starts with thirty days of synthetic usage. A natural-language request produces this daily-spend widget using a validated rule parser. The table, widgets and CSV work without a license or model. Licensed Grid and Studio adapters are implemented but await actual license verification.” |
+| 1:45–2:10 | Analytics. Submit **Show daily spend this month**. Show the custom receipt, Page-agent delegation and chart; resize the receipt. | “The analytics workspace combines synthetic history with live tool calls. Our custom analyst validates this request, delegates to Studio’s Page agent and creates a daily-spend chart. The custom receipt keeps exact dollar totals, and Studio lets us resize the layout. Without licenses, the plain table and rule-driven widgets remain available.” |
 | 2:10–2:30 | Buyer. Replace budget text with **Keep extract_entities under $0.00 this month**; Apply budget, then Run 3-call demo. Show BUDGET_EXCEEDED and unchanged balance. | “Now I set this tool's monthly cap to zero. The next call is blocked before execution, so no new charge appears. Intent may be interpreted by an optional model, but prices, reservations and settlement always use exact integer arithmetic.” |
-| 2:30–2:50 | Hold Reconcile or Buyer; end on title and local-run instruction. | “AgentMeter runs from a clean clone with Node twenty-six and npm start, without installing packages. The mock money loop is complete. A separate real sandbox run verified funding, signed webhooks and author payout. Reporting now includes both transactions. Licensed Studio and optional Gemini remain pending. The repository includes tests, evidence boundaries and reproducible instructions.” |
+| 2:30–2:50 | Hold Reconcile or Buyer; end on title and local-run instruction. | “AgentMeter runs from a clean clone with Node twenty-six and npm start, without installing packages. The mock money loop is complete. A separate real sandbox run verified funding, signed webhooks and author payout. Reporting now includes both transactions. Licensed Studio and its Agent Framework are verified. Optional Gemini is not configured. The repository includes tests, evidence boundaries and reproducible instructions.” |
 
 Aim for a calm pace. Rehearse to the timestamps; shorten narration if any click takes
 longer. Leave the last two seconds silent on the application. Do not add a long outro.
@@ -70,8 +70,8 @@ This video demonstrates simulated funds: $5.00 prepaid credit, three $0.01 tool
 calls, $4.97 remaining, $0.03 author earnings, a simulated payout and receipt
 reconciliation. A separate actual sandbox run verified SDK v6 funding, signed Webhook
 delivery, successful author payout and Transaction Search reconciliation; see
-the README's evidence table. Optional licensed Studio and Gemini paths are not
-represented as verified in this recording.
+the README's evidence table. The analytics segment uses verified licensed Studio,
+a custom receipt and agent delegation with validated rules. No LLM inference is claimed.
 
 Run locally with Node 26+: clone the repository, then `npm start`. No package
 installation is required. Project information: https://dotfield.xyz/apps/agentmeter/
@@ -85,6 +85,6 @@ sandbox take, keep the sandbox badge visible and use the actual receipts. Say
 “Search now includes both matching transactions. The payout report omits its fee,
 so we verify that fee independently using the Payouts API and show the source.”
 A new take with a new purchase must use another buyer-approved sandbox top-up;
-preserve the completed ledger. If a Studio trial or Gemini key becomes available, verify the live
-path and only then name it as used in the narration. Keep the total video under
+preserve the completed ledger. Studio trial execution is now verified; film its actual
+delegation and widget results. Gemini remains unconfigured. Keep the total video under
 three minutes. Do not splice simulated receipts into a sandbox sequence.

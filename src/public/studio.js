@@ -10,7 +10,7 @@ export async function enableStudio({licenseKey,gridLicense,data}) {
   const base=ag.createWidgets({});
   const valueDefinition=base.widgets.find(w=>w.id==='value');
   class ReceiptWidget {
-    constructor(){this.element=document.createElement('div');this.element.style.cssText='padding:24px;height:100%;display:flex;flex-direction:column;justify-content:center';}
+    constructor(){this.element=document.createElement('div');this.element.style.cssText='padding:16px 24px;height:100%;display:flex;flex-direction:column;justify-content:center;gap:8px';}
     getGui(){return this.element;}
     init(params){return this.refresh(params);}
     async refresh(params){
@@ -25,7 +25,7 @@ export async function enableStudio({licenseKey,gridLicense,data}) {
       // Studio resolves a field to an opaque result key; it is not the source field id.
       const amount=row[fields[0].key];
       if(!Number.isSafeInteger(amount)){params.widgetApi.setDisplayState('noData');return;}
-      this.element.replaceChildren();const label=document.createElement('span');label.className='eyebrow';label.textContent=fields[0].fieldId.endsWith('spend_micro')?'SETTLED TOOL SPEND':fields[0].fieldId.endsWith('author_micro')?'AUTHOR CREDITS':params.widgetApi.getFieldName(fields[0]);const value=document.createElement('strong');value.className='money';value.style.cssText='font-size:38px;font-weight:500;margin-top:15px';value.textContent=fields[0].fieldId.endsWith('_micro')?dollars(amount):String(amount);const note=document.createElement('small');note.textContent=fields[0].fieldId.endsWith('_micro')?'Integer micro-USD · settled only · history + live':'Usage count · history + live';this.element.append(label,value,note);params.widgetApi.setDisplayState('displayed');
+      this.element.replaceChildren();const label=document.createElement('span');label.className='eyebrow';label.style.cssText='font-size:11px;line-height:1.2;flex-shrink:0';label.textContent=fields[0].fieldId.endsWith('spend_micro')?'SETTLED TOOL SPEND':fields[0].fieldId.endsWith('author_micro')?'AUTHOR CREDITS':params.widgetApi.getFieldName(fields[0]);const value=document.createElement('strong');value.className='money';value.style.cssText='font-size:32px;font-weight:500;line-height:1.1;flex-shrink:0';value.textContent=fields[0].fieldId.endsWith('_micro')?dollars(amount):String(amount);const note=document.createElement('small');note.style.cssText='font-size:11px;line-height:1.4;flex-shrink:0';note.textContent=fields[0].fieldId.endsWith('_micro')?'Integer micro-USD · settled only · history + live':'Usage count · history + live';this.element.append(label,value,note);params.widgetApi.setDisplayState('displayed');
     }
     destroy(){this.refreshId=null;this.element.remove();}
   }
