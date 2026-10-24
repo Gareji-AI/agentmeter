@@ -100,3 +100,30 @@ The invoice calls were separately executed through HTTP MCP.
 Private evidence is Git-ignored under `data/verification/workspaces/` and the
 local rehearsal's `data/recordings/take-*/`. No recovery code, client key or cookie
 belongs in public documentation, screenshots or video.
+
+## Hosted release verification
+
+Runtime commit `d91bd27` deployed successfully to the existing Render service as
+`dep-dbe9eu1srm7s73bd1nog`. Public entry:
+https://agentmeter-sandbox.onrender.com/join . No compute, disk, PayPal key or
+Webhook destination change was required.
+
+Chrome verified public registration, zero credit and no shared history, one-time
+client-key display, revocation and sign-out. Recovery-code sign-in and Secure/
+HttpOnly session cookies passed over HTTPS. The installed Codex app-server
+successfully authenticated against the public MCP URL and discovered all six tools
+with no tool-discovery error. A zero-credit execution returned `-32002` with the
+personal funding URL; the request did not create a charged call. The revoked key
+subsequently returned HTTP 401. No hosted top-up, paid call or payout was performed.
+
+The deployment produced a new process identity while preserving the original demo
+ledger SHA-256 `3cdb60d7b29727e79ac302b56f4002f3254647d7b800e3411c8bf65d2254ad90`,
+buyer $4.9700, author $0.0000, zero reservations and both actual sandbox reporting
+matches. The new verification account contains no financial activity. Frozen-source
+comparisons document this deployment checkpoint; legitimate future customer funding
+and tool usage will change the global ledger and reporting counts.
+
+Private evidence: `data/verification/workspaces/hosted-proof.json`,
+`hosted-codex-discovery.json`, and `data/verification/sandbox/workspaces-*-deploy.json`.
+The public information, privacy, terms and support pages were updated through the
+Dotfield repository (`1141060`) and verified over HTTPS after deployment.

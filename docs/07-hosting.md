@@ -124,3 +124,15 @@ Private machine-readable proof: `render-initial.json`, `render-webhook-cutover.j
 under `data/verification/sandbox/`. These files and bootstrap data are not committed.
 The app is a single-process prototype with daily platform disk snapshots, not a
 replicated/high-availability payment service. Plan manual updates and backups.
+
+## Personal buyer workspace release
+
+`d91bd27` adds public `/join`, `/sign-in` and `/workspace` entry points. Existing
+operator screens and their global ledger remain token-protected. New accounts
+start at zero; new recovery, session and client secrets are hash-stored in additive
+SQLite tables. The existing disk, PayPal configuration and Webhook URL are unchanged.
+Deployment `dep-dbe9eu1srm7s73bd1nog` retained the original demo balances, identities
+and two Search matches. A zero-credit public account and revoked verification key
+were tested without creating new financial activity. See `09-personal-workspaces.md`.
+The frozen two-receipt verifier is an evidence checkpoint, not a general health
+monitor once legitimate public users add funding or calls.

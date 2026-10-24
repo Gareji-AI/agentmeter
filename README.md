@@ -91,7 +91,7 @@ plus replay, cap, isolation and revocation. Global mock reporting has three matc
 the seeded operator top-up, personal top-up and author payout. Personal funding
 receipts are scoped and do not claim independent Transaction Search verification.
 Actual Codex app-server Bearer authentication and discovery of six tools were also
-verified locally; model-driven Codex execution has not yet been filmed/verified.
+verified locally and against the hosted endpoint; model-driven Codex execution has not yet been filmed/verified.
 See [workspace evidence and usage](docs/09-personal-workspaces.md).
 
 ## Record the English demo
