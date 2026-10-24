@@ -1,6 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { randomUUID } from 'node:crypto';
 
 const SCHEMA = `
 PRAGMA journal_mode = WAL;
@@ -105,11 +106,41 @@ CREATE TABLE IF NOT EXISTS events (
 `;
 
 export function openDb(path = process.env.DATABASE_PATH || 'data/agentmeter.sqlite') {
-  const file = resolve(path);
+  const file = path === ':memory:' ? path : resolve(path);
   if (file !== ':memory:') mkdirSync(dirname(file), { recursive: true });
   const db = new DatabaseSync(file);
   db.exec(SCHEMA);
+  db.exec('PRAGMA busy_timeout = 5000');
+  const columns = db.prepare('PRAGMA table_info(topups)').all();
+  if (!columns.some(c => c.name === 'paypal_capture_id')) db.exec('ALTER TABLE topups ADD COLUMN paypal_capture_id TEXT');
+  db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_capture_id ON topups(paypal_capture_id)');
+  if (!db.prepare('PRAGMA table_info(payouts)').all().some(c => c.name === 'fee_micro')) db.exec('ALTER TABLE payouts ADD COLUMN fee_micro INTEGER NOT NULL DEFAULT 0');
+  const amounts = {
+    accounts: ['balance_micro', 'reserved_micro'], tools: ['price_micro'],
+    calls: ['price_micro', 'platform_fee_micro', 'author_credit_micro'],
+    topups: ['amount_micro', 'fee_micro'], payouts: ['amount_micro', 'fee_micro'], budget_policies: ['cap_micro'],
+  };
+  for (const [table, fields] of Object.entries(amounts)) {
+    const invalid = fields.map(f => `(typeof(NEW.${f}) != 'integer' OR NEW.${f} < 0 OR NEW.${f} > 9007199254740991)`).join(' OR ');
+    const extra = table === 'accounts' ? ' OR NEW.reserved_micro > NEW.balance_micro OR (NEW.monthly_cap_micro IS NOT NULL AND (typeof(NEW.monthly_cap_micro) != \'integer\' OR NEW.monthly_cap_micro < 0 OR NEW.monthly_cap_micro > 9007199254740991))' : '';
+    for (const action of ['INSERT', 'UPDATE']) db.exec(`CREATE TRIGGER IF NOT EXISTS guard_${table}_${action} BEFORE ${action} ON ${table} WHEN ${invalid}${extra} BEGIN SELECT RAISE(ABORT, 'invalid monetary invariant'); END`);
+  }
   return db;
+}
+
+/** Synchronous savepoints compose atomically; never hold a transaction across I/O. */
+export function transaction(db, fn) {
+  const name = `tx_${randomUUID().replaceAll('-', '')}`;
+  db.exec(`SAVEPOINT ${name}`);
+  try {
+    const value = fn();
+    if (value?.then) throw new TypeError('database transactions must be synchronous');
+    db.exec(`RELEASE ${name}`);
+    return value;
+  } catch (error) {
+    db.exec(`ROLLBACK TO ${name}; RELEASE ${name}`);
+    throw error;
+  }
 }
 
 export const nowIso = () => new Date().toISOString();
