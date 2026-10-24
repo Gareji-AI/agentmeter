@@ -1,101 +1,73 @@
-# AgentMeter — English demo, target 2:50
+# AgentMeter — recorded screen demo and presenter plan
 
-The full plan is **170 seconds / 265 spoken words**, including opening and closing.
-At 130 words per minute this leaves about 47 seconds for actions and response time.
-`npm run verify:recording` checks this estimate; only the exported video's measured
-runtime proves it is under three minutes. Do not add a title sequence or long outro.
+Actual silent screen master: **170.000 seconds, 1920 × 1080, H.264, 30 fps, no audio**.
+Recorded in Chrome through Computer Use on 2026-10-24. Source footage comes from an
+actual Chrome-window capture, with browser chrome and unrelated applications excluded.
+The current spoken script contains **310 English words**. It has not been recorded
+by the presenter. Only the complete face/voice composition will be a final demo.
 
-## Safe recording launch
+## Story and timed narration
 
-Use Node 26+, an ignored `.env` with a working Gemini key and active Grid/Studio
-licenses, and internet access. No package installation is needed.
+A provider publishes a one-cent invoice API; three actual Codex MCP client calls
+produce provider earnings. The local money flow is simulated. A separate closing
+evidence scene reads the already-completed real PayPal sandbox payout on Render.
+Gemini/Studio uses the actual model and licensed agent framework.
 
-```sh
-npm test
-npm run verify:demo
-npm run verify:recording
-npm run demo:record
-```
-
-Open the **exact local URL printed by the final command** in Chrome. Each launch
-creates an unused `data/recordings/take-*/ledger.sqlite` and selects a free loopback
-port. It overrides any hosted URL, sandbox keys, payout flags and archive path from
-`.env`. It preserves Gemini and the evaluation licenses; only widget interpretation
-uses the model in this profile. Other AI surfaces use deterministic behavior.
-The existing sandbox ledger is never opened. Ctrl-C stops a take without deleting it;
-launch again for a fresh $5 buyer / $0 author. Do not reuse the rehearsal take.
-
-Read [the recording checklist](08-recording-checklist.md) before recording.
-Use the Studio **AI Assistant message input**, not the separate Build a widget form,
-so delegation and task hand-back appear on camera. Paste the prepared prompt once.
-
-## Timed narration and actions
-
-| Time | Screen and action | Spoken narration |
+| Time | Screen / actual action | English narration |
 | --- | --- | --- |
-| 0:00–0:12 | Buyer · fresh local take. Hold on the $5.0000 balance and MOCK badge. | “AgentMeter gives agent tool calls a spending limit and a receipt. This take uses simulated funds for the money flow and real Gemini for analytics.” |
-| 0:12–0:33 | Buyer · three calls. Click Run 3-call demo once. Hold $4.9700 and $0.0300 author credits. | “One click runs a scripted three-call plan. Each call costs one cent. The ledger reserves before execution, settles successful calls, and credits the author. Five dollars becomes four ninety-seven; the author earns three cents.” |
-| 0:33–0:47 | Buyer · failure. Click Try a tool failure. Show RELEASED and $0.0000 price. | “This deliberately failing tool releases its reservation. The buyer stays at four ninety-seven, and the receipt says released with zero charge. Retries reuse receipts.” |
-| 0:47–1:04 | Provider · payout. Open Provider, show $0.0300, then click Pay out earnings. Hold SUCCESS and $0.0000. | “The author can now pay out the three cents. This take uses the mock payment rail. A successful batch and item receipt reduce the author balance to zero.” |
-| 1:04–1:22 | Reconciliation · mock. Open Reconciliation. Show two MATCH rows and gross, fee and net. | “Reconciliation matches the funding and payout receipts. Gross credit, fees, and net cash stay separate. These two matches are simulated here; the separate PayPal sandbox evidence uses actual sandbox APIs.” |
-| 1:22–2:06 | Analytics · real Gemini and Studio. Open Analytics. Submit the prepared paraphrase. Wait for Gemini model source, Page-agent delegation, hand-back and chart. | “Now I ask: plot what I paid each calendar day during the current month. Gemini Flash-Lite turns that wording into a structured intent. The server validates the metric, grouping, period, and tool. Our custom analyst delegates to Studio’s Page agent, which adds the chart and returns the task. The source explicitly names Gemini.” |
-| 2:06–2:25 | Analytics · custom widget and layout. Resize the custom receipt. Briefly show the themed Grid and custom USD/status cells. | “This is our own receipt widget, alongside the themed Grid and custom money and status cells. I can resize the Studio layout. Charting reads the ledger; it never moves funds.” |
-| 2:25–2:42 | Hosted reconciliation · separate completed sandbox run. Switch to the pre-authenticated Render Reconcile tab. Keep PAYPAL SANDBOX visible. Read-only; no new payment. | “This separate, completed PayPal sandbox run shows two independent reporting matches: capture and author payout. Signed webhook redelivery and a service restart preserved the same balances and receipt identities.” |
-| 2:42–2:50 | Close · AgentMeter. Hold the app title and end. No long outro. | “Clone and run npm start. No package installation. AgentMeter: meter, settle, verify.” |
+| 0:00–0:08 | Local overview: Hold the product overview; local mock mode is labeled. | “AgentMeter helps tool makers earn from useful APIs, while giving AI agents a budget and clear receipts.” |
+| 0:08–0:36 | Local provider portal: Register the free invoice API example at $0.01, save a draft, test synthetic input, publish. Cuts omit setup pauses. | “Here is a simple invoice example. A provider registers a read-only API, sets a one-cent price, and tests a synthetic invoice. The invoice total is one hundred twenty dollars; the tool fee is only one cent. After a successful connection test, I publish the tool through AgentMeter’s MCP endpoint.” |
+| 0:36–1:00 | Local buyer workspace: Show $5 before and $4.97 after three actual scripted Codex MCP calls; namespaced tool receipts and invoice output are visible. Transport runs off screen. | “The buyer starts with five dollars of test credit. The installed Codex MCP client sends three invoice requests to this registered service. Each successful execution settles once. The buyer now has four ninety-seven, and this provider has earned three cents. This is scripted transport verification, without a model turn.” |
+| 1:00–1:10 | Local buyer workspace: Send FAIL_UPSTREAM to the same registered tool; show RELEASED, zero charge and unchanged credit. | “A deliberately failing request releases its reservation. It costs zero, and the buyer stays at four ninety-seven. Retries also avoid duplicate charges.” |
+| 1:10–1:24 | Local personal provider portal: Show $0.03 own earnings, request mock payout, then show SUCCESS and zero remaining earnings. | “The provider can pay out those three cents. This local sequence uses simulated payments. A successful payout clears the earnings and preserves the receipt.” |
+| 1:24–1:36 | Local reconciliation: Show two simulated reporting matches and separate gross, fee and net columns. | “Reconciliation checks funding and payout against the payment rail. Gross credit, fees, and net cash are separate. These two matches are simulated.” |
+| 1:36–2:20 | Local Gemini/Studio and Grid: Submit the actual question in Studio AI Assistant; retain normal-speed model wait, Page-agent hand-back, model source and chart. Cut to the themed Grid. | “Now I ask, plot what I paid each calendar day during the current month. Real Gemini converts that question into a validated intent. Our custom Studio analyst delegates to the Page agent, which creates a chart and returns the task. The source names Gemini. This custom receipt widget and the themed Grid make usage visible. These views keep billing evidence beside the data. Historical rows are synthetic; analysis never moves funds.” |
+| 2:20–2:42 | Hosted provider portal and reconciliation: Read-only view of the separately completed real sandbox payout; three independently verified rail receipts, with the new Search row visibly pending. | “This is a separate completed run on the permanent Render backend. The provider’s actual PayPal sandbox payout succeeded. Fresh PayPal reads verify the receipt. Transaction Search can arrive later, so its status stays visible. Restarting the service preserved the tools, balances, and receipts.” |
+| 2:42–2:50 | Local overview: Reuse the opening product hold as a closing shot. | “Your service. Your price. A receipt for every call. AgentMeter: meter, settle, verify.” |
 
-The timing and narration source is [demo-timeline.json](demo-timeline.json).
-[demo-voiceover.txt](demo-voiceover.txt) contains the same spoken lines for a prompter.
-Read at a measured pace and leave the model wait visible. If the generation fails
-or its source says rules/fallback, stop the take and resolve it before recording again.
+The canonical timing and voiceover remain `demo-timeline.json` and
+`demo-voiceover.txt`. The editable shot sources are in `video/edit-list.json`.
+The actor copy and Japanese filming notes are in [video/](video/presenter-guide-ja.md).
 
-## Evidence boundaries on camera
+## What was captured
 
-Scenes 1–7 use **mock money and real Gemini/Studio**. The seed's 180 historical calls
-are synthetic; the custom receipt includes history plus the three live calls. Its
-$2.3750 settled-spend total is not the buyer's $4.9700 remaining balance.
-The chart shows the current UTC month, and integer micro-USD axes with exact USD tooltips.
+The new ignored take `data/recordings/take-mJBTdN/` has its own ledger and private
+credentials. The old sandbox archive and hosted balances were not opened for writing.
+The local buyer spent exactly 30000 micro-USD, retained 4970000, and the new provider
+received a successful 30000-micro mock payout. A failed remote call charged zero.
+The installed Codex app-server proof records the three successful calls and free retry.
+Its test thread was ephemeral, with no model turn; autonomous tool selection is not claimed.
 
-The 2:25–2:42 scene is a **separate, already completed PayPal sandbox run** on Render.
-Pre-authenticate its Reconciliation tab privately. Keep its sandbox badge visible,
-show both MATCH rows and fee sources, and make no new purchase, call or payout there.
-Search supplies the capture fee; a fresh Payouts item read verifies the omitted
-outgoing fee. Signed webhook replay and restart persistence are documented checks,
-not actions demonstrated live in this short scene. See [sandbox evidence](06-sandbox-evidence.md)
-and [hosting evidence](07-hosting.md). Never splice mock receipts into that scene.
+The invoice example is a free public demonstration endpoint on the same backend.
+Its $120 input amount is not the one-cent usage fee and is not a payment of that invoice.
+The $2.3750 custom receipt includes synthetic history plus live spend; it is not the
+buyer's $4.9700 remaining credit. Historical rows are explicitly synthetic.
 
-The buyer plan is scripted. Models do not choose prices, negotiate, approve payments,
-or change balances. The Studio Page agent uses our custom runner with shipped
-framework tools; do not call it an unconstrained built-in model agent.
+Hard cuts remove idle setup periods. Actual model execution plays at normal speed;
+no screen states or financial results are reconstructed. The buyer scene shows actual
+before/after UI and stored receipts while the scripted MCP transport executes off screen.
+The separate hosted scene does not imply that preceding mock actions moved sandbox funds.
 
-## Video title and description
+## Local deliverables
 
-**Title:** AgentMeter — Meter, Settle, Verify | PayPal AI Hackathon Demo
+The machine-local packet is under `~/Movies/AgentMeter-demo-2026-10-24/`:
 
-AgentMeter gives every agent tool call a price, a budget check and a receipt.
-This demo shows simulated funding: $5.00 credit, three $0.01 calls, $4.97 remaining,
-a released failed call, $0.03 author earnings, mock payout and reconciliation.
-Real Gemini 3.5 Flash-Lite interprets a usage question; our custom analyst delegates
-to the AG Studio Page agent to create a read-only chart. The workspace also includes
-a custom receipt widget, editable layout, a theme and custom Grid cells.
+- `delivery/agentmeter-screen-only.mp4`: 170-second silent screen master with chapter/source labels.
+- `delivery/presenter-rehearsal.html`: offline player with synchronized English actor copy.
+- `delivery/narration-english.txt` and `.srt`: timed actor copy and optional subtitle guide.
+- `delivery/撮影メモ.md`: Japanese instructions for recording the presenter's face/voice.
+- `delivery/media-check.json`: measured codec, dimensions, duration and no-audio check.
+- `raw/`: genuine recorded screen clips. Credentials stay in ignored `data/`, never in the delivery packet.
 
-A clearly separate completed PayPal sandbox run shows capture and payout matched
-against Transaction Search, with explicit fee sources. Signed webhook replay and
-restart persistence are documented in the repository. All funds are simulated or
-sandbox test funds. Analytics history includes synthetic entries.
+Optional local authoring tools are in `scripts/video/`. They require macOS 15+ /
+Apple SDK for window capture and header rendering, FFmpeg for editing, and Python 3.10+.
+They add no dependency to the Node application or normal `npm start`.
 
-Run with Node 26+: clone the repository, then npm start. No package installation.
-Project: https://dotfield.xyz/apps/agentmeter/
-Application: https://agentmeter-sandbox.onrender.com (operator access required)
-Source: https://github.com/Gareji-AI/agentmeter (judge access must be arranged)
+## Next production step
 
-Actual YouTube URL: pending recording, export inspection and public upload.
-
-## Later provider run — separate evidence
-
-The hosted ledger has since completed provider onboarding and three more one-cent
-Codex MCP calls: API → MCP → API. The existing buyer is now $4.94; the new provider
-received a $0.03 sandbox payout. The original capture/payout remain reporting
-matches, while the new payout has a fresh verified Payouts receipt and a visibly
-pending Transaction Search row. Scene 8 must show the actual labels, not imply all
-three reporting rows match. See [provider walkthrough and proof](10-provider-tools.md).
-The original local 2:50 rehearsal still starts at $5 and uses its own fresh ledger.
+Record the presenter's real face and English narration, preferably with a few seconds
+of lead/tail room; chapter takes are fine. Then edit mistakes, synchronize speech,
+place the face in the lower-right corner without obscuring evidence, and retime subtitles.
+No face/voice was synthesized or assumed received. Watch the entire final export and
+measure it below 180 seconds before any public upload. YouTube publishing and Devpost
+submission have not been performed.

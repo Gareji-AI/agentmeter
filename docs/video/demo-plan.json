@@ -1,0 +1,15 @@
+{
+  "target_seconds": 170,
+  "format": "1920x1080, silent screen recording, later presenter picture-in-picture",
+  "scenes": [
+    {"id":"overview","start":0,"end":8,"narration":"AgentMeter helps tool makers earn from useful APIs, while giving AI agents a budget and clear receipts."},
+    {"id":"publish","start":8,"end":36,"narration":"Here is a simple invoice example. A provider registers a read-only API, sets a one-cent price, and tests a synthetic invoice. The invoice total is one hundred twenty dollars; the tool fee is only one cent. After a successful connection test, I publish the tool through AgentMeter’s MCP endpoint."},
+    {"id":"calls","start":36,"end":60,"narration":"The buyer starts with five dollars of test credit. The installed Codex MCP client sends three invoice requests to this registered service. Each successful execution settles once. The buyer now has four ninety-seven, and this provider has earned three cents. This is scripted transport verification, without a model turn."},
+    {"id":"failure","start":60,"end":70,"narration":"A deliberately failing request releases its reservation. It costs zero, and the buyer stays at four ninety-seven. Retries also avoid duplicate charges."},
+    {"id":"payout","start":70,"end":84,"narration":"The provider can pay out those three cents. This local sequence uses simulated payments. A successful payout clears the earnings and preserves the receipt."},
+    {"id":"reconcile","start":84,"end":96,"narration":"Reconciliation checks funding and payout against the payment rail. Gross credit, fees, and net cash are separate. These two matches are simulated."},
+    {"id":"analytics","start":96,"end":140,"narration":"Now I ask, plot what I paid each calendar day during the current month. Real Gemini converts that question into a validated intent. Our custom Studio analyst delegates to the Page agent, which creates a chart and returns the task. The source names Gemini. This custom receipt widget and the themed Grid make usage visible. These views keep billing evidence beside the data. Historical rows are synthetic; analysis never moves funds."},
+    {"id":"sandbox","start":140,"end":162,"narration":"This is a separate completed run on the permanent Render backend. The provider’s actual PayPal sandbox payout succeeded. Fresh PayPal reads verify the receipt. Transaction Search can arrive later, so its status stays visible. Restarting the service preserved the tools, balances, and receipts."},
+    {"id":"close","start":162,"end":170,"narration":"Your service. Your price. A receipt for every call. AgentMeter: meter, settle, verify."}
+  ]
+}

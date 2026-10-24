@@ -1,0 +1,26 @@
+[0:00–0:08] OVERVIEW
+AgentMeter helps tool makers earn from useful APIs, while giving AI agents a budget and clear receipts.
+
+[0:08–0:36] PUBLISH
+Here is a simple invoice example. A provider registers a read-only API, sets a one-cent price, and tests a synthetic invoice. The invoice total is one hundred twenty dollars; the tool fee is only one cent. After a successful connection test, I publish the tool through AgentMeter’s MCP endpoint.
+
+[0:36–1:00] CALLS
+The buyer starts with five dollars of test credit. The installed Codex MCP client sends three invoice requests to this registered service. Each successful execution settles once. The buyer now has four ninety-seven, and this provider has earned three cents. This is scripted transport verification, without a model turn.
+
+[1:00–1:10] FAILURE
+A deliberately failing request releases its reservation. It costs zero, and the buyer stays at four ninety-seven. Retries also avoid duplicate charges.
+
+[1:10–1:24] PAYOUT
+The provider can pay out those three cents. This local sequence uses simulated payments. A successful payout clears the earnings and preserves the receipt.
+
+[1:24–1:36] RECONCILE
+Reconciliation checks funding and payout against the payment rail. Gross credit, fees, and net cash are separate. These two matches are simulated.
+
+[1:36–2:20] ANALYTICS
+Now I ask, plot what I paid each calendar day during the current month. Real Gemini converts that question into a validated intent. Our custom Studio analyst delegates to the Page agent, which creates a chart and returns the task. The source names Gemini. This custom receipt widget and the themed Grid make usage visible. These views keep billing evidence beside the data. Historical rows are synthetic; analysis never moves funds.
+
+[2:20–2:42] SANDBOX
+This is a separate completed run on the permanent Render backend. The provider’s actual PayPal sandbox payout succeeded. Fresh PayPal reads verify the receipt. Transaction Search can arrive later, so its status stays visible. Restarting the service preserved the tools, balances, and receipts.
+
+[2:42–2:50] CLOSE
+Your service. Your price. A receipt for every call. AgentMeter: meter, settle, verify.

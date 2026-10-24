@@ -1,75 +1,32 @@
-# Recording and release checklist
+# Recorded screens and remaining presenter checklist
 
-Target: English desktop demo, 2:50 including all titles and closing frames.
-This is a preparation checklist. Unchecked export/upload/form items still require
-the actual assets; a script timing estimate is not a measured video.
+## Completed — 2026-10-24
 
-## Before each take
+- [x] Record actual Chrome interactions using a new isolated mock ledger.
+- [x] Register/test/publish a one-cent invoice API; retain the original source clips.
+- [x] Verify actual scripted Codex MCP client execution, three receipts, free retry and zero-charge failure.
+- [x] Show the new provider's own $0.03 mock payout and two simulated rail matches.
+- [x] Capture actual Gemini intent, Studio Page-agent delegation/hand-back, generated chart, custom receipt and themed Grid.
+- [x] Capture a separate, read-only real PayPal sandbox success and honest pending Search status.
+- [x] Exclude browser chrome, unrelated windows, recovery codes, API keys, login and private recipient settings from selected footage.
+- [x] Cut the silent master to measured 170.000 seconds at 1920 × 1080 / 30 fps; full FFmpeg decode succeeds.
+- [x] Create matching English actor copy, SRT guide, Japanese filming notes and an offline rehearsal player; verify playback and chapter controls in Chrome.
 
-- [ ] Run `npm test`, `npm run verify:demo` and `npm run verify:recording`.
-- [ ] Launch `npm run demo:record`; open its printed URL in Chrome. Confirm MOCK,
-  buyer $5.0000, reserved $0.0000, session spend $0.0000 and author $0.0000.
-- [ ] Rehearse once: three calls, failure, payout, two matches, actual Gemini chart,
-  Page-agent hand-back, receipt resize and themed Grid cells. Then stop that take
-  and launch a fresh one. Rehearsal changes stay in its own ignored SQLite file.
-- [ ] Confirm active evaluation licenses and Gemini quota. Warm the CDN imports.
-  A fallback result is valid product behavior but cannot be narrated as real Gemini.
-- [ ] Prepare this prompt in a text editor: “Plot what I paid each calendar day
-  during the current month.” Paste into **Studio's AI Assistant** during the take.
-- [ ] Pre-authenticate the separate hosted `/reconcile` tab privately. Confirm two
-  original MATCH rows and explicit fee sources. The later provider payout adds a
-  third row, independently API-verified and still pending Transaction Search. Show
-  its actual status. Leave the completed hosted funds untouched.
-- [ ] Use a desktop viewport at least 1440 × 900. At this Mac's display size, Chrome
-  80% zoom fits Studio's chat, receipt and chart; verify readable exported text.
-  Scroll Studio into view before its scene. At narrow widths its canvas can scroll.
-- [ ] Capture app content only. Crop out browser chrome, bookmarks, unrelated tabs,
-  extensions, OS notifications and third-party brand artwork. Keep AgentMeter's
-  payment-mode badges, source labels and evidence disclosures in frame.
-- [ ] Keep API keys, operator sign-in, MCP connection details, private account
-  emails, payment payload expanders and secret-bearing terminals out of the take.
-- [ ] Test microphone levels. Use English narration/captions/title/description.
-  Use no music, stock footage, third-party logos or copyrighted soundtrack.
+## Record the presenter
 
-## During the 170-second sequence
+- [ ] Read [the Japanese filming notes](video/presenter-guide-ja.md), then rehearse with the offline player.
+- [ ] Record real face and English voice, with a few seconds of lead/tail room. Chapter takes are allowed.
+- [ ] Provide the original presenter file(s), preserving microphone audio. No music.
 
-- [ ] Follow [the timed script](01-demo-script.md), including its mock/sandbox transition.
-- [ ] Click the three-call button once. Show $4.9700 / $0.0300 and zero reserved funds.
-- [ ] Show RELEASED and zero charge for the failure, then the successful mock payout.
-- [ ] Show two mock MATCH rows and gross / fee / net; mock fees are illustrative.
-- [ ] Submit the prepared question once. Leave the wait visible. Show the actual
-  `Gemini · validated intent (gemini-3.5-flash-lite)` source, “Delegated to Page agent”
-  and “Handed back”, followed by the generated chart.
-- [ ] Select the custom receipt and drag its layout handle. Show actual layout
-  movement, then briefly scroll to the themed Grid and its USD/status cells.
-- [ ] Switch to the completed hosted sandbox reconciliation for the separate final
-  evidence scene. Do not imply that the preceding mock actions caused these receipts.
-- [ ] Stop and retake if errors, fallback, private data or unreadable results appear.
-  Do not substitute screenshots or speed up model waits to imply instant results.
+## Edit and release after the presenter footage arrives
 
-## Inspect the actual export
+- [ ] Remove mistakes and align narration to actual scenes; retime optional captions.
+- [ ] Put the presenter in the lower-right corner and adjust placement wherever money/receipt evidence would be covered.
+- [ ] Play the entire composed video with sound and captions. Check reading size, voice level, privacy and every narrated outcome.
+- [ ] Measure the entire final export, including titles/closing, below 180 seconds. The silent master's duration is not proof of a future composite's duration.
+- [ ] Keep simulated money, real model execution, direct scripted Codex transport and the separate actual sandbox evidence clearly distinguished.
+- [ ] Publicly upload the inspected English video to YouTube only in the separately authorized publishing step; verify signed-out playback.
+- [ ] Complete source-release/judge-access and live Devpost-form checks. No public repository visibility change or Devpost transmission is implied by filming.
 
-- [ ] Play the entire exported file with sound and captions. Text and mode/source
-  labels remain readable; no keys, private account details or unrelated marks appear.
-- [ ] Measure total duration, including all inserted frames: **less than 180 seconds**.
-  Target 170 seconds. If `ffprobe` is installed, use
-  `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 /absolute/path/demo.mp4`.
-- [ ] Verify every narrated outcome is visible and the two payment modes are clear.
-- [ ] Upload the inspected English video to YouTube with **Public** visibility;
-  test signed-out playback and copy the actual URL into `devpost-submission.md`.
-- [ ] Arrange judge access to the currently private source repository and hosted
-  operator demo. Never put a shared operator token in public prose or video.
-- [ ] Reconnect Devpost and check the live form, required fields, rules and asset
-  requirements. The local copy is prepared; this pass could not verify the live form.
-- [ ] Review the final form and submit only through a separately authorized step.
-
-## Rehearsal evidence — 2026-10-24
-
-Chrome rehearsal passed on a fresh isolated take: $5 → $4.97, three settled calls,
-one zero-charge released call, $0.03 author payout, and two mock reporting matches.
-The paraphrase produced a real Gemini response and a Studio chart with Page-agent
-delegation and task hand-back. The receipt's layout handle changed its height;
-the generated chart used locale-independent numeric axes. The separate Render
-reconciliation still showed two actual sandbox MATCH rows with explicit fee sources.
-Historical analytics are explicitly synthetic.
-This evidence describes a rehearsal, not a recorded/exported/uploaded video.
+Reproduce the timing check with `npm run verify:recording`. The core app still passes
+79 tests. Local demo/workspace/provider proofs remain separate from any real PayPal evidence.

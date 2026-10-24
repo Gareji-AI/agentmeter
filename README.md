@@ -132,7 +132,12 @@ This is direct Codex transport verification, without a model turn. See [provider
 
 The [2:50 script](docs/01-demo-script.md), [voiceover](docs/demo-voiceover.txt),
 [filming checklist](docs/08-recording-checklist.md) and
-[English Devpost draft](devpost-submission.md) are prepared. Actual video recording,
+[English Devpost draft](devpost-submission.md) are prepared. Actual Chrome screen
+footage has now been recorded and cut to a measured **170-second silent 1080p master**.
+It includes provider registration, actual scripted Codex MCP receipts, mock payout/
+reconciliation, real Gemini/Studio and a separate completed PayPal sandbox evidence scene.
+The [presenter packet](docs/video/presenter-guide-ja.md) includes English copy and
+an offline rehearsal player. Real presenter footage/narration, final composition,
 public YouTube upload, judge access and the live Devpost form check remain open.
 
 ```sh

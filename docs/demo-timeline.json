@@ -1,71 +1,80 @@
 {
   "target_seconds": 170,
   "max_words_per_minute": 150,
-  "minimum_action_seconds": 28,
+  "minimum_action_seconds": 24,
   "widget_prompt": "Plot what I paid each calendar day during the current month.",
   "scenes": [
     {
+      "id": "overview",
       "start": 0,
-      "end": 12,
-      "screen": "Buyer · fresh local take",
-      "action": "Hold on the $5.0000 balance and MOCK badge.",
-      "narration": "AgentMeter gives agent tool calls a spending limit and a receipt. This take uses simulated funds for the money flow and real Gemini for analytics."
+      "end": 8,
+      "narration": "AgentMeter helps tool makers earn from useful APIs, while giving AI agents a budget and clear receipts.",
+      "screen": "Local overview",
+      "action": "Hold the product overview; local mock mode is labeled."
     },
     {
-      "start": 12,
-      "end": 33,
-      "screen": "Buyer · three calls",
-      "action": "Click Run 3-call demo once. Hold $4.9700 and $0.0300 author credits.",
-      "narration": "One click runs a scripted three-call plan. Each call costs one cent. The ledger reserves before execution, settles successful calls, and credits the author. Five dollars becomes four ninety-seven; the author earns three cents."
+      "id": "publish",
+      "start": 8,
+      "end": 36,
+      "narration": "Here is a simple invoice example. A provider registers a read-only API, sets a one-cent price, and tests a synthetic invoice. The invoice total is one hundred twenty dollars; the tool fee is only one cent. After a successful connection test, I publish the tool through AgentMeter’s MCP endpoint.",
+      "screen": "Local provider portal",
+      "action": "Register the free invoice API example at $0.01, save a draft, test synthetic input, publish. Cuts omit setup pauses."
     },
     {
-      "start": 33,
-      "end": 47,
-      "screen": "Buyer · failure",
-      "action": "Click Try a tool failure. Show RELEASED and $0.0000 price.",
-      "narration": "This deliberately failing tool releases its reservation. The buyer stays at four ninety-seven, and the receipt says released with zero charge. Retries reuse receipts."
+      "id": "calls",
+      "start": 36,
+      "end": 60,
+      "narration": "The buyer starts with five dollars of test credit. The installed Codex MCP client sends three invoice requests to this registered service. Each successful execution settles once. The buyer now has four ninety-seven, and this provider has earned three cents. This is scripted transport verification, without a model turn.",
+      "screen": "Local buyer workspace",
+      "action": "Show $5 before and $4.97 after three actual scripted Codex MCP calls; namespaced tool receipts and invoice output are visible. Transport runs off screen."
     },
     {
-      "start": 47,
-      "end": 64,
-      "screen": "Provider · payout",
-      "action": "Open Provider, show $0.0300, then click Pay out earnings. Hold SUCCESS and $0.0000.",
-      "narration": "The author can now pay out the three cents. This take uses the mock payment rail. A successful batch and item receipt reduce the author balance to zero."
+      "id": "failure",
+      "start": 60,
+      "end": 70,
+      "narration": "A deliberately failing request releases its reservation. It costs zero, and the buyer stays at four ninety-seven. Retries also avoid duplicate charges.",
+      "screen": "Local buyer workspace",
+      "action": "Send FAIL_UPSTREAM to the same registered tool; show RELEASED, zero charge and unchanged credit."
     },
     {
-      "start": 64,
-      "end": 82,
-      "screen": "Reconciliation · mock",
-      "action": "Open Reconciliation. Show two MATCH rows and gross, fee and net.",
-      "narration": "Reconciliation matches the funding and payout receipts. Gross credit, fees, and net cash stay separate. These two matches are simulated here; the separate PayPal sandbox evidence uses actual sandbox APIs."
+      "id": "payout",
+      "start": 70,
+      "end": 84,
+      "narration": "The provider can pay out those three cents. This local sequence uses simulated payments. A successful payout clears the earnings and preserves the receipt.",
+      "screen": "Local personal provider portal",
+      "action": "Show $0.03 own earnings, request mock payout, then show SUCCESS and zero remaining earnings."
     },
     {
-      "start": 82,
-      "end": 126,
-      "screen": "Analytics · real Gemini and Studio",
-      "action": "Open Analytics. Submit the prepared paraphrase. Wait for Gemini model source, Page-agent delegation, hand-back and chart.",
-      "narration": "Now I ask: plot what I paid each calendar day during the current month. Gemini Flash-Lite turns that wording into a structured intent. The server validates the metric, grouping, period, and tool. Our custom analyst delegates to Studio’s Page agent, which adds the chart and returns the task. The source explicitly names Gemini."
+      "id": "reconcile",
+      "start": 84,
+      "end": 96,
+      "narration": "Reconciliation checks funding and payout against the payment rail. Gross credit, fees, and net cash are separate. These two matches are simulated.",
+      "screen": "Local reconciliation",
+      "action": "Show two simulated reporting matches and separate gross, fee and net columns."
     },
     {
-      "start": 126,
-      "end": 145,
-      "screen": "Analytics · custom widget and layout",
-      "action": "Resize the custom receipt. Briefly show the themed Grid and custom USD/status cells.",
-      "narration": "This is our own receipt widget, alongside the themed Grid and custom money and status cells. I can resize the Studio layout. Charting reads the ledger; it never moves funds."
+      "id": "analytics",
+      "start": 96,
+      "end": 140,
+      "narration": "Now I ask, plot what I paid each calendar day during the current month. Real Gemini converts that question into a validated intent. Our custom Studio analyst delegates to the Page agent, which creates a chart and returns the task. The source names Gemini. This custom receipt widget and the themed Grid make usage visible. These views keep billing evidence beside the data. Historical rows are synthetic; analysis never moves funds.",
+      "screen": "Local Gemini/Studio and Grid",
+      "action": "Submit the actual question in Studio AI Assistant; retain normal-speed model wait, Page-agent hand-back, model source and chart. Cut to the themed Grid."
     },
     {
-      "start": 145,
+      "id": "sandbox",
+      "start": 140,
       "end": 162,
-      "screen": "Hosted reconciliation · separate completed sandbox run",
-      "action": "Switch to the pre-authenticated Render Reconcile tab. Keep PAYPAL SANDBOX visible. Read-only; no new payment.",
-      "narration": "This separate, completed PayPal sandbox run shows two independent reporting matches: capture and author payout. Signed webhook redelivery and a service restart preserved the same balances and receipt identities."
+      "narration": "This is a separate completed run on the permanent Render backend. The provider’s actual PayPal sandbox payout succeeded. Fresh PayPal reads verify the receipt. Transaction Search can arrive later, so its status stays visible. Restarting the service preserved the tools, balances, and receipts.",
+      "screen": "Hosted provider portal and reconciliation",
+      "action": "Read-only view of the separately completed real sandbox payout; three independently verified rail receipts, with the new Search row visibly pending."
     },
     {
+      "id": "close",
       "start": 162,
       "end": 170,
-      "screen": "Close · AgentMeter",
-      "action": "Hold the app title and end. No long outro.",
-      "narration": "Clone and run npm start. No package installation. AgentMeter: meter, settle, verify."
+      "narration": "Your service. Your price. A receipt for every call. AgentMeter: meter, settle, verify.",
+      "screen": "Local overview",
+      "action": "Reuse the opening product hold as a closing shot."
     }
   ]
 }

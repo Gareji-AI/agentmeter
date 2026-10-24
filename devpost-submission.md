@@ -148,10 +148,12 @@ alone does not satisfy that requirement.
 
 ## Demo Video
 
-YouTube URL: **pending actual recording, export inspection and public upload**.
-Prepared outline: 0:00 buyer; 0:12 three calls; 0:33 failure; 0:47 payout;
-1:04 mock reconciliation; 1:22 real Gemini/Studio; 2:06 layout/Grid;
-2:25 separate completed sandbox reconciliation; 2:42 close; end at 2:50.
+YouTube URL: **pending presenter face/voice recording, composition, final inspection and public upload**.
+Actual Chrome screens are recorded and edited to a measured 170-second silent 1080p master.
+Recorded outline: 0:00 overview; 0:08 provider registration/test/publication;
+0:36 three actual scripted Codex MCP calls and receipts; 1:00 zero-charge failure;
+1:10 own mock payout; 1:24 mock reconciliation; 1:36 real Gemini/Studio and themed
+Grid; 2:20 separate completed hosted sandbox evidence; 2:42 close; end at 2:50.
 English narration and shot actions: `docs/01-demo-script.md`.
 
 ## Screenshot Shot List
@@ -171,7 +173,8 @@ are prepared. Chrome rehearsals verified the money loop and actual Gemini/Studio
 path. Recorded sandbox evidence covers SDK v6 approval, $5 capture, three $0.01
 calls, $0.03 successful payout, signed webhook replay, both Search matches and
 unchanged ledger identities after service restart. Raw evidence stays Git-ignored.
-This packet does not assert that a video has been made or that the live form was checked.
+The silent screen master exists; presenter footage and the final spoken composition
+do not exist yet. The live form has not been checked in this pass.
 
 ## Known Limitations
 
