@@ -148,3 +148,9 @@ The direct-transport evidence above remains historical. A later filmed Codex
 Buyer credit moved from $4.94 to $4.91, and this provider earned $0.03. Those new
 earnings remain unpaid. The privacy-filtered capture uses a three-input MCP gateway
 with fixed execution IDs and one-cent maximum prices. See [filming evidence](12-live-codex-filming.md).
+
+The [latest complete retake](13-full-demo-retake.md) uses another fresh provider:
+registration → one official Codex CLI invocation → three successful calls → buyer
+$4.91 to $4.88 → that provider's $0.03 actual sandbox payout SUCCESS → fresh API
+verification. Its newest Search row was pending when filmed. The earlier provider's
+unpaid earnings were not used for this payout. All selected footage is new.

@@ -1,71 +1,85 @@
-# AgentMeter — recorded screen demo and presenter plan
+# AgentMeter — full retake and presenter plan
 
-Updated silent screen master: **170 seconds, 1920 × 1080, H.264, 30 fps, no audio**.
-The revised spoken script contains **289 English words**. Presenter face/voice,
-final composition and public upload remain pending. The original master is preserved.
+Latest silent screen master: **162 seconds (2:42), 1920 × 1080, H.264, 30 fps**.
+All selected footage was newly recorded in Chrome on 2026-10-24. The older masters
+are archives. The updated English narration has **277 words**. Real presenter
+face/voice, composition and public upload remain pending.
 
-## Story and timed narration
+## One connected demonstration
 
-Start with local registration, then show an actual Codex model calling a hosted
-registered invoice API. Three successful calls spend $0.03 of existing PayPal
-sandbox credit: buyer $4.94 → $4.91, provider $0 → $0.03. The filmed client is our
-privacy-filtered app-server client, not the stock Codex chat UI. Keys, account
-settings, browser chrome and unrelated applications are excluded.
+A new hosted provider starts at zero, registers/tests/publishes one one-cent invoice
+API, and receives three calls from the actual installed Codex CLI. The same funded
+buyer goes from $4.91 to $4.88. That new provider earns $0.03, pays out this $0.03
+through real PayPal sandbox Payouts, and reaches SUCCESS with zero held/available
+credit. The same payout is independently checked in Reconciliation. Its Search
+report is still pending, visibly distinct from a verified fresh Payouts read.
+No mock payout or older payout footage appears in this retake.
 
 | Time | Screen / actual action | English narration |
 | --- | --- | --- |
-| 0:00–0:06 | Local overview: Hold the local mock overview. | “AgentMeter lets tool makers sell useful APIs, with budgets and receipts for AI agents.” |
-| 0:06–0:26 | Local provider portal: Local sample registration, probe and publication. This is separate from the hosted provider used next. | “A provider registers a read-only invoice API, sets a one-cent price, tests a synthetic input, and publishes it through MCP. This is a free sample service; the invoice amount is separate from the tool fee.” |
-| 0:26–1:10 | Privacy-filtered Codex live client → hosted registered API: Actual gpt-6.1-sol turns, three stored hosted receipts, buyer $4.94 → $4.91 and provider $0 → $0.03. Two model turns; idle waits and resume setup removed by hard cuts. | “Now a live Codex model calls the registered invoice tool through MCP. Synthetic invoices and a filtered client keep keys and account details off screen. Three successful calls consume three cents of existing PayPal sandbox credit: four ninety-four becomes four ninety-one. The provider earns three cents. Each row shows the real result and backend receipt. We captured two model turns, cutting idle waits. A local gateway enforces the three-cent allowance.” |
-| 1:10–1:18 | Separate local mock buyer: Show the earlier local zero-charge failure. These are different accounts from the hosted Codex run. | “In the separate offline demo, a failing request releases its hold and costs zero. Retries avoid duplicate charges.” |
-| 1:18–1:32 | Separate local mock provider: Earlier mock payout success; the new hosted earnings remain unpaid. | “The offline provider can pay out three cents of simulated earnings. Success clears the balance and keeps the receipt. This is separate from the hosted Codex run.” |
-| 1:32–1:40 | Separate local mock reconciliation: Hold the two earlier simulated reporting matches. | “Reconciliation separates purchased credit, payment fees, and cash received. These two matches use simulated payment receipts.” |
-| 1:40–2:24 | Actual Gemini/Studio and themed Grid: Preserve the real Gemini/Studio handoff footage at normal speed, then the themed Grid. | “Now I ask, plot what I paid each calendar day this month. Real Gemini converts the question into a validated intent. Our custom Studio analyst delegates to the Page agent, which creates a chart and returns the task. The source names Gemini. The custom receipt widget and themed Grid expose usage and cost. Historical rows are synthetic; analysis never moves funds.” |
-| 2:24–2:42 | Earlier completed hosted PayPal sandbox evidence: Earlier payout and reporting footage; no new payout was made for the Codex filming take. | “The permanent Render backend also has a completed PayPal sandbox payout. Fresh PayPal reads verify that receipt. Transaction Search may arrive later, so pending reporting stays visible. A restart preserved the recorded balances and receipts.” |
-| 2:42–2:50 | Local overview: Close on the local overview. | “Your service. Your price. A receipt for every call. AgentMeter: meter, settle, verify.” |
+| 0:00–0:06 | Hosted provider portal: New zero-earning provider, recorded at the start of this same take. | “AgentMeter lets developers sell useful tools to AI agents, with budgets and receipts.” |
+| 0:06–0:36 | Hosted provider registration: Actual new draft, connection probe and publication of the same provider-prefixed tool used by Codex. | “I register a read-only invoice API, set the price to one cent, and test a synthetic invoice. After testing, I publish its stable MCP name. The example endpoint is free; this demonstrates how a provider meters access.” |
+| 0:36–0:46 | Hosted buyer console: Show existing $4.91 credit and choose the new tool from the priced catalogue. | “The buyer already has four dollars and ninety-one cents of sandbox credit. I choose the newly published one-cent tool.” |
+| 0:46–1:12 | Official Codex CLI output streamed to Chrome: Retain one continuous normal-speed interval from prompt entry through the three successful MCP calls and model answer. One CLI invocation, no resume or repeated turn. | “Here I enter a real request into the installed Codex CLI: review three synthetic invoices for at most three cents. Codex calls the registered MCP tool three times and returns the totals and due dates. These are actual CLI logs, streamed to Chrome with private data redacted.” |
+| 1:12–1:22 | Hosted buyer console: The same newly registered tool appears in three new stored receipts; actual balance $4.88. | “Back in AgentMeter, all three calls are settled. The buyer now has four eighty-eight. Every result has a receipt.” |
+| 1:22–1:44 | Same hosted provider portal: Actual $0.03 earnings → Pay out → SENT hold → SUCCESS and zero balances. Remove the intervening poll wait. | “The same provider started at zero and earned three cents from these calls. I request a PayPal sandbox payout. Pending funds remain reserved. Once the batch and item succeed, earnings and reserved funds return to zero. The payout receipt remains.” |
+| 1:44–2:00 | Hosted reconciliation: Fresh API VERIFIED for this new payout, PENDING_REPORT preserved; three of four total payment-rail records match independent reporting. | “Reconciliation checks this payout against PayPal. The fresh API receipt agrees. Transaction Search has not reported the new transfer yet, so it stays pending. Fees, gross credit, and net cash remain separate.” |
+| 2:00–2:36 | Hosted Gemini/Studio and AG Grid: Fresh actual Gemini request, visible model source and Page-agent hand-back, generated chart and custom receipt, then the new tool’s three-call/$0.03 row in themed Grid. Hosted ledger identity unchanged. | “Next I ask for daily spend this month. Real Gemini produces a validated intent. Our custom Studio analyst delegates to the Page agent, which creates the chart and hands back the task. The custom receipt widget and themed Grid show exact money and status cells. This tool has three paid calls. Historical rows are synthetic; analysis never moves funds.” |
+| 2:36–2:42 | Hosted buyer console: New closing capture of the same buyer and $4.88 balance. | “Your tool. Your price. Clear receipts for every successful call. AgentMeter.” |
 
-Canonical timing and copy: `demo-timeline.json` and `demo-voiceover.txt`.
-Shot sources: `video/edit-list.json`. Actor notes: [presenter guide](video/presenter-guide-ja.md).
+The canonical timing and voiceover are `demo-timeline.json` and `demo-voiceover.txt`.
+Edit sources are `video/edit-list.json`; all ten raw clip filenames belong to the
+new retake folder. See [retake evidence](13-full-demo-retake.md).
 
-## Source boundaries
+## What the viewer is seeing
 
-The Codex scene is genuine Chrome footage of two ephemeral `gpt-6.1-sol` turns.
-The first turn had one successful call and two attempts without settled receipts;
-the second processed the remaining two invoices, preserving the approved execution
-IDs. No more than $0.03 was spent. Hard cuts shorten idle waits and resume setup;
-retained actions play at normal speed. No financial result or screen is reconstructed.
-The source label discloses two turns and cut waits. The API is a free public sample
-on the same Render backend; this does not claim proprietary OCR, invoice approval,
-payment of the invoice itself, or unprompted tool selection.
+The recording environment restricts automation of native terminal apps. Chrome
+therefore displays the **installed official Codex CLI's real stdout/stderr** in a
+local filming terminal. It is not a stock Codex desktop/TUI window, generated
+conversation or simulated execution. The camera shows prompt entry, launch,
+actual named MCP start/completion logs and the CLI's invoice table/charge answer.
+The retained 26-second interval is continuous and at normal speed, from raw
+`04-codex-cli.mp4` seconds 9–35. One CLI invocation exited zero with exactly three
+MCP requests and three unique hosted SETTLED receipts. No retry/resume was needed.
 
-The local mock failure/payout/reconciliation scenes and the earlier completed
-hosted payout are separate demonstrations. The new $0.03 hosted earnings remain
-unpaid; the older payout footage does not show those new earnings being paid out.
-Gemini/Studio uses the actual model and licensed agent framework. Its historical
-rows are synthetic, and analysis does not move funds.
-See [live Codex evidence](12-live-codex-filming.md) for verification and privacy scope.
+A loopback capture gateway restricts execution to three synthetic inputs, binds
+stable execution IDs and enforces one-cent maximum quotes. Credentials stay
+server-side. The CLI runs without user config/plugins/shell/web/multi-agent tools,
+in a scratch directory, under read-only policy. Personal paths and secrets are
+redacted from the real text stream. Browser chrome, unrelated windows and
+recipient/recovery settings are excluded from the encoded window capture.
 
-## Local deliverables
+Hard cuts remove registration setup, payout polling waits and analytics idle time.
+Every retained action plays at normal speed. Every source range is checked against
+its real recorded duration; the assembler has no freeze-frame padding. No financial
+state was reset or reconstructed. The older provider's unpaid earnings are separate
+from this fresh provider's successfully paid earnings.
 
-Revised packet: `~/Movies/AgentMeter-live-tool-2026-10-24/`.
+The invoice sample is a free public endpoint on the same backend, not proprietary
+OCR or invoice approval/payment. Invoice totals are input data, not tool fees.
+The $2.4650 analytics receipt includes synthetic history plus live spend; it is
+not the buyer's $4.88 balance. The themed Grid includes this new tool's three calls
+and $0.03. The fresh Gemini/Studio session leaves the hosted ledger identity unchanged.
 
-- `delivery/agentmeter-screen-only.mp4`: revised 170-second silent master.
-- `delivery/agentmeter-codex-live.mp4`: standalone 44-second actual-model scene.
-- `delivery/presenter-rehearsal.html`: offline video with synchronized English copy.
-- `delivery/narration-english.txt` and `.srt`: actor copy and optional subtitle guide.
+## Local delivery
+
+Use `~/Movies/AgentMeter-retake-2026-10-24/`, not the two older packet folders.
+
+- `delivery/agentmeter-screen-only.mp4`: the complete new 2:42 silent master.
+- `delivery/presenter-rehearsal.html`: offline video and synchronized English actor copy.
+- `delivery/narration-english.txt` / `.srt`: narration and optional timed subtitle guide.
 - `delivery/撮影メモ.md`: Japanese presenter instructions.
-- `delivery/media-check.json`: measured duration, codec, dimensions and no-audio check.
-- `raw/`: original app-only window recordings; private connection files stay under ignored `data/`.
+- `delivery/media-check.json`: measured codec/duration, full decode and privacy notes.
+- `raw/`: genuinely new window recordings, retained outside Git.
 
-The earlier packet under `~/Movies/AgentMeter-demo-2026-10-24/` is an archive and
-contains the superseded scripted transport scene. Use the revised packet for filming.
-Optional local capture/edit helpers require macOS 15+, Apple SDK, FFmpeg and Python;
-they add no dependency to the Node application.
+Credentials, execution nonces and private API evidence remain in ignored
+`data/recordings/retake-20261024/`. The delivery ZIP contains only the reviewed
+video, actor copy and previews. No public upload or Devpost transmission occurred.
 
-## Next production step
+## Presenter and final export
 
-Record real face and English voice, with a few seconds of lead/tail room. Chapter
-takes are fine. Then edit mistakes, synchronize speech, position the presenter
-without covering money/receipt evidence, and retime subtitles. Watch the complete
-composition and measure it below 180 seconds. No face/voice was synthesized or
-assumed received; no YouTube publishing or Devpost submission was performed.
+Record real face and English voice with lead/tail room; chapter takes are fine.
+Edit mistakes and synchronize the delivery. Place the presenter without obscuring
+money or status evidence, moving the face when the Reconciliation status column
+needs space. Inspect the entire final composition and measure it below 180 seconds.
+The measured silent master is not proof of a future composite's duration.

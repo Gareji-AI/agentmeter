@@ -1,13 +1,13 @@
 {
-  "mode": "Actual Chrome footage; hard cuts including Codex idle waits and resume setup; normal-speed retained action; two Codex model turns; no reconstructed results",
+  "mode": "All new source clips from this retake. Same hosted tool, buyer, provider and payout. Normal speed. Hard cuts between scenes; cut payment/analysis waits. No freeze padding. One continuous Codex invocation interval.",
   "scenes": [
     {
       "id": "overview",
-      "title": "Paid tools for AI agents",
-      "label": "LOCAL DEMO · MOCK PAYMENTS",
+      "title": "Your API can become a paid agent tool",
+      "label": "RENDER BACKEND · PAYPAL SANDBOX TEST FUNDS",
       "cuts": [
         [
-          "01-overview-take2.mp4",
+          "01-provider.mp4",
           0,
           6
         ]
@@ -15,137 +15,117 @@
     },
     {
       "id": "publish",
-      "title": "Register · price · test · publish",
-      "label": "PUBLIC INVOICE EXAMPLE · $0.01 / SUCCESS",
+      "title": "Register · set a price · test · publish",
+      "label": "ONE NEW PROVIDER · ONE TOOL · $0.01 / SUCCESS",
       "cuts": [
         [
-          "02-provider-registration.mp4",
+          "01-provider.mp4",
+          15,
+          14
+        ],
+        [
+          "01-provider.mp4",
+          106,
+          10
+        ],
+        [
+          "02-publish.mp4",
           0,
-          3
-        ],
-        [
-          "02-provider-registration.mp4",
-          31,
-          5
-        ],
-        [
-          "02-provider-registration.mp4",
-          43,
           6
-        ],
+        ]
+      ]
+    },
+    {
+      "id": "buyer",
+      "title": "Choose the tool · check its price",
+      "label": "EXISTING SANDBOX BUYER CREDIT · $4.91",
+      "cuts": [
         [
-          "02-provider-registration.mp4",
-          54,
-          6
+          "03-buyer-before.mp4",
+          2,
+          10
         ]
       ]
     },
     {
       "id": "calls",
-      "title": "Codex calls a registered invoice tool",
-      "label": "REAL MODEL · SANDBOX CREDIT · TWO TURNS / CUT WAITS",
+      "title": "Codex CLI calls the registered tool",
+      "label": "REAL CLI OUTPUT · ONE RUN · NORMAL SPEED",
       "cuts": [
         [
-          "codex-live-sandbox.mp4",
-          0,
-          12
-        ],
-        [
-          "codex-live-sandbox.mp4",
-          30,
-          13
-        ],
-        [
-          "codex-live-remaining.mp4",
-          8,
-          12
-        ],
-        [
-          "codex-live-remaining.mp4",
-          80,
-          7
+          "04-codex-cli.mp4",
+          9,
+          26
         ]
       ]
     },
     {
-      "id": "failure",
-      "title": "Failed upstream · zero charge",
-      "label": "SEPARATE LOCAL DEMO · MOCK PAYMENTS",
+      "id": "after",
+      "title": "Three successful calls · three receipts",
+      "label": "SAME HOSTED BUYER · $4.91 → $4.88",
       "cuts": [
         [
-          "04-failure.mp4",
-          11,
-          8
+          "05-buyer-after.mp4",
+          2,
+          10
         ]
       ]
     },
     {
       "id": "payout",
-      "title": "Provider earnings → payout",
-      "label": "SEPARATE LOCAL DEMO · MOCK PAYMENTS",
+      "title": "Earn $0.03 · pay out through PayPal sandbox",
+      "label": "SAME PROVIDER · NEW EARNINGS · TEST FUNDS",
       "cuts": [
         [
-          "05-provider-payout.mp4",
-          12,
-          14
+          "06-provider-payout.mp4",
+          0,
+          12
+        ],
+        [
+          "06-provider-payout.mp4",
+          55,
+          10
         ]
       ]
     },
     {
       "id": "reconcile",
-      "title": "Gross · fee · net · receipts",
-      "label": "SEPARATE LOCAL DEMO · MOCK PAYMENTS",
+      "title": "Match the payout · keep reporting honest",
+      "label": "FRESH PAYPAL API VERIFIED · SEARCH STILL PENDING",
       "cuts": [
         [
-          "06-reconciliation.mp4",
-          4,
-          8
+          "07-reconcile.mp4",
+          3,
+          16
         ]
       ]
     },
     {
       "id": "analytics",
       "title": "Gemini → Studio Page agent → chart",
-      "label": "REAL GEMINI · SYNTHETIC HISTORY + LIVE CALLS",
+      "label": "REAL GEMINI · CUSTOM RECEIPT · THEMED GRID",
       "cuts": [
         [
-          "07-gemini-studio.mp4",
-          0,
-          34
+          "08-gemini-studio.mp4",
+          28,
+          26
         ],
         [
-          "07b-themed-grid.mp4",
-          0,
+          "09-themed-grid.mp4",
+          1,
           10
         ]
       ]
     },
     {
-      "id": "sandbox",
-      "title": "Separate completed PayPal sandbox run",
-      "label": "EARLIER COMPLETED PAYPAL SANDBOX RUN",
-      "cuts": [
-        [
-          "08-real-sandbox.mp4",
-          3,
-          7
-        ],
-        [
-          "08-real-sandbox.mp4",
-          29,
-          11
-        ]
-      ]
-    },
-    {
       "id": "close",
-      "title": "Your service. Your price. Clear receipts.",
+      "title": "Your tool. Your price. Clear receipts.",
       "label": "METER · SETTLE · VERIFY",
       "cuts": [
         [
-          "01-overview-take2.mp4",
-          0,
-          8
+          "10-close.mp4",
+          1,
+          6
         ]
       ]
     }

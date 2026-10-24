@@ -1,6 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { boundedCall, invoices, safeResult } from '../scripts/video/live-codex.mjs';
+import { captureLineSink } from '../scripts/video/cli-recording.mjs';
+
+test('CLI filming never emits a partial credential split across stream chunks', () => {
+  const chunks=[];const key='private-test-token-123456';
+  const sink=captureLineSink(s=>chunks.push(s),[key,'/Users/private-person']);
+  sink.write('token: private-test-');assert.equal(chunks.length,0);
+  sink.write('token-123456\n\x1b[32mInvoice DEMO-201: $0.01\x1b[0m\n');
+  sink.write('/Users/private-');sink.write('person/demo');sink.end();
+  const output=chunks.join('');assert.equal(output,'token: [private]\nInvoice DEMO-201: $0.01\n[private]/demo');
+  for(const chunk of chunks)assert.ok(!chunk.includes(key)&&!chunk.includes('private-test-')&&!chunk.includes('/Users/private-'));
+});
 
 test('filming gateway binds retries to three approved inputs and a one-cent quote', () => {
   const nonces = ['invoice-one', 'invoice-two', 'invoice-three'];

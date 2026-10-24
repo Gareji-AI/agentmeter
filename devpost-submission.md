@@ -152,25 +152,27 @@ alone does not satisfy that requirement.
 ## Demo Video
 
 YouTube URL: **pending presenter face/voice recording, composition, final inspection and public upload**.
-Actual Chrome screens are recorded and edited to a measured 170-second silent 1080p master.
-Revised outline: 0:00 overview; 0:06 local provider registration/test/publication;
-0:26 actual Codex model calls the hosted registered tool, buyer $4.94 → $4.91 and
-provider $0 → $0.03; 1:10 separate local zero-charge failure; 1:18 mock payout;
-1:32 mock reconciliation; 1:40 real Gemini/Studio and themed Grid; 2:24 earlier
-completed hosted sandbox payout evidence; 2:42 close; end at 2:50. The filtered
-Codex capture client shows actual results and receipts, across two model turns
-with idle waits cut. New hosted earnings remain unpaid.
+A completely new Chrome recording is edited to a measured **162-second (2:42)
+silent 1080p master**. The filmed flow uses one new provider and its own newly
+registered invoice tool: 0:00 introduction; 0:06 registration/test/publication;
+0:36 buyer selects the one-cent tool; 0:46 real official Codex CLI prompt → three
+MCP calls → invoice table; 1:12 actual buyer balance $4.91 → $4.88; 1:22 the same
+provider's $0.03 earnings → actual sandbox payout SUCCESS; 1:44 this payout's fresh
+PayPal API verification and pending Search report; 2:00 fresh Gemini/Studio and
+themed Grid; 2:36 close. No old or mock payout shot is reused. The CLI's actual
+stdout/stderr is streamed into a privacy-filtered Chrome terminal; its 26-second
+input-to-answer interval is continuous, at normal speed, in one invocation.
 English narration and shot actions: `docs/01-demo-script.md`.
 
 ## Screenshot Shot List
 
 Capture app-only English images after checking for private data:
 
-1. Buyer: $4.9700 available, three settled calls, zero-charge released receipt and MOCK badge.
-2. Provider: $0.0300 successful mock payout and zero remaining author earnings.
+1. Hosted buyer: $4.8800 available and three settled calls for the newly registered tool.
+2. Same fresh provider: successful $0.0300 PayPal sandbox payout and zero available/reserved earnings.
 3. Analytics: Gemini source/model, Page-agent delegation/hand-back, custom receipt and chart.
 4. Themed Grid: custom USD and state cells beside the Studio layout.
-5. Separate hosted sandbox Reconciliation: two MATCH rows, fee sources and sandbox badge.
+5. Same payout in hosted Reconciliation: fresh API VERIFIED, Search PENDING_REPORT; fee sources and sandbox badge.
 
 ## Submission Readiness Notes
 
@@ -204,30 +206,22 @@ single sponsor target (AG Grid). Add the real public video URL, arrange code/dem
 access and review required acknowledgments. No registration, rule acknowledgment,
 team membership or form-specific answer is inferred here.
 
-## Additional provider verification
+## Verified provider demonstration
 
-On the hosted service, a new provider registered a one-cent invoice API and MCP
-tool, tested and published both. The installed Codex MCP client executed API → MCP
-→ API, leaving the existing buyer at $4.94 from $4.97 and crediting the new provider
-$0.03. A repeated execution charged zero; an upstream failure released its hold.
-The provider requested a real PayPal sandbox payout: batch and item both SUCCESS,
-with a matching USD amount and receiver. A service restart retained the tools,
-credentials, balances and receipts. This test used direct Codex app-server tool
-calls, without a model turn; autonomous model selection is not claimed. Both sample
-upstreams run on this same backend and are publicly free demonstration endpoints.
+A fresh hosted provider registers, probes and publishes its invoice API at $0.01.
+One installed Codex CLI invocation makes exactly three successful MCP requests;
+the buyer's existing sandbox credit moves from $4.91 to $4.88, and that provider
+earns $0.03. The provider then pays out this new $0.03 through actual PayPal sandbox
+Payouts. Batch and item both succeed, leaving zero available and reserved earnings.
+Fresh PayPal reads verify the outgoing amount; its Search report remains pending,
+while three earlier payment-rail records match. The same tool name connects the
+registration, CLI task, buyer receipts, author earnings and Grid row.
 
-The original capture and payout remain Transaction Search matches. The new payout
-is independently verified through fresh Payouts GET and remains visibly pending in
-Transaction Search. See `docs/10-provider-tools.md` for the exact evidence boundary.
-
-## Actual-model tool-use filming update
-
-A later bounded capture used the real `gpt-6.1-sol` model through installed Codex
-app-server. Across two ephemeral model turns, three synthetic invoices reached the
-registered HTTP API through MCP and settled for 30000 micro-USD total. Buyer credit
-changed from $4.94 to $4.91 and that provider earned $0.03; hosted receipt reads
-independently confirm all three IDs. There was no new capture or payout in this
-take. The app-server client is our local privacy-filtered filming UI, not the stock
-Codex application UI. The source label discloses shortened waits and two turns.
-This verifies model execution of a requested tool, not autonomous price selection
-or payment approval. See `docs/12-live-codex-filming.md`.
+Chrome streams the official CLI's actual stdout/stderr with private fields redacted.
+The input-to-answer interval is continuous and at normal speed, in one invocation.
+Fresh Gemini/Studio and themed Grid footage complete the all-new recording. The
+analytics session preserves the hosted ledger identity. Earlier automated proofs
+also cover replay/failure charge zero, API plus MCP upstreams and restart persistence.
+Both supplied invoice examples are free public endpoints on this same backend;
+this demonstrates provider metering, not proprietary OCR or invoice payment.
+See `docs/10-provider-tools.md` and `docs/13-full-demo-retake.md`.

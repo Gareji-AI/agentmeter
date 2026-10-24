@@ -1,5 +1,9 @@
 # Actual Codex model tool-use filming
 
+This is the earlier two-turn capture, retained as historical evidence. The
+[complete new retake](13-full-demo-retake.md) supersedes its edited video and
+follows a different fresh provider through that provider's own successful payout.
+
 Verified in Chrome on 2026-10-24. This extends the earlier direct, scripted MCP
 transport proof; it does not rewrite that earlier test as model-driven execution.
 

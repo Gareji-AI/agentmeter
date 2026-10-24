@@ -1,5 +1,5 @@
 {
-  "target_seconds": 170,
+  "target_seconds": 162,
   "max_words_per_minute": 150,
   "minimum_action_seconds": 24,
   "widget_prompt": "Plot what I paid each calendar day during the current month.",
@@ -8,73 +8,73 @@
       "id": "overview",
       "start": 0,
       "end": 6,
-      "narration": "AgentMeter lets tool makers sell useful APIs, with budgets and receipts for AI agents.",
-      "screen": "Local overview",
-      "action": "Hold the local mock overview."
+      "narration": "AgentMeter lets developers sell useful tools to AI agents, with budgets and receipts.",
+      "screen": "Hosted provider portal",
+      "action": "New zero-earning provider, recorded at the start of this same take."
     },
     {
       "id": "publish",
       "start": 6,
-      "end": 26,
-      "narration": "A provider registers a read-only invoice API, sets a one-cent price, tests a synthetic input, and publishes it through MCP. This is a free sample service; the invoice amount is separate from the tool fee.",
-      "screen": "Local provider portal",
-      "action": "Local sample registration, probe and publication. This is separate from the hosted provider used next."
+      "end": 36,
+      "narration": "I register a read-only invoice API, set the price to one cent, and test a synthetic invoice. After testing, I publish its stable MCP name. The example endpoint is free; this demonstrates how a provider meters access.",
+      "screen": "Hosted provider registration",
+      "action": "Actual new draft, connection probe and publication of the same provider-prefixed tool used by Codex."
+    },
+    {
+      "id": "buyer",
+      "start": 36,
+      "end": 46,
+      "narration": "The buyer already has four dollars and ninety-one cents of sandbox credit. I choose the newly published one-cent tool.",
+      "screen": "Hosted buyer console",
+      "action": "Show existing $4.91 credit and choose the new tool from the priced catalogue."
     },
     {
       "id": "calls",
-      "start": 26,
-      "end": 70,
-      "narration": "Now a live Codex model calls the registered invoice tool through MCP. Synthetic invoices and a filtered client keep keys and account details off screen. Three successful calls consume three cents of existing PayPal sandbox credit: four ninety-four becomes four ninety-one. The provider earns three cents. Each row shows the real result and backend receipt. We captured two model turns, cutting idle waits. A local gateway enforces the three-cent allowance.",
-      "screen": "Privacy-filtered Codex live client → hosted registered API",
-      "action": "Actual gpt-6.1-sol turns, three stored hosted receipts, buyer $4.94 → $4.91 and provider $0 → $0.03. Two model turns; idle waits and resume setup removed by hard cuts."
+      "start": 46,
+      "end": 72,
+      "narration": "Here I enter a real request into the installed Codex CLI: review three synthetic invoices for at most three cents. Codex calls the registered MCP tool three times and returns the totals and due dates. These are actual CLI logs, streamed to Chrome with private data redacted.",
+      "screen": "Official Codex CLI output streamed to Chrome",
+      "action": "Retain one continuous normal-speed interval from prompt entry through the three successful MCP calls and model answer. One CLI invocation, no resume or repeated turn."
     },
     {
-      "id": "failure",
-      "start": 70,
-      "end": 78,
-      "narration": "In the separate offline demo, a failing request releases its hold and costs zero. Retries avoid duplicate charges.",
-      "screen": "Separate local mock buyer",
-      "action": "Show the earlier local zero-charge failure. These are different accounts from the hosted Codex run."
+      "id": "after",
+      "start": 72,
+      "end": 82,
+      "narration": "Back in AgentMeter, all three calls are settled. The buyer now has four eighty-eight. Every result has a receipt.",
+      "screen": "Hosted buyer console",
+      "action": "The same newly registered tool appears in three new stored receipts; actual balance $4.88."
     },
     {
       "id": "payout",
-      "start": 78,
-      "end": 92,
-      "narration": "The offline provider can pay out three cents of simulated earnings. Success clears the balance and keeps the receipt. This is separate from the hosted Codex run.",
-      "screen": "Separate local mock provider",
-      "action": "Earlier mock payout success; the new hosted earnings remain unpaid."
+      "start": 82,
+      "end": 104,
+      "narration": "The same provider started at zero and earned three cents from these calls. I request a PayPal sandbox payout. Pending funds remain reserved. Once the batch and item succeed, earnings and reserved funds return to zero. The payout receipt remains.",
+      "screen": "Same hosted provider portal",
+      "action": "Actual $0.03 earnings → Pay out → SENT hold → SUCCESS and zero balances. Remove the intervening poll wait."
     },
     {
       "id": "reconcile",
-      "start": 92,
-      "end": 100,
-      "narration": "Reconciliation separates purchased credit, payment fees, and cash received. These two matches use simulated payment receipts.",
-      "screen": "Separate local mock reconciliation",
-      "action": "Hold the two earlier simulated reporting matches."
+      "start": 104,
+      "end": 120,
+      "narration": "Reconciliation checks this payout against PayPal. The fresh API receipt agrees. Transaction Search has not reported the new transfer yet, so it stays pending. Fees, gross credit, and net cash remain separate.",
+      "screen": "Hosted reconciliation",
+      "action": "Fresh API VERIFIED for this new payout, PENDING_REPORT preserved; three of four total payment-rail records match independent reporting."
     },
     {
       "id": "analytics",
-      "start": 100,
-      "end": 144,
-      "narration": "Now I ask, plot what I paid each calendar day this month. Real Gemini converts the question into a validated intent. Our custom Studio analyst delegates to the Page agent, which creates a chart and returns the task. The source names Gemini. The custom receipt widget and themed Grid expose usage and cost. Historical rows are synthetic; analysis never moves funds.",
-      "screen": "Actual Gemini/Studio and themed Grid",
-      "action": "Preserve the real Gemini/Studio handoff footage at normal speed, then the themed Grid."
-    },
-    {
-      "id": "sandbox",
-      "start": 144,
-      "end": 162,
-      "narration": "The permanent Render backend also has a completed PayPal sandbox payout. Fresh PayPal reads verify that receipt. Transaction Search may arrive later, so pending reporting stays visible. A restart preserved the recorded balances and receipts.",
-      "screen": "Earlier completed hosted PayPal sandbox evidence",
-      "action": "Earlier payout and reporting footage; no new payout was made for the Codex filming take."
+      "start": 120,
+      "end": 156,
+      "narration": "Next I ask for daily spend this month. Real Gemini produces a validated intent. Our custom Studio analyst delegates to the Page agent, which creates the chart and hands back the task. The custom receipt widget and themed Grid show exact money and status cells. This tool has three paid calls. Historical rows are synthetic; analysis never moves funds.",
+      "screen": "Hosted Gemini/Studio and AG Grid",
+      "action": "Fresh actual Gemini request, visible model source and Page-agent hand-back, generated chart and custom receipt, then the new tool’s three-call/$0.03 row in themed Grid. Hosted ledger identity unchanged."
     },
     {
       "id": "close",
-      "start": 162,
-      "end": 170,
-      "narration": "Your service. Your price. A receipt for every call. AgentMeter: meter, settle, verify.",
-      "screen": "Local overview",
-      "action": "Close on the local overview."
+      "start": 156,
+      "end": 162,
+      "narration": "Your tool. Your price. Clear receipts for every successful call. AgentMeter.",
+      "screen": "Hosted buyer console",
+      "action": "New closing capture of the same buyer and $4.88 balance."
     }
   ]
 }

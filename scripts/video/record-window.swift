@@ -46,8 +46,11 @@ final class RecorderDelegate: NSObject, SCRecordingOutputDelegate, SCStreamDeleg
     let duration = Double(args[2])!
     let stopFile = args[1] + ".stop"
     let end = Date().addingTimeInterval(duration)
-    while Date() < end && !FileManager.default.fileExists(atPath:stopFile) { try await Task.sleep(for:.milliseconds(100)) }
-    try await stream.stopCapture()
+    while Date() < end && !delegate.finished && !FileManager.default.fileExists(atPath:stopFile) { try await Task.sleep(for:.milliseconds(100)) }
+    if !delegate.finished {
+      do { try await stream.stopCapture() }
+      catch { if !delegate.finished { throw error } }
+    }
     for _ in 0..<100 { if delegate.finished {break}; try await Task.sleep(for:.milliseconds(50)) }
  }
 }

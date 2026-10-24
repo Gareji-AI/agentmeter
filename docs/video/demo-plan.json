@@ -1,60 +1,60 @@
 {
-  "target_seconds": 170,
-  "format": "1920x1080, silent screen recording, later presenter picture-in-picture",
+  "target_seconds": 162,
+  "format": "1920x1080, silent Chrome window recordings; wholly new take; later real presenter overlay",
   "scenes": [
     {
       "id": "overview",
       "start": 0,
       "end": 6,
-      "narration": "AgentMeter lets tool makers sell useful APIs, with budgets and receipts for AI agents."
+      "narration": "AgentMeter lets developers sell useful tools to AI agents, with budgets and receipts."
     },
     {
       "id": "publish",
       "start": 6,
-      "end": 26,
-      "narration": "A provider registers a read-only invoice API, sets a one-cent price, tests a synthetic input, and publishes it through MCP. This is a free sample service; the invoice amount is separate from the tool fee."
+      "end": 36,
+      "narration": "I register a read-only invoice API, set the price to one cent, and test a synthetic invoice. After testing, I publish its stable MCP name. The example endpoint is free; this demonstrates how a provider meters access."
+    },
+    {
+      "id": "buyer",
+      "start": 36,
+      "end": 46,
+      "narration": "The buyer already has four dollars and ninety-one cents of sandbox credit. I choose the newly published one-cent tool."
     },
     {
       "id": "calls",
-      "start": 26,
-      "end": 70,
-      "narration": "Now a live Codex model calls the registered invoice tool through MCP. Synthetic invoices and a filtered client keep keys and account details off screen. Three successful calls consume three cents of existing PayPal sandbox credit: four ninety-four becomes four ninety-one. The provider earns three cents. Each row shows the real result and backend receipt. We captured two model turns, cutting idle waits. A local gateway enforces the three-cent allowance."
+      "start": 46,
+      "end": 72,
+      "narration": "Here I enter a real request into the installed Codex CLI: review three synthetic invoices for at most three cents. Codex calls the registered MCP tool three times and returns the totals and due dates. These are actual CLI logs, streamed to Chrome with private data redacted."
     },
     {
-      "id": "failure",
-      "start": 70,
-      "end": 78,
-      "narration": "In the separate offline demo, a failing request releases its hold and costs zero. Retries avoid duplicate charges."
+      "id": "after",
+      "start": 72,
+      "end": 82,
+      "narration": "Back in AgentMeter, all three calls are settled. The buyer now has four eighty-eight. Every result has a receipt."
     },
     {
       "id": "payout",
-      "start": 78,
-      "end": 92,
-      "narration": "The offline provider can pay out three cents of simulated earnings. Success clears the balance and keeps the receipt. This is separate from the hosted Codex run."
+      "start": 82,
+      "end": 104,
+      "narration": "The same provider started at zero and earned three cents from these calls. I request a PayPal sandbox payout. Pending funds remain reserved. Once the batch and item succeed, earnings and reserved funds return to zero. The payout receipt remains."
     },
     {
       "id": "reconcile",
-      "start": 92,
-      "end": 100,
-      "narration": "Reconciliation separates purchased credit, payment fees, and cash received. These two matches use simulated payment receipts."
+      "start": 104,
+      "end": 120,
+      "narration": "Reconciliation checks this payout against PayPal. The fresh API receipt agrees. Transaction Search has not reported the new transfer yet, so it stays pending. Fees, gross credit, and net cash remain separate."
     },
     {
       "id": "analytics",
-      "start": 100,
-      "end": 144,
-      "narration": "Now I ask, plot what I paid each calendar day this month. Real Gemini converts the question into a validated intent. Our custom Studio analyst delegates to the Page agent, which creates a chart and returns the task. The source names Gemini. The custom receipt widget and themed Grid expose usage and cost. Historical rows are synthetic; analysis never moves funds."
-    },
-    {
-      "id": "sandbox",
-      "start": 144,
-      "end": 162,
-      "narration": "The permanent Render backend also has a completed PayPal sandbox payout. Fresh PayPal reads verify that receipt. Transaction Search may arrive later, so pending reporting stays visible. A restart preserved the recorded balances and receipts."
+      "start": 120,
+      "end": 156,
+      "narration": "Next I ask for daily spend this month. Real Gemini produces a validated intent. Our custom Studio analyst delegates to the Page agent, which creates the chart and hands back the task. The custom receipt widget and themed Grid show exact money and status cells. This tool has three paid calls. Historical rows are synthetic; analysis never moves funds."
     },
     {
       "id": "close",
-      "start": 162,
-      "end": 170,
-      "narration": "Your service. Your price. A receipt for every call. AgentMeter: meter, settle, verify."
+      "start": 156,
+      "end": 162,
+      "narration": "Your tool. Your price. Clear receipts for every successful call. AgentMeter."
     }
   ]
 }

@@ -22,7 +22,7 @@ webhook delivery, successful author payout and Transaction Search reconciliation
 | D5 | Store of record | **agentmeter ledger**, not PayPal | PayPal sandbox has no realistic settlement lag model. Payouts are *initiated* by AgentMeter; PayPal is the money rail. |
 | D6 | MCP transport | **Streamable HTTP** (`tools/list`, `tools/call`) at `POST /mcp` | Judges get a live URL; no `npx` install required. stdio bridge is a stretch goal. |
 | D7 | UI | Server-rendered HTML + SSE live feed, no build step | A build step is a judge-experience risk. |
-| D8 | Buyer agent | **scripted three-call plan, optional LLM narration** | See §5 — this is the load-bearing decision. |
+| D8 | Buyer agent | **scripted offline plan; real Codex CLI MCP usage verified separately** | Keep the no-key demo reproducible. The complete filming retake verifies a requested provider tool with one actual model invocation; see `13-full-demo-retake.md`. |
 | D9 | Top-up | **PayPal JS SDK v6 buttons** (client-side) + server capture | Judges click a real PayPal button. This is the strongest "PayPal is central" signal. |
 | D10 | Payouts | Payouts API, one batch at a time, `sandbox` only; no flag executes, copied `.env.example` selects dry-run | Live payouts need approval; sandbox only. |
 | D11 | Reconciliation | AgentMeter ledger vs PayPal Transaction Search plus separately labeled fresh Orders/Payouts checks, **explicit fee column** | Shows we understand that `order total ≠ money received`. This is the highest-credibility screen in the demo. |

@@ -133,21 +133,27 @@ $0.03, and matches both mock rail receipts. On Render, the installed Codex MCP c
 also ran API → MCP → API; a real sandbox $0.03 payout succeeded and survived restart.
 That earlier check used direct transport without a model turn. A later filmed
 `gpt-6.1-sol` run made three successful calls through a bounded MCP capture gateway:
-buyer $4.94 → $4.91 and provider $0 → $0.03. These new earnings remain unpaid.
-See [provider evidence](docs/10-provider-tools.md) and [actual-model filming](docs/12-live-codex-filming.md).
+buyer $4.94 → $4.91 and provider $0 → $0.03. Those earlier earnings remain unpaid in that earlier provider account. The latest
+complete retake uses a different fresh provider and successfully pays out its new
+$0.03 after one official CLI invocation. See [provider evidence](docs/10-provider-tools.md),
+[earlier model capture](docs/12-live-codex-filming.md) and [latest retake](docs/13-full-demo-retake.md).
 
 ## Record the English demo
 
-The [2:50 script](docs/01-demo-script.md), [voiceover](docs/demo-voiceover.txt),
+The [2:42 script](docs/01-demo-script.md), [voiceover](docs/demo-voiceover.txt),
 [filming checklist](docs/08-recording-checklist.md) and
-[English Devpost draft](devpost-submission.md) are prepared. Actual Chrome screen
-footage has now been recorded and cut to a measured **170-second silent 1080p master**.
-The revised cut includes provider registration, actual Codex model-driven calls and
-hosted receipts, separate mock payout/reconciliation, real Gemini/Studio and an earlier
-completed PayPal sandbox payout. Its Codex capture client hides private fields and
-labels the two model turns and shortened waits. It also has a standalone 44-second clip.
-The [presenter packet](docs/video/presenter-guide-ja.md) includes English copy and
-an offline rehearsal player. Real presenter footage/narration, final composition,
+[English Devpost draft](devpost-submission.md) now match a **wholly new 162-second
+silent 1080p retake**. It follows one newly registered hosted tool, one funded buyer
+and one new provider: actual Codex CLI calls → $4.91 to $4.88 → $0.03 earned → this
+provider's actual $0.03 sandbox payout SUCCESS → fresh API verification, with its
+Search report honestly pending. No older or mock payout shot is reused.
+
+The official CLI's real text output is streamed to a privacy-filtered Chrome
+terminal because native terminal automation is restricted. The actual input,
+three named MCP calls and final answer are retained continuously at normal speed.
+Fresh Gemini/Studio and the themed Grid complete the story. See [retake evidence](docs/13-full-demo-retake.md).
+The [presenter packet](docs/video/presenter-guide-ja.md) has updated English copy
+and an offline rehearsal player. Real presenter footage/narration, final composition,
 public YouTube upload, judge access and the live Devpost form check remain open.
 
 ```sh
