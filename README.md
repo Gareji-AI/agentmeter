@@ -52,8 +52,9 @@ Open `/join` to create your own buyer workspace. Save the one-time recovery code
 it signs you back in at `/sign-in`. New workspaces start with **zero** credit.
 Approve a sandbox top-up, create a named client key, then copy the MCP URL and
 Codex configuration from `/workspace`. Your page contains only your balance,
-funding receipts, keys and tool-call receipts. Operator analytics, payout controls
-and the global ledger remain behind the separate operator sign-in.
+funding receipts, keys and tool-call receipts. Operator analytics and the global
+ledger remain behind the separate operator sign-in. `/sell` manages your own provider
+tools and sandbox payouts.
 
 For a fresh, isolated local demonstration with no credentials or model calls:
 
@@ -93,6 +94,37 @@ receipts are scoped and do not claim independent Transaction Search verification
 Actual Codex app-server Bearer authentication and discovery of six tools were also
 verified locally and against the hosted endpoint; model-driven Codex execution has not yet been filmed/verified.
 See [workspace evidence and usage](docs/09-personal-workspaces.md).
+
+## Register your own paid API or MCP tool
+
+Sign in to your personal workspace, then open **Provide tools** (`/sell`).
+
+1. Create a provider profile using a PERSONAL PayPal **sandbox** recipient email.
+2. Register a public HTTPS JSON POST API or Streamable HTTP MCP tool you control.
+   Set its object schema, description, price ($0.000001–$1 per success) and optional
+   Bearer/X-API-Key secret. This release supports read-only, retry-safe operations.
+3. Test a synthetic input, inspect the response, then publish the tool. The public
+   catalogue and `/mcp` now advertise its stable provider-prefixed name and price.
+4. Call it from a buyer MCP client with a fresh `_request_id` and the listed
+   `_max_price_micro` (10000 for $0.01). It spends the buyer's credit and credits
+   only this tool's author. A stale lower quote is rejected; failures cost zero.
+5. In `/sell`, pay out whole-cent earnings and poll the same pending batch until
+   both batch and item succeed. Production payments are disabled.
+
+The page includes free invoice API/MCP endpoints for a reproducible example; they
+run on this same backend. Registration does not host your code or make that public
+example exclusive. Upstream arguments/results go to the selected service. Secrets
+are encrypted; the private `DATABASE_PATH.upstream-key` file must be backed up with
+the SQLite database. Endpoint/schema changes require a new registration; credential
+replacement pauses the tool for retesting. Recipient ownership is not verified.
+
+```sh
+npm run verify:provider
+```
+
+This starts an isolated mock ledger, registers/tests/publishes both HTTP and MCP,
+runs three paid calls, proves replay/failure charge zero, pays the new provider
+$0.03, and matches both mock rail receipts. See [provider protocol and evidence](docs/10-provider-tools.md).
 
 ## Record the English demo
 
@@ -315,14 +347,16 @@ All stored monetary values are safe integer micro-USD. `BigInt` intermediates av
 floating-point arithmetic; only `microToPayPalAmount` produces PayPal decimal strings.
 Reservations use SQLite `BEGIN IMMEDIATE`; retries replay the stored result. Monthly
 spend includes active reservations. On startup, stale tool reservations are released;
-this assumes one application process and pure local tools, not arbitrary side effects.
+this assumes one application process and local/read-only retry-safe upstream tools.
+It does not promise exactly-once execution of arbitrary external side effects.
 Pending payout reservations survive restart and must be polled/retried to resolve.
 
 Consumer balance = captured credit − settled tool charges. Provider balance =
 settled author credits − successful payouts. Author credit is currently 100% of the
 call price; a platform fee can be enabled in the metering API. External funding fees
 and payout fees are explicit expenses; they are not silently deducted from tool credit.
-This prototype has no production onboarding, refunds, FX, or persistent user auth.
+This prototype has no production seller identity checks, refunds or FX. Personal
+recovery/session/key credentials persist as hashes in SQLite.
 
 For hosting, use one Node process, `HOST=0.0.0.0`, `PORT` from the host, a backend
 `PUBLIC_BASE_URL` (or `RENDER_EXTERNAL_URL`), and durable SQLite storage. Fast process

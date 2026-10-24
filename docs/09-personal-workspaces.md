@@ -62,7 +62,8 @@ implemented metered tool. No model or network is used inside these built-ins.
 - New schema tables are additive: `workspace_credentials`, `workspace_sessions`, `client_keys`.
   Signup is bounded to 500 workspaces, with process-local request limits. Active
   browser sessions are bounded to 20 per account. This is a test prototype, not
-  production identity, abuse protection or author onboarding.
+  production identity or abuse protection. Provider onboarding and own sandbox payouts
+  are described separately in [provider tools](10-provider-tools.md).
 
 ## Reproduction and verification — 2026-10-24
 

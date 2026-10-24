@@ -14,6 +14,7 @@ export function canonical(value) {
 }
 
 export function accountForKey(db, apiKey) {
+  if(typeof apiKey!=='string'||apiKey.startsWith('disabled_'))throw new MeteringError(-32001,'UNAUTHORIZED');
   const hash=createHash('sha256').update(typeof apiKey==='string'?apiKey:'').digest('hex');
   const account = db.prepare('SELECT a.*,1 public_customer FROM accounts a JOIN client_keys k ON k.account_id=a.id WHERE k.key_hash=? AND k.revoked_at IS NULL').get(hash)
     || db.prepare('SELECT a.* FROM accounts a WHERE a.api_key = ? AND NOT EXISTS (SELECT 1 FROM workspace_credentials w WHERE w.account_id=a.id)').get(apiKey || '');
@@ -26,7 +27,7 @@ export function monthWindow(at = nowIso()) {
   return [new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)).toISOString(), new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1)).toISOString()];
 }
 
-export function reserve(db, { accountId, toolName, args = {}, idempotencyKey, at = nowIso(), platformFeeBps = 0 }) {
+export function reserve(db, { accountId, toolName, args = {}, idempotencyKey, at = nowIso(), platformFeeBps = 0,maxPriceMicro }) {
   if (typeof idempotencyKey !== 'string' || !idempotencyKey || idempotencyKey.length > 200) throw new MeteringError(-32602, 'An idempotency key of 1–200 characters is required');
   const requestArgs = canonical(args);
   const key = createHash('sha256').update(`${accountId}\0${idempotencyKey}`).digest('hex');
@@ -44,6 +45,7 @@ export function reserve(db, { accountId, toolName, args = {}, idempotencyKey, at
     const owner = db.prepare("SELECT id FROM accounts WHERE id = ? AND kind = 'provider'").get(tool.owner_account_id);
     if (!owner) throw new MeteringError(-32603, 'TOOL_OWNER_INVALID');
     const price = integer(tool.price_micro);
+    if(maxPriceMicro!==undefined){integer(maxPriceMicro,'maximum price');if(price>maxPriceMicro)throw new MeteringError(-32007,'PRICE_CHANGED',{required_micro:price,maximum_micro:maxPriceMicro});}
     const fee = feeOf(price, platformFeeBps);
     if (account.balance_micro - account.reserved_micro < price) throw new MeteringError(-32002, 'INSUFFICIENT_FUNDS', { topup_url: '/app#topup', available_micro: account.balance_micro - account.reserved_micro, required_micro: price });
     const [start, end] = monthWindow(at);

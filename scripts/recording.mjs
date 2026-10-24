@@ -20,7 +20,7 @@ export async function startRecording({workspaces=process.argv.includes('--worksp
   if(!workspaces&&missing.length)throw Error(`Recording needs configured, active ${missing.join(', ')}. Use npm start for the offline demo.`);
   const directory=join(root,'data','recordings');mkdirSync(directory,{recursive:true});
   const take=mkdtempSync(join(directory,'take-'));Object.assign(process.env,recordingEnvironment(process.env,join(take,'ledger.sqlite')));
-  if(workspaces)Object.assign(process.env,{PUBLIC_WORKSPACES:'1',DEMO_ACCESS_TOKEN:randomUUID(),GEMINI_API_KEY:'',AG_GRID_LICENSE_KEY:'',AG_STUDIO_LICENSE_KEY:''});
+  if(workspaces)Object.assign(process.env,{PUBLIC_WORKSPACES:'1',TEST_UPSTREAM_LOOPBACK:'1',DEMO_ACCESS_TOKEN:randomUUID(),GEMINI_API_KEY:'',AG_GRID_LICENSE_KEY:'',AG_STUDIO_LICENSE_KEY:''});
   const {start}=await import('../src/server.mjs');const app=await start();
   const base=`http://127.0.0.1:${app.server.address().port}`;
   app.ctx.publicBaseUrl=base;app.paypal.config.publicBaseUrl=base;

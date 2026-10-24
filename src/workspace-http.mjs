@@ -4,9 +4,11 @@ import { MeteringError,setBudget } from './metering.mjs';
 import { toMicro } from './money.mjs';
 import { createTopup,captureTopup } from './payments.mjs';
 import { renderWorkspace } from './views/workspace.mjs';
+import { handleProvider } from './provider-http.mjs';
 
 // These routes never fall through to operator-token authentication.
 export async function handleWorkspace(req,res,ctx) {
+  if(await handleProvider(req,res,ctx))return true;
   const {db,paypal}=ctx,url=new URL(req.url,ctx.publicBaseUrl),path=url.pathname;
   const accountId=workspaceSession(db,req.headers.cookie);
   if(req.method==='GET'&&path==='/app'&&url.searchParams.get('checkout')==='cancelled'&&accountId){res.writeHead(303,{Location:'/workspace#funds','Cache-Control':'no-store'});res.end();return true;}

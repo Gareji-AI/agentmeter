@@ -58,5 +58,5 @@ export function workspaceSnapshot(db,accountId,base) {
     keys:db.prepare('SELECT id,label,suffix,created_at,revoked_at FROM client_keys WHERE account_id=? ORDER BY revoked_at IS NOT NULL,rowid DESC LIMIT 50').all(accountId),
     calls:db.prepare('SELECT c.id,c.status,c.price_micro,c.author_credit_micro,c.created_at,t.name tool_name FROM calls c JOIN tools t ON t.id=c.tool_id WHERE c.account_id=? ORDER BY c.rowid DESC LIMIT 50').all(accountId),
     topups:db.prepare('SELECT id,paypal_order_id,amount_micro,fee_micro,status,created_at FROM topups WHERE account_id=? ORDER BY rowid DESC LIMIT 30').all(accountId),
-    tools:db.prepare('SELECT t.name,t.description,t.price_micro,a.display_name author FROM tools t JOIN accounts a ON a.id=t.owner_account_id WHERE t.enabled=1 ORDER BY t.price_micro,t.name').all()};
+    tools:db.prepare('SELECT t.name,t.description,t.price_micro,a.display_name author,u.kind,u.endpoint FROM tools t JOIN accounts a ON a.id=t.owner_account_id LEFT JOIN tool_upstreams u ON u.tool_id=t.id WHERE t.enabled=1 ORDER BY t.price_micro,t.name').all().map(({endpoint,...tool})=>({...tool,upstream_host:endpoint?new URL(endpoint).host:null}))};
 }

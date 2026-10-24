@@ -122,6 +122,21 @@ CREATE TABLE IF NOT EXISTS client_keys (
   created_at TEXT NOT NULL,
   revoked_at TEXT
 );
+CREATE TABLE IF NOT EXISTS workspace_providers (
+  workspace_account_id TEXT PRIMARY KEY REFERENCES workspace_credentials(account_id),
+  provider_account_id TEXT NOT NULL UNIQUE REFERENCES accounts(id)
+);
+CREATE TABLE IF NOT EXISTS tool_upstreams (
+  tool_id TEXT PRIMARY KEY REFERENCES tools(id),
+  kind TEXT NOT NULL CHECK(kind IN ('http','mcp')),
+  endpoint TEXT NOT NULL,
+  remote_tool TEXT,
+  auth_mode TEXT NOT NULL,
+  auth_cipher TEXT,
+  tested_at TEXT,
+  last_error TEXT,
+  revision INTEGER NOT NULL DEFAULT 1
+);
 `;
 
 export function openDb(path = process.env.DATABASE_PATH || 'data/agentmeter.sqlite') {
@@ -130,6 +145,7 @@ export function openDb(path = process.env.DATABASE_PATH || 'data/agentmeter.sqli
   const db = new DatabaseSync(file);
   db.exec(SCHEMA);
   db.exec('PRAGMA busy_timeout = 5000');
+  db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_tool_name ON tools(name)');
   const columns = db.prepare('PRAGMA table_info(topups)').all();
   if (!columns.some(c => c.name === 'paypal_capture_id')) db.exec('ALTER TABLE topups ADD COLUMN paypal_capture_id TEXT');
   db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_capture_id ON topups(paypal_capture_id)');

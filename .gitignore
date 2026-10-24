@@ -9,3 +9,5 @@ data/
 tmp/
 .DS_Store
 coverage/
+
+*.upstream-key

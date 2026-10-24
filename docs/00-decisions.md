@@ -197,7 +197,8 @@ Invariants enforced in code and asserted by tests:
 
 The SQL above is a domain sketch; `src/db.mjs` is the complete executable schema,
 including `webhook_events`, `budget_policies`, capture IDs and snapshotted author credits.
-Tools are pure local functions between reservation and settlement transactions. One
+Built-ins are pure local functions. Registered read-only upstream tools execute over HTTP
+outside the short reservation and settlement transactions. One
 server process recovers stale tool reservations on startup. Payouts retain unresolved
 reservations across restart and reuse the same external batch identity.
 
@@ -286,8 +287,10 @@ request. Cookie sessions persist for seven days and survive service restart.
 
 Personal snapshots query only the signed-in account and omit raw payment payloads,
 other accounts, event streams and secret key material. The existing global ledger,
-provider payouts, Gemini and licensed analytics remain operator-only. This release
-does not add public author registration, external tool registration or real payments.
+Gemini, licensed analytics and global reconciliation remain operator-only. Signed-in
+users can now create a separate provider account, register/test/publish paid read-only
+HTTP or MCP tools, and request payouts of their own sandbox earnings. No real payments
+or production seller identity checks are included; see `10-provider-tools.md`.
 
 Personal MCP clients supply a unique `_request_id` per intended call, advertised in
 the input schema. JSON-RPC IDs are insufficient across independent connections.
@@ -295,3 +298,25 @@ Legacy operator keys retain their previous protocol behavior and evidence identi
 The public console sets an explicit monthly cap without invoking a model.
 The shared mock profile uses `PUBLIC_WORKSPACES=1`; the offline legacy demo's
 auto-login is appropriate only for trusted local use. See `09-personal-workspaces.md`.
+
+## 12. Provider tools
+
+A personal workspace can own a separate provider account. Buyer credit and provider
+earnings never share an account row. Registration requires a public HTTPS POST JSON
+API or Streamable HTTP MCP tool, a supported object input schema, a USD price and
+explicit read-only/retry-safe confirmation. Drafts are private until a successful
+connection probe. Probes do not reserve buyer funds and may consume upstream quota.
+
+Registered tools have stable provider-prefixed MCP names. Consumers must send a
+unique execution nonce and `_max_price_micro`; a higher current price is rejected
+before reservation. The price and author are snapshotted when reserving. Failures
+release credit; a settled retry returns the original result without another request.
+This is at-most-once charging, not exactly-once arbitrary external side effects.
+
+Private/reserved IPs, unsafe mixed DNS responses, URL credentials, redirects and
+non-HTTPS/non-443 endpoints are rejected. The socket pins the vetted DNS address.
+Local loopback is test-only, explicitly enabled in mock mode. Same-origin management
+routes are blocked; two clearly labeled free invoice examples are allowed. Secrets
+use AES-256-GCM with per-tool/owner AAD. The private 32-byte key file lives beside the
+SQLite file on the persistent disk; backup both together and never commit either.
+No shell commands, uploaded code, OAuth forwarding or interactive MCP requests run.

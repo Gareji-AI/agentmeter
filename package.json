@@ -28,7 +28,8 @@
     "demo:record": "node scripts/recording.mjs",
     "verify:recording": "node scripts/verify-recording.mjs",
     "verify:workspace": "node scripts/verify-workspace.mjs",
-    "demo:users": "node scripts/recording.mjs --workspaces"
+    "demo:users": "node scripts/recording.mjs --workspaces",
+    "verify:provider": "node scripts/verify-provider.mjs"
   },
   "dependencies": {},
   "files": [

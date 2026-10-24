@@ -13,6 +13,8 @@ import { renderPage } from './views/index.mjs';
 import { interpretWidget,interpretBudget,narrate,classifySyntheticHistory } from './ai.mjs';
 import { availableAnalyticsLicense } from './analytics-license.mjs';
 import { handleWorkspace } from './workspace-http.mjs';
+import { createGateway } from './gateway.mjs';
+import { handleExample } from './example-upstreams.mjs';
 
 const equal=(a,b)=>typeof a==='string'&&typeof b==='string'&&Buffer.byteLength(a)===Buffer.byteLength(b)&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
 
@@ -55,6 +57,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
   const autoOperator=paypal.mode==='mock'&&env.PUBLIC_WORKSPACES!=='1';
   const accessToken=env.DEMO_ACCESS_TOKEN||randomUUID();
   const ctx={db,paypal,publicBaseUrl,sessions,accessToken,env,boot:{id:randomUUID(),started_at:nowIso()}};
+  ctx.gateway=createGateway(db,{base:()=>ctx.publicBaseUrl,allowLoopback:paypal.mode==='mock'&&env.TEST_UPSTREAM_LOOPBACK==='1'});
   const sessionFor=req=>{
     const sid=req.headers.cookie?.split(';').map(c=>c.trim()).find(c=>c.startsWith('am_session='))?.slice(11);
     const session=sessions.get(sid);
@@ -90,6 +93,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
       if(path==='/mcp')return await handleMcp(req,res,ctx);
       if(path==='/health')return json(res,200,{status:'ok',mode:paypal.mode==='mock'?'mock':'sandbox',instance_id:ctx.boot.id,started_at:ctx.boot.started_at});
       if(req.method==='POST'&&!validOrigin(req,ctx.publicBaseUrl))return json(res,403,{error:'Invalid Origin'});
+      if(await handleExample(req,res))return;
       if(await handleWorkspace(req,res,ctx))return;
       if(path==='/api/webhooks/paypal'&&req.method==='POST') {
         const rawBody=await bodyText(req);const event=JSON.parse(rawBody);
@@ -98,7 +102,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
         return json(res,200,await processWebhook(db,paypal,event,{verified:true}));
       }
       if(path.startsWith('/assets/')&&req.method==='GET') {
-        const files={'/assets/app.css':['./public/app.css','text/css'],'/assets/app.js':['./public/app.js','text/javascript'],'/assets/grid.js':['./public/grid.js','text/javascript'],'/assets/studio.js':['./public/studio.js','text/javascript'],'/assets/studio-session.js':['./public/studio-session.js','text/javascript'],'/assets/workspace.js':['./public/workspace.js','text/javascript']};
+        const files={'/assets/app.css':['./public/app.css','text/css'],'/assets/app.js':['./public/app.js','text/javascript'],'/assets/grid.js':['./public/grid.js','text/javascript'],'/assets/studio.js':['./public/studio.js','text/javascript'],'/assets/studio-session.js':['./public/studio-session.js','text/javascript'],'/assets/workspace.js':['./public/workspace.js','text/javascript'],'/assets/seller.js':['./public/seller.js','text/javascript']};
         const file=files[path];if(!file)return json(res,404,{error:'Not found'});
         try { const content=await readFile(new URL(file[0],import.meta.url));res.writeHead(200,{'Content-Type':file[1]+'; charset=utf-8'});return res.end(content); }catch(e){if(e.code==='ENOENT')return json(res,404,{error:'Not found'});throw e;}
       }
@@ -114,7 +118,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
       }
       if(path==='/api/call'&&req.method==='POST') {
         const buyer=account(req,'consumer');const input=await bodyJson(req);
-        return json(res,200,callTool(db,{accountId:buyer.id,toolName:input.name,args:input.arguments||{},idempotencyKey:req.headers['idempotency-key']||input.idempotency_key}));
+        return json(res,200,await ctx.gateway.call({accountId:buyer.id,toolName:input.name,args:input.arguments||{},idempotencyKey:req.headers['idempotency-key']||input.idempotency_key,maxPriceMicro:input.max_price_micro}));
       }
       if(path==='/api/demo'&&req.method==='POST') {
         const buyer=account(req,'consumer');await bodyJson(req);

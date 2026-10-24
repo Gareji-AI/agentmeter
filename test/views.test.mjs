@@ -24,12 +24,12 @@ test('unauthenticated sandbox page never renders account keys',()=>{
 test('live receipt panels keep synthetic entries separate even on the same date',t=>{
   const db=fixture();t.after(()=>db.close());
   const data={...snapshot(db,{mode:'mock'}),authenticated:true,mode:'mock',query:{}};
-  const call={id:'live_receipt_123456',tool_name:'live_tool',status:'SETTLED',price_micro:10_000,author_credit_micro:10_000,latency_ms:0,created_at:new Date().toISOString(),response_preview:'{}'};
+  const call={account_id:'buyer',owner_account_id:'author',id:'live_receipt_123456',tool_name:'live_tool',status:'SETTLED',price_micro:10_000,author_credit_micro:10_000,latency_ms:0,created_at:new Date().toISOString(),response_preview:'{}'};
   data.calls=[{...call,id:'seed_same_day',tool_name:'synthetic_only'},call];
   const html=renderPage('/app',data);
   const current=html.split('<div id="calls-table">')[1].split('<div class="receipt-detail">')[0];
   assert.match(current,/live_tool/);assert.doesNotMatch(current,/synthetic_only/);assert.match(html,/synthetic_only/);
-  const payout={id:'live_payout',paypal_batch_id:'live-batch',status:'SUCCESS',amount_micro:10_000,payload:'{}',raw:'{}'};
+  const payout={provider_account_id:'author',id:'live_payout',paypal_batch_id:'live-batch',status:'SUCCESS',amount_micro:10_000,payload:'{}',raw:'{}'};
   data.payouts=[{...payout,id:'seed_payout',paypal_batch_id:'synthetic-batch'},payout];
   const author=renderPage('/provider',data).split('<div id="payouts-table">')[1].split('Latest 15 live payouts')[0];
   assert.match(author,/live-batch/);assert.doesNotMatch(author,/synthetic-batch/);

@@ -15,3 +15,7 @@ test('PayPal conversion rounds with integer arithmetic at boundaries', () => {
   assert.equal(feeOf(Number.MAX_SAFE_INTEGER,349),Number(BigInt(Number.MAX_SAFE_INTEGER)*349n/10_000n));
   assert.throws(()=>microToPayPalAmount(0.1));
 });
+
+test('display retains six decimals for micro-priced provider tools',()=>{
+ assert.equal(formatMicro(1),'0.000001');assert.equal(formatMicro(123456),'0.123456');assert.equal(formatMicro(10000),'0.0100');assert.equal(formatMicro(-1),'-0.000001');
+});

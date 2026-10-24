@@ -24,13 +24,13 @@ export function toMicro(value) {
   return negative ? -micro : micro;
 }
 
-/** Render micro-dollars as a 4-decimal dollar string: 10000 -> "0.0100". */
+/** Display four decimals normally, preserving all six when sub-0.0001 precision is needed. */
 export function formatMicro(micro) {
   integer(micro, 'amount', { min: -Number.MAX_SAFE_INTEGER });
   const negative = micro < 0;
   const abs = Math.abs(micro);
   const whole = BigInt(abs) / 1_000_000n;
-  const frac = String(abs % MICRO).padStart(6, '0').slice(0, 4);
+  const frac = String(abs % MICRO).padStart(6, '0').slice(0, abs % 100 ? 6 : 4);
   return `${negative ? '-' : ''}${whole}.${frac}`;
 }
 
