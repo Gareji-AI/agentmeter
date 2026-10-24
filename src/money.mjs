@@ -36,7 +36,8 @@ export function formatMicro(micro) {
 
 /** Render micro-dollars as a display string with a currency marker. */
 export function usd(micro) {
-  return `$${formatMicro(micro)}`;
+  const value = formatMicro(micro);
+  return value.startsWith('-') ? `-$${value.slice(1)}` : `$${value}`;
 }
 
 /** PayPal REST wants a 2-decimal string. Round half-up, away from zero. */
