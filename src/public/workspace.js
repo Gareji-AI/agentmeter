@@ -1,6 +1,6 @@
 const $=selector=>document.querySelector(selector);
 const h=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const dollars=value=>{const n=BigInt(value);return `$${n/1000000n}.${String(n%1000000n).padStart(6,'0').slice(0,abs%100n?6:4)}`;};
+const dollars=value=>{const n=BigInt(value);return `$${n/1000000n}.${String(n%1000000n).padStart(6,'0').slice(0,n%100n?6:4)}`;};
 const cash=value=>`<span class="money">${dollars(value)}</span>`;
 const badge=value=>`<span class="status">${h(value)}</span>`;
 const table=(headings,rows)=>`<div class="table-scroll" tabindex="0"><table><thead><tr>${headings.map(x=>`<th scope="col">${h(x)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;

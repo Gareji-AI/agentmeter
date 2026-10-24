@@ -1,6 +1,6 @@
 const $=s=>document.querySelector(s);
 const h=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const dollars=value=>{const n=BigInt(value);return `$${n/1000000n}.${String(n%1000000n).padStart(6,'0').slice(0,abs%100n?6:4)}`;};
+const dollars=value=>{const n=BigInt(value);return `$${n/1000000n}.${String(n%1000000n).padStart(6,'0').slice(0,n%100n?6:4)}`;};
 const notify=message=>{$('#customer-notice').textContent=message;};
 const table=(headers,rows)=>`<div class="table-scroll" tabindex="0"><table><thead><tr>${headers.map(x=>`<th scope="col">${h(x)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 async function api(path,body){const r=await fetch('/api/customer/provider/'+path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});const value=await r.json();if(!r.ok)throw Error((value.error||'Request failed')+(value.data?.detail?' · '+value.data.detail:''));return value;}
