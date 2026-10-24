@@ -1,0 +1,34 @@
+{
+  "name": "agentmeter",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Metered billing rail for AI tools: agents pay per tool call in PayPal, authors get paid out automatically.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Gareji AI",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Gareji-AI/agentmeter"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "dev": "node --watch src/server.mjs",
+    "seed": "node scripts/seed.mjs",
+    "verify:sandbox": "node scripts/verify-sandbox.mjs",
+    "test": "node --test test/",
+    "check": "node --test test/",
+    "reset": "node scripts/reset.mjs"
+  },
+  "dependencies": {},
+  "files": [
+    "src/",
+    "scripts/",
+    "docs/",
+    "README.md",
+    "LICENSE",
+    ".env.example"
+  ]
+}
