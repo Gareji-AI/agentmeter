@@ -32,9 +32,10 @@ remain available. These keys authorize evaluation only, not commercial productio
 
 Chart axes retain integer micro-USD; captions state the unit. Money tooltips and
 the receipt use exact USD formatting. Counts and monetary mappings are distinguished.
-The deterministic custom runner uses Studio's shipped harness, delegation, Page
-agent definition, tools and chat events. Gemini remains unconfigured: this proves
-Agent Framework execution, not language-model inference.
+The custom runner uses Studio's shipped harness, delegation, Page agent definition,
+tools and chat events. This initial analytics check used the deterministic rule
+parser. Subsequent Gemini widget inference was verified separately; see
+`docs/05-gemini-verification.md`.
 
 The custom receipt reads Studio's resolved field key rather than guessing a source
 identifier. Missing/unsafe values cannot silently become a zero receipt. Submission

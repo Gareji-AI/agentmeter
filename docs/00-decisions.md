@@ -130,13 +130,16 @@ Optional Gemini adapters interpret budget/widget intent, narrate already-settled
 facts, and label synthetic historical examples. Model output is validated against
 explicit user amounts, named tools and whitelisted fields; it cannot change prices,
 execute tools, generate SQL or initiate payments. Without a key, budget and analytics
-requests use a documented rule parser and narration is literal. No actual Gemini
-response has been verified as of 2026-10-24.
+requests use a documented rule parser and narration is literal. Gemini 3.5 Flash-Lite
+widget interpretation was verified through direct API, local Chrome Studio and the
+Render backend on 2026-10-24. Live budget, narration and labeling model paths remain
+unverified. See `docs/05-gemini-verification.md`.
 
 Optional AG Studio uses a custom analyst agent delegating to the built-in page agent.
 Licensed Grid, the custom receipt widget, month-filtered charts, layout resizing and
 custom analyst delegation through Studio’s Page agent were verified locally and on
-Render on 2026-10-24. This custom runner uses validated rules, not an LLM response.
+Render on 2026-10-24. The custom runner accepts validated Gemini intents with a
+rule-parser fallback, then delegates layout through Studio’s Page agent.
 Expired or absent trial keys retain the offline table and local widget path.
 See `docs/04-analytics-verification.md` for evidence and trial expiration dates.
 

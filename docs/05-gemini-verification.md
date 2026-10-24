@@ -33,11 +33,11 @@ The verified path is **widget interpretation**. Other adapters for budget intent
 narration and synthetic labeling have unit coverage; their actual model paths are
 not claimed as verified here.
 
-| Synthetic request | Expected validated view | Direct API | Local Chrome |
-|---|---|---|---|
-| Plot what I paid each calendar day during the current month. | spend / day / month | PASS | PASS |
-| Compare the number of invocations for each utility over the last 30 days. | calls / tool / 30 days | PASS | — |
-| For extract_entities, chart daily author earnings this month. | author credits / day / month / named tool | PASS | — |
+| Synthetic request | Expected validated view | Direct API | Local Chrome | Render API | Render Chrome |
+|---|---|---|---|---|---|
+| Plot what I paid each calendar day during the current month. | spend / day / month | PASS | PASS | PASS | PASS |
+| Compare the number of invocations for each utility over the last 30 days. | calls / tool / 30 days | PASS | — | PASS | — |
+| For extract_entities, chart daily author earnings this month. | author credits / day / month / named tool | PASS | — | PASS | — |
 
 The first paraphrase cannot be interpreted by the keyword-only fallback. Chrome
 showed `Gemini · validated intent (gemini-3.5-flash-lite)`, Page-agent delegation,
@@ -59,5 +59,22 @@ private and ignored. `npm test` remains offline: **58 tests pass**, including
 schema construction, prompt minimization, ignored thought parts, provider errors,
 truncated output, invalid intent, fallback, and the remaining adapters.
 
-`npm run verify:demo` also passes without a model key. Hosted verification will be
-recorded after the runtime deployment.
+`npm run verify:demo` also passes without a model key.
+
+## Hosted result
+
+Render runtime commit `8c82bfb` was deployed on 2026-10-24. The three hosted checks
+returned `gemini-3.5-flash-lite`, validated expected fields, and completed in
+928–3,637 ms in this sample. Chrome's hosted Studio chat showed the Gemini source,
+Page-agent delegation, task hand-back, and the generated chart for the paraphrase.
+The API credential was absent from the rendered `/grid` HTML.
+
+The model questions left the ledger SHA-256 unchanged:
+`3cdb60d7b29727e79ac302b56f4002f3254647d7b800e3411c8bf65d2254ad90`.
+The deployment verifier confirmed a new process identity, buyer balance $4.9700,
+provider balance $0.0000, and the same two independent PayPal reporting matches.
+No new payment, payout, or paid tool call was used for this check.
+
+Private evidence: `data/verification/ai/direct-gemini-lite.json`,
+`data/verification/ai/hosted-gemini.json`, and
+`data/verification/sandbox/gemini-before-deploy.json` / `gemini-after-deploy.json`.

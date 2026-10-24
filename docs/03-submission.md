@@ -152,13 +152,15 @@ coding reference (native REST remains the runtime). Dotfield/Cloudflare hosts pu
 information pages. Render hosts the Node sandbox and persistent SQLite ledger.
 
 **Optional AI and analytics:** Gemini adapters for constrained intent, narration and
-synthetic labels are implemented, with deterministic fallbacks. No Gemini key has
-been supplied: real model use is not yet verified. AG Grid 36.2.0 and AG Studio 3.0.0
+synthetic labels are implemented, with deterministic fallbacks. Gemini 3.5 Flash-Lite
+widget interpretation was verified via direct API, local Chrome and Render using
+three structured-intent checks; the ledger remained unchanged. Other live model
+paths remain unverified. AG Grid 36.2.0 and AG Studio 3.0.0
 adapters implement theming, custom cells, a receipt widget, layout and a custom Studio
 agent delegating to the built-in Page agent. Licensed execution was verified locally
 and on Render in Chrome on 2026-10-24: exact receipt totals, month-filtered charts,
 chat-driven delegation and task hand-back, custom cells, and layout resizing. The
-runner uses validated rules; no LLM inference is claimed. Absent or expired trials
+runner validates Gemini intent and retains rule-based fallback. Absent or expired trials
 retain the offline table, CSV and rule-driven widgets. See analytics verification.
 
 **What we learned:** A timeout is not a failed transfer. Unresolved payout requests
@@ -166,7 +168,7 @@ must retain their reservation and external identity. Tool prices and budget deci
 must use exact integers, while external fees and capture receipts remain distinct
 from purchased tool credit.
 
-**Next:** Record the English video with verified Studio. Optional Gemini remains unverified.
+**Next:** Record the English video with verified Studio and Gemini widget interpretation.
 Refunds, FX, high availability and production account onboarding are future work.
 
 Copy this draft only after updating it against the final evidence. See README for the

@@ -208,16 +208,16 @@ Payment routes: `/api/topup`, `/api/topup/:id/capture`, `/api/payout`,
   from pinned CDN versions. Quartz theming, custom money/status cells, a micro-USD
   receipt widget, editable layout, and a custom Studio agent delegating to the built-in
   Page agent run through Studio's Agent Framework. Licensed execution was verified
-  locally and on Render in Chrome on 2026-10-24: exact receipt totals, monthly filters, delegation,
-  task completion, and widget resizing. Intent interpretation uses Gemini when configured, with a validated rule-parser
-  fallback. Without active licenses, the
+  locally and on Render in Chrome on 2026-10-24: exact receipt totals, monthly filters,
+  delegation, task completion, and widget resizing. Intent interpretation uses Gemini
+  when configured, with a validated rule-parser fallback. Without active licenses, the
   SSR table, CSV, rule-based widgets and local card layout work offline. Expired
   trials are omitted before rendering. Set `AG_GRID_LICENSE_KEY` (Grid + Charts
   bundle) and `AG_STUDIO_LICENSE_KEY` in ignored `.env` or private hosting settings.
   The current evaluation keys expire on 2026-11-23 and 2026-12-08 respectively.
   Keys are never committed. See [analytics verification](docs/04-analytics-verification.md).
 - **Gemini 3.5 Flash-Lite**: REST structured output for validated widget intent,
-  verified through actual API requests and local Chrome Studio execution. Set private
+  verified through actual API requests and Chrome Studio execution locally and on Render. Set private
   `GEMINI_API_KEY` and optional `GEMINI_MODEL` (default `gemini-3.5-flash-lite`).
   `npm run verify:ai` requires actual model success; the hosted form adds a ledger
   identity check. [Gemini verification](docs/05-gemini-verification.md) records the
