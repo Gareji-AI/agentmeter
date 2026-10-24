@@ -1,20 +1,22 @@
 # Persistent sandbox backend
 
-## Prepared configuration
+## Deployed configuration — 2026-10-24
 
 `render.yaml` defines a single Node 26.10.0 web service in Singapore with the
 `0.5c-512mb` compute plan and a 1 GB persistent disk at `/var/data`. The ledger is
 `/var/data/agentmeter-sandbox.sqlite`. It is not a free instance and should not
 sleep from inactivity. Confirm the current dashboard price before provisioning.
-The Render example estimates about $7/month compute and $0.25/month for a 1 GB disk;
-usage, workspace charges and taxes can differ. Never silently upgrade the plan.
+The creation screen confirmed $7/month compute plus $0.25/month for the 1 GB disk,
+within the approved $10/month estimate. Additional usage and taxes can differ.
+The service is https://agentmeter-sandbox.onrender.com; operator access is required.
+No trial/license or model key is required for the fallback analytics UI.
 
 Build: `node --version`. Start: `node scripts/import-ledger.mjs && node src/server.mjs`.
 No package installation is needed. Render's `RENDER_EXTERNAL_URL` supplies the
 backend origin and PayPal return/cancel URLs unless `PUBLIC_BASE_URL` is explicit.
 Do not put a localhost or Quick Tunnel URL in the hosted environment.
 
-Auto-deploy is off. Keep one instance: local SQLite is a single-process ledger.
+Auto-deploy and Blueprint Auto Sync are off. Keep one instance: local SQLite is a single-process ledger.
 A disk-backed deploy can have a short outage; do not promise zero downtime.
 Public information pages stay on Dotfield. Do not change PayPal's webhook to a
 new address before its backend is ready to verify signatures.
@@ -95,3 +97,30 @@ access to return 401, compares the exposed ledger state and API-key hashes, and
 requires both actual reporting receipts to reconcile. The restart check also
 requires a new process identity and unchanged ledger/rail receipt identities.
 Raw evidence stays private under ignored `data/`; the token stays out of URLs/logs.
+
+
+## Observed cutover and persistence results
+
+| Check | Result |
+| --- | --- |
+| Initial deploy | PASS: Node 26.10.0, commit `ac9c1da`; log `Sandbox ledger bootstrap: imported` |
+| Frozen source vs hosted | PASS: API ledger identity SHA-256 `3cdb60d7b29727e79ac302b56f4002f3254647d7b800e3411c8bf65d2254ad90` |
+| PayPal Webhook cutover | PASS: same Webhook ID and both capture subscriptions, URL changed to Render |
+| Actual signed redelivery | PASS: hosted `webhook.duplicate`, balances unchanged |
+| Bootstrap cleanup | PASS: both import variables removed; REQUIRE_EXISTING_LEDGER retained |
+| Redeploy without import | PASS: new process, same ledger identity and 2 reconciled receipts |
+| Explicit Restart service | PASS: another new process, same balances, keys, idempotency and receipt identities |
+| Endpoint checks | PASS: all screens/assets 200, anonymous state 401, MCP listing 6 tools, SSE stream works |
+
+Buyer remains 4,970,000 micro-USD; author and both reservations are zero. This is
+persistence of actual sandbox test records, not a newly seeded or simulated balance.
+The original local writer and Quick Tunnel are stopped. The frozen source snapshot
+remains private; Render is now the active ledger. No new purchase, call or payout
+was made to verify deployment/restart.
+
+Private machine-readable proof: `render-initial.json`, `render-webhook-cutover.json`,
+`render-before-restart.json`, `render-after-restart.json`,
+`render-webhook-after-restart.json` and `render-routes.json`
+under `data/verification/sandbox/`. These files and bootstrap data are not committed.
+The app is a single-process prototype with daily platform disk snapshots, not a
+replicated/high-availability payment service. Plan manual updates and backups.

@@ -85,35 +85,26 @@ V2 uses a separate, matching browser observation file; the command does not clai
 to automate checkout. V7 remains MANUAL because no sandbox account was reset.
 Private output: `data/verification/sandbox/ledger-latest.json`.
 
-## Public backend and restart
+## Persistent backend and restart — completed
 
-The verified endpoint is a **Cloudflare Quick Tunnel to the local Node server** on
-port 8791. The actual URL and registered webhook ID are in local `.env`.
-`PUBLIC_BASE_URL` is the HTTPS backend origin; it is not the static Dotfield site.
-Public `/health` returns sandbox mode. Without an operator token or session,
-`/api/state` returns 401. Incoming webhooks are separately signature-authenticated.
+The original signed delivery used a Cloudflare Quick Tunnel to this Mac. That
+verification backend has now been replaced by **https://agentmeter-sandbox.onrender.com**.
+The existing PayPal Webhook ID and event subscriptions were retained; its URL is now
+`https://agentmeter-sandbox.onrender.com/api/webhooks/paypal`.
 
-Keep the Mac awake, the Node process running and the tunnel running during testing.
-No paid hosting or durable remote backend has been provisioned. The SQLite ledger
-persists on this Mac. The hostname changes when a Quick Tunnel is recreated;
-Cloudflare provides no uptime guarantee and does not support SSE on Quick Tunnels.
-The app therefore also refreshes visible state every 15 seconds and on focus.
-See [Cloudflare Quick Tunnel limitations](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/).
+The exact SQLite ledger was backed up after stopping the local writer, validated
+and imported into Render's 1 GB persistent disk. Source/hosted ledger fingerprints
+agree, including API-key hashes and call idempotency keys. PayPal's actual resend
+was accepted on Render after signature verification; duplicate handling left all
+balances and reservations unchanged.
 
-To restart after the existing tunnel stops:
+After deleting the two bootstrap environment variables, a redeploy and an explicit
+Render **Restart service** each produced a new process ID and retained buyer $4.97,
+author $0, zero reservations, all receipt identities and the two Reporting matches.
+Anonymous state access still returns 401. All five screens and the six-tool MCP
+listing work on the hosted origin. See `07-hosting.md` for the repeatable checks.
 
-1. Keep `.env` and the existing sandbox SQLite file. Do not reset/reseed test money.
-2. Start `cloudflared tunnel --url http://127.0.0.1:8791 --no-autoupdate --protocol http2`.
-3. Set `PUBLIC_BASE_URL` in `.env` to its new HTTPS origin; retain `PORT=8791`,
-   `DATABASE_PATH=data/agentmeter-sandbox.sqlite`, and `PAYPAL_MODE=sandbox`.
-4. Update the **existing AgentMeter sandbox app webhook** to that origin plus
-   `/api/webhooks/paypal`, retaining both event types and its webhook ID. Verify
-   `PAYPAL_WEBHOOK_ID` agrees with the registration. Do not create duplicate listeners.
-5. Run `npm start`; sign in with local `DEMO_ACCESS_TOKEN`. `/health` should return
-   sandbox mode publicly; unauthenticated `/api/state` must still return 401.
-6. Re-run the read-only verifier. Existing receipts remain intact. Test a signed
-   PayPal event delivery before recording another checkout.
-
-A permanent hosted demo still needs one Node process, stable HTTPS and durable
-SQLite storage. Dotfield remains the public information site; Render is not deployed.
-Do not publish a temporary hostname as a permanent submission demo URL.
+The old local sandbox writer and Quick Tunnel are stopped. Local `.env` and the
+frozen SQLite backup are private archives; do not restart that old sandbox writer
+against the same PayPal app. Use `PAYPAL_MODE=mock` for independent local demos.
+PayPal credentials remain on the backend; none are included in Dotfield assets.

@@ -142,11 +142,30 @@ An absent transaction never becomes a reporting match. PayPal documents
 [optional fee fields and reporting delay](https://developer.paypal.com/api/transaction-search/v1/schema.json).
 See [actual sandbox evidence and restart instructions](docs/06-sandbox-evidence.md).
 
-A Cloudflare Quick Tunnel currently exposes the local sandbox backend for verified
-Webhook delivery. It is temporary and requires the Mac, Node server and tunnel to
-stay running. It is not a durable hosted demo. Quick Tunnels do not support SSE;
-visible pages refresh state every 15 seconds and on focus as a fallback. Dotfield
-continues to serve static information pages; Render has not been deployed.
+The persistent sandbox backend is now deployed on **Render**:
+[Open AgentMeter sandbox](https://agentmeter-sandbox.onrender.com/app).
+It requires the operator demo token; records are shared sandbox test data, not
+individual customer accounts. The service uses Node 26.10.0, one Singapore instance
+and a 1 GB persistent disk. Its reviewed base price is **$7.25/month** before any
+additional usage or taxes. Auto-deploy and Blueprint Auto Sync are off.
+
+The existing ledger was imported with checksum/invariant checks. The signed PayPal
+Webhook now targets the Render backend; actual redelivery left balances unchanged.
+After removing import variables, both a redeploy and **Restart service** retained
+buyer $4.97, author $0, zero reservations, three live calls, API-key identities and
+both reconciled receipts. A changed health process ID proves a new process started.
+The old local sandbox writer and Quick Tunnel are stopped. Dotfield serves the
+public information pages; the active sandbox ledger belongs to Render.
+
+To repeat read-only checks, keep `DEMO_ACCESS_TOKEN` in local `.env` and run:
+
+```sh
+npm run verify:deployment -- --base https://agentmeter-sandbox.onrender.com
+```
+
+See [deployment and restart evidence](docs/07-hosting.md) for source and
+before/after comparisons. The local `verify:sandbox:ledger` command checks the
+frozen archive; it is not a query of the hosted database.
 
 ## MCP and HTTP
 
@@ -209,8 +228,8 @@ Payment routes: `/api/topup`, `/api/topup/:id/capture`, `/api/payout`,
   visual system was adapted into the live SSR views and browser renderers. Prototype
   fixtures remain outside the application. See [design notes](docs/05-ui-design.md).
 - **Codex**: implementation and browser-assisted checks. **Dotfield / Cloudflare**:
-  public information pages and a temporary Quick Tunnel to the local Node application.
-  Render is not deployed.
+  public information pages. **Render**: persistent sandbox Node backend, 1 GB SQLite
+  disk, stable HTTPS, verified Webhooks and restart persistence.
 
 ## Ledger boundaries and hosting
 
@@ -231,9 +250,8 @@ For hosting, use one Node process, `HOST=0.0.0.0`, `PORT` from the host, a backe
 `PUBLIC_BASE_URL` (or `RENDER_EXTERNAL_URL`), and durable SQLite storage. Fast process
 startup does not remove platform wake-up time. On Render free hosting, **the first
 load may take up to a minute**, and filesystem changes are ephemeral. Use free
-hosting only for an explicitly resettable mock demo; a persistent sandbox ledger
-needs durable storage. No paid backend has been provisioned. A single-process Render Blueprint and a
-validated, non-overwriting ledger import are ready; see [cutover instructions](docs/07-hosting.md).
+hosting only for an explicitly resettable mock demo. The deployed sandbox instead
+uses the paid Render service and disk described above. See [hosting evidence](docs/07-hosting.md).
 
 Public information: [project](https://dotfield.xyz/apps/agentmeter/),
 [privacy](https://dotfield.xyz/apps/agentmeter/privacy/),

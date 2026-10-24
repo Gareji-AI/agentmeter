@@ -36,7 +36,7 @@ Consequences for AgentMeter:
 | Bryntum | $1,000 | 3 | High. Needs Gantt/Scheduler/Calendar as the product's spine. | Pass — same effort, 5× less upside |
 | Channel3 | $1,500 | 1 | Medium. Needs a real product-search call path. | Optional garnish |
 | APIMatic | $1,000 + 6mo Business | 3 | **Low — and pays out even without winning** | **Do it** (see §4) |
-| Render | Credits only | 3 | Optional backend host; not deployed | Optional |
+| Render | Credits only | 3 | Persistent backend and SQLite disk; restart verified | Optional |
 | Elastic / KERNEL / Astropods / Postman / Zapier | various | — | High, orthogonal | Pass |
 
 **Rationale for AG Grid over Bryntum.** Bryntum's own suggested idea — "Subscription
@@ -82,7 +82,7 @@ concrete instead of a claim.
 | Astropods | free tier | `astropods.com` |
 | Discord | PayPal hackathon server | `discord.gg/sJ2G6DyvSK` |
 
-AG Grid is the sponsor target; a Render deployment is optional, not yet provisioned. The rest are recorded so nobody
+AG Grid remains the sponsor target; Render now hosts the persistent sandbox backend. The rest are recorded so nobody
 re-researches them.
 
 ## 6. PayPal's own "Inspiration" list — direct hit
@@ -142,13 +142,14 @@ Search. Missing reporting transactions still remain pending. The $5 capture had 
 funding fees; tool credit is not cash received. An initial payout was rejected for
 insufficient USD funds, preserving author earnings. Converting JPY 1,000 of existing
 fake sandbox funds to USD 6.16 prefunded the business wallet before successful
-payout. The public backend is a temporary tunnel to a local Mac, not durable hosting.
+payout. The backend now runs on Render with a persistent SQLite disk, stable HTTPS and
+operator-token access. Signed Webhook redelivery and restart persistence are proven.
 
 **Tools used:** Native Node.js 26, `node:sqlite`, native fetch, `node:test`; PayPal Orders,
 Payouts, Transaction Search, Webhook Verification REST and optional JS SDK v6 approval;
 MCP Streamable HTTP; Codex; APIMatic Context Plugin for PayPal as a source-grounded
 coding reference (native REST remains the runtime). Dotfield/Cloudflare hosts public
-information pages and a temporary tunnel to the local backend. Render is not deployed.
+information pages. Render hosts the Node sandbox and persistent SQLite ledger.
 
 **Optional AI and analytics:** Gemini adapters for constrained intent, narration and
 synthetic labels are implemented, with deterministic fallbacks. No Gemini key has
@@ -164,9 +165,8 @@ must retain their reservation and external identity. Tool prices and budget deci
 must use exact integers, while external fees and capture receipts remain distinct
 from purchased tool credit.
 
-**Next:** Complete durable hosting, verify licensed Studio and optional Gemini,
-then record the English video. Durable
-hosting, refunds, FX and production account onboarding are future work.
+**Next:** Verify licensed Studio and optional Gemini, then record the English video.
+Refunds, FX, high availability and production account onboarding are future work.
 
 Copy this draft only after updating it against the final evidence. See README for the
 full Tools inventory and `01-demo-script.md` for the under-three-minute recording plan.
@@ -177,7 +177,7 @@ full Tools inventory and `01-demo-script.md` for the under-three-minute recordin
 - [x] README: English, setup + run instructions that work on a clean machine
 - [x] README: "Tools" section naming every model/API and what it does
 - [x] README: sandbox verification result table filled in (including pending/failed checks)
-- [ ] Working demo reachable (hosted URL **or** reproducible local run — both for us)
+- [x] Working demo reachable: https://agentmeter-sandbox.onrender.com (operator token required); reproducible local mock also verified
 - [x] English description draft: problem, audience, PayPal integration and limitations
 - [ ] Demo video < 3:00, uploaded to YouTube, public, link on the form
 - [ ] Video shows the app running on the device it was built for

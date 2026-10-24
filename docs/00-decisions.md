@@ -26,7 +26,7 @@ webhook delivery, successful author payout and Transaction Search reconciliation
 | D9 | Top-up | **PayPal JS SDK v6 buttons** (client-side) + server capture | Judges click a real PayPal button. This is the strongest "PayPal is central" signal. |
 | D10 | Payouts | Payouts API, one batch at a time, `sandbox` only; no flag executes, copied `.env.example` selects dry-run | Live payouts need approval; sandbox only. |
 | D11 | Reconciliation | AgentMeter ledger vs PayPal Transaction Search plus separately labeled fresh Orders/Payouts checks, **explicit fee column** | Shows we understand that `order total ≠ money received`. This is the highest-credibility screen in the demo. |
-| D12 | Hosting | Public information pages on Dotfield; Node backend deployed separately, with "run locally" in README | Dotfield provides stable public URLs; the backend needs a Node runtime and durable ledger storage. Render free instances lose local SQLite data on sleep/restart, so a persistent hosted ledger requires a paid instance with a disk or another suitable host. |
+| D12 | Hosting | Public information pages on Dotfield; single Node process on Render with a 1 GB persistent SQLite disk; local mock remains reproducible | The paid Singapore backend has stable HTTPS, verified Webhooks and proven restart persistence. Base compute/disk price is $7.25/month. Keep one writer; Auto Deploy and Blueprint Auto Sync are off. |
 
 ## 3. Verified vs. unverified PayPal surface
 
@@ -262,6 +262,7 @@ listener. Keep `PUBLIC_BASE_URL` pointed at the AgentMeter server, not Dotfield.
 Register `<backend HTTPS origin>/api/webhooks/paypal` once the server is deployed.
 Payment secrets stay on the backend and must never enter Dotfield's static build.
 
-Update the project website with a verified demo link when the application is ready.
-Until then, the public pages describe a prototype in development and label the
-balance example as illustrative.
+The verified interactive sandbox is https://agentmeter-sandbox.onrender.com.
+It requires the operator demo token. Public pages link to it and identify sandbox
+test funds. Actual migration, redelivery and restart checks are recorded in
+`07-hosting.md`; the earlier local sandbox writer and tunnel are stopped.
