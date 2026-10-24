@@ -18,8 +18,8 @@
     "dev": "node --watch src/server.mjs",
     "seed": "node scripts/seed.mjs",
     "verify:sandbox": "node scripts/verify-sandbox.mjs",
-    "test": "node --test test/",
-    "check": "node --test test/",
+    "test": "node --test test/*.test.mjs",
+    "check": "node --test test/*.test.mjs",
     "reset": "node scripts/reset.mjs"
   },
   "dependencies": {},
