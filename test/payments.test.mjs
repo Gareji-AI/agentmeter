@@ -108,4 +108,3 @@ test('a present reporting fee in another currency cannot be replaced with a matc
   const report=await reconcile(db,{...rail,mode:'live',async listTransactions(args){const report=structuredClone(await rail.listTransactions(args));for(const row of report.transaction_details)if(row.transaction_info.transaction_amount.value.startsWith('-'))row.transaction_info.fee_amount.currency_code='JPY';return report;}});
   assert.equal(report.rows.find(r=>r.kind==='Payout').status,'MISMATCH');
 });
-

@@ -33,7 +33,7 @@ export function paypalConfigFromEnv(env = process.env) {
     webhookId: (env.PAYPAL_WEBHOOK_ID || '').trim(),
     payoutClientId: (env.PAYPAL_PAYOUT_CLIENT_ID || '').trim() || clientId,
     payoutClientSecret: (env.PAYPAL_PAYOUT_CLIENT_SECRET || '').trim() || clientSecret,
-    publicBaseUrl: (env.PUBLIC_BASE_URL || 'http://localhost:8787').replace(/\/+$/, ''),
+    publicBaseUrl: (env.PUBLIC_BASE_URL || env.RENDER_EXTERNAL_URL || 'http://localhost:8787').replace(/\/+$/, ''),
   };
 }
 

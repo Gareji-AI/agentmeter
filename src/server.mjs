@@ -200,7 +200,7 @@ export async function start() {
   const port=Number(process.env.PORT||8787);const host=process.env.HOST||'127.0.0.1';
   await new Promise((resolve,reject)=>{app.server.once('error',reject);app.server.listen(port,host,resolve);});
   console.log(`AgentMeter: http://${host}:${app.server.address().port} (${app.paypal.mode==='mock'?'MOCK — simulated funds':'PAYPAL SANDBOX — test funds'})`);
-  if(app.paypal.mode!=='mock')console.log(`Demo access token: ${app.ctx.accessToken}`);
+  if(app.paypal.mode!=='mock'&&!process.env.DEMO_ACCESS_TOKEN)console.log(`Demo access token: ${app.ctx.accessToken}`);
   let closing=false;
   const close=()=>{if(closing)return;closing=true;app.server.closeAllConnections();app.server.close(()=>app.db.close());};
   process.once('SIGINT',close);process.once('SIGTERM',close);
