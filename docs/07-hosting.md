@@ -73,3 +73,25 @@ References: [Render persistent disks](https://render.com/docs/disks),
 [Blueprint specification](https://render.com/docs/blueprint-spec),
 [Node version](https://render.com/docs/node-version),
 [official cost example](https://github.com/render-examples/nanobot-render#cost-expectations).
+
+## Repeatable hosted verification
+
+Freeze and fingerprint the source ledger before importing it. Then check the hosted
+service without creating another payment or metered call:
+
+```sh
+npm run verify:deployment -- --base https://YOUR-SERVICE.onrender.com \
+  --expected data/migration/frozen-ledger-identity.json \
+  --out data/verification/sandbox/render-before-restart.json
+# After using Render's Restart service action:
+npm run verify:deployment -- --base https://YOUR-SERVICE.onrender.com \
+  --expected data/migration/frozen-ledger-identity.json \
+  --previous data/verification/sandbox/render-before-restart.json \
+  --out data/verification/sandbox/render-after-restart.json
+```
+
+The verifier sends GET requests only, rejects redirects, requires anonymous state
+access to return 401, compares the exposed ledger state and API-key hashes, and
+requires both actual reporting receipts to reconcile. The restart check also
+requires a new process identity and unchanged ledger/rail receipt identities.
+Raw evidence stays private under ignored `data/`; the token stays out of URLs/logs.
