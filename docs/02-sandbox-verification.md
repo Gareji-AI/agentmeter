@@ -65,15 +65,15 @@ Needs the seller sandbox account to have a **payments/receive** capability and a
 verification state. Steps:
 
 1. `POST /v1/oauth2/token` with the second (business) sandbox app credentials.
-2. `POST /v1/payments/payouts` with a single item, `receiver_type: EMAIL`,
+2. `POST /v1/payments/payouts` with a single item, `recipient_type: EMAIL`,
    receiver = the PERSONAL sandbox account email, `value: "0.03"`.
 3. Poll `GET /v1/payments/payouts/{batch_id}`.
 
 Pass criteria: batch status reaches `SUCCESS` and item status `SUCCESS`.
 
 Fallback ladder (in order):
-1. Retry with `receiver_type: PAYPAL_ID` using the buyer's payer_id.
-2. Retry with `receiver_type: PHONE` if the sandbox account has a phone.
+1. Retry with `recipient_type: PAYPAL_ID` using the buyer's payer_id.
+2. Retry with `recipient_type: PHONE` if the sandbox account has a phone.
 3. Use `POST /v2/payments/referenced-payouts` (alternative rail).
 4. Documented dry-run: AgentMeter computes the exact payload, stores it, shows it in the UI,
    and the demo states "payload generated; sandbox payout requires a business-verified
@@ -138,3 +138,13 @@ must be reflected in the 3-minute script, not discovered on Day 17.
 - 150–180 min: V3, V5.
 - 180–210 min: V6, V7.
 - 210–240 min: write the table + amend this doc + commit.
+
+
+## 4. Implementation checkpoint — 2026-10-24
+
+The Day-1 gate was not fully passed before implementation. The local simulation is
+complete; actual sandbox V1 capture, V2, V3, V4 success, V5 capture match and V7 are
+still open. V4 returned HTTP 422 `INSUFFICIENT_FUNDS`; do not describe real author
+payouts as verified. The README contains the current result table and commands for
+`scripts/verify-sandbox.mjs`. `--mock` passes only the corresponding simulation checks;
+V2/V7 stay manual and V6 is explicitly skipped because direct REST is used.

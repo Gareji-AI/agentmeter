@@ -40,7 +40,7 @@ try {
       if(!process.argv.includes('--payout')||!env.PAYPAL_SANDBOX_RECIPIENT){record('V4','PENDING','Set PAYPAL_SANDBOX_RECIPIENT and pass --payout to send $0.03 of sandbox funds.');return;}
       const id='verify-'+Date.now();let batch=await paypal.createPayout({senderBatchId:id,emailSubject:'AgentMeter sandbox verification',items:[{recipient_type:'EMAIL',amount:{currency:'USD',value:'0.03'},receiver:env.PAYPAL_SANDBOX_RECIPIENT,sender_item_id:id}]});
       for(let i=0;i<5&&!batch.items?.length;i++){await new Promise(r=>setTimeout(r,1500));batch=await paypal.getPayout(batch.batch_header.payout_batch_id);}
-      const success=batch.batch_header?.batch_status==='SUCCESS'&&batch.items?.every(item=>item.transaction_status==='SUCCESS');record('V4',success?'PASS':'PENDING','PayPal sandbox batch and item status',batch);
+      const success=batch.batch_header?.batch_status==='SUCCESS'&&batch.items?.length===1&&batch.items[0].transaction_status==='SUCCESS';record('V4',success?'PASS':'PENDING','PayPal sandbox batch and item status',batch);
     });
     await check('V5',async()=>{const end=new Date();const report=await paypal.listTransactions({startDate:new Date(end.getTime()-30*86400000).toISOString(),endDate:end.toISOString()});const captureId=captured?.purchase_units?.[0]?.payments?.captures?.[0]?.id;const row=report.transaction_details?.find(t=>t.transaction_info?.transaction_id===captureId);record('V5',row?'PASS':'PENDING',row?'Captured order is visible in Transaction Search':'Capture not yet visible or no captured order supplied; reporting can lag.',row||report);});
     record('V6','SKIP','REST integration selected. No PayPal Agent Toolkit usage is claimed.');

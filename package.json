@@ -2,7 +2,7 @@
   "name": "agentmeter",
   "version": "0.1.0",
   "private": true,
-  "description": "Metered billing rail for AI tools: agents pay per tool call in PayPal, authors get paid out automatically.",
+  "description": "Metered tool calls with an integer ledger, PayPal sandbox funding and author payouts.",
   "type": "module",
   "license": "MIT",
   "author": "Gareji AI",
@@ -11,7 +11,7 @@
     "url": "https://github.com/Gareji-AI/agentmeter"
   },
   "engines": {
-    "node": ">=22.5.0"
+    "node": ">=26.0.0"
   },
   "scripts": {
     "start": "node src/server.mjs",
@@ -20,7 +20,8 @@
     "verify:sandbox": "node scripts/verify-sandbox.mjs",
     "test": "node --test test/*.test.mjs",
     "check": "node --test test/*.test.mjs",
-    "reset": "node scripts/reset.mjs"
+    "reset": "node scripts/reset.mjs",
+    "verify:demo": "node scripts/smoke.mjs"
   },
   "dependencies": {},
   "files": [

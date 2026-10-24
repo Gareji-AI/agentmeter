@@ -5,6 +5,8 @@ test('untrusted model output cannot invent budget amounts, tools or analytics fi
   const tools=[{id:'tool',name:'extract_entities',slug:'extract-entities'}];
   assert.throws(()=>checkedBudget({amount:'500',scope:'monthly',tool_name:'extract_entities'},'Keep extract_entities under $0.50 this month',tools));
   assert.throws(()=>checkedWidget({metric:'DROP TABLE',group_by:'day',period:'all',tool_name:null},tools));
+  assert.throws(()=>checkedBudget({amount:'0.50',scope:'monthly',tool_name:null},'Keep extract_entities under $0.50 this month for overall safety',tools));
+  assert.throws(()=>checkedBudget({amount:'0.50',scope:'monthly',tool_name:'extract_entities'},'Keep all tools under $0.50 this month',tools));
   assert.equal(checkedBudget({amount:'0.50',scope:'monthly',tool_name:'extract_entities'},'Keep extract_entities under $0.50 this month',tools).capMicro,500_000);
 });
 test('without credentials, intent and narration remain deterministic without a network call',async()=>{

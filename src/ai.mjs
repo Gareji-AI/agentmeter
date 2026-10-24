@@ -24,7 +24,9 @@ export async function interpretWidget(env,text,tools,fetcher=fetch) {
 }
 export function checkedBudget(value,text,tools) {
   const literal=[...text.matchAll(/\$(\d+(?:\.\d{1,6})?)(?![\d.])/g)];
-  if(literal.length!==1||value.amount!==literal[0][1]||value.scope!=='monthly'||value.tool_name!==null&&!tools.some(t=>t.name===value.tool_name))throw new Error('Model budget does not match the explicit amount and scope');
+  const named=tools.filter(t=>[t.name,t.slug,t.name.replaceAll('_',' ')].filter(Boolean).some(name=>text.toLowerCase().includes(name)));
+  if(value.tool_name!==null&&(named.length!==1||named[0].name!==value.tool_name)||value.tool_name===null&&named.length)throw new Error('Model changed the named budget tool');
+  if(literal.length!==1||! /month/i.test(text)||value.amount!==literal[0][1]||value.scope!=='monthly'||value.tool_name===null&&!/all tools|total|overall|entire/i.test(text)||value.tool_name!==null&&!tools.some(t=>t.name===value.tool_name))throw new Error('Model budget does not match the explicit amount and scope');
   const capMicro=toMicro(value.amount);if(capMicro<0)throw new Error('Negative cap');
   return {capMicro,toolId:tools.find(t=>t.name===value.tool_name)?.id||null,sourceText:text};
 }

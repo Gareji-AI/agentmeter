@@ -38,7 +38,7 @@ test('ambiguous payout failure holds funds and retries the identical batch',asyn
 });
 test('definite payout rejection releases reservation without deleting earnings',async t=>{
   const db=fixture();t.after(()=>db.close());callTool(db,request());
-  await assert.rejects(()=>payOut(db,{async createPayout(){const e=new Error('Rejected');e.status=422;throw e;}},'author'));
+  await assert.rejects(()=>payOut(db,{async createPayout(){const e=new Error('Rejected');e.status=422;e.body=JSON.stringify({name:'INSUFFICIENT_FUNDS'});throw e;}},'author'));
   assert.equal(db.prepare('SELECT status FROM payouts').get().status,'FAILED');assertLedger(db);
 });
 test('dry-run payout never consumes real ledger earnings',async t=>{
@@ -48,4 +48,13 @@ test('dry-run payout never consumes real ledger earnings',async t=>{
 test('production hosts and partial credentials fail closed',()=>{
   assert.throws(()=>createPayPal({PAYPAL_API_BASE:'https://api-m.paypal.com'}),/sandbox/);
   assert.throws(()=>createPayPal({PAYPAL_CLIENT_ID:'only-id'}),/Both/);
+});
+
+test('a known payout batch lookup failure keeps its reservation',async t=>{
+  const db=fixture();t.after(()=>db.close());callTool(db,request());
+  const paypal={async createPayout(){return {batch_header:{payout_batch_id:'known-batch',batch_status:'PENDING'},items:[]};},async getPayout(){const error=new Error('Temporarily missing');error.status=404;error.body=JSON.stringify({name:'INVALID_REQUEST'});throw error;}};
+  assert.equal((await payOut(db,paypal,'author')).status,'SENT');
+  await assert.rejects(()=>payOut(db,paypal,'author'));
+  assert.equal(db.prepare("SELECT reserved_micro FROM accounts WHERE id='author'").get().reserved_micro,10_000);
+  assert.equal(db.prepare('SELECT status FROM payouts').get().status,'SENT');assertLedger(db);
 });

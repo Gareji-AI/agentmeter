@@ -36,7 +36,7 @@ Consequences for AgentMeter:
 | Bryntum | $1,000 | 3 | High. Needs Gantt/Scheduler/Calendar as the product's spine. | Pass — same effort, 5× less upside |
 | Channel3 | $1,500 | 1 | Medium. Needs a real product-search call path. | Optional garnish |
 | APIMatic | $1,000 + 6mo Business | 3 | **Low — and pays out even without winning** | **Do it** (see §4) |
-| Render | Credits only | 3 | Zero (it is the host) | Free | 
+| Render | Credits only | 3 | Optional backend host; not deployed | Optional |
 | Elastic / KERNEL / Astropods / Postman / Zapier | various | — | High, orthogonal | Pass |
 
 **Rationale for AG Grid over Bryntum.** Bryntum's own suggested idea — "Subscription
@@ -82,7 +82,7 @@ concrete instead of a claim.
 | Astropods | free tier | `astropods.com` |
 | Discord | PayPal hackathon server | `discord.gg/sJ2G6DyvSK` |
 
-Only Render and AG Grid are load-bearing for AgentMeter. The rest are recorded so nobody
+AG Grid is the sponsor target; a Render deployment is optional, not yet provisioned. The rest are recorded so nobody
 re-researches them.
 
 ## 6. PayPal's own "Inspiration" list — direct hit
@@ -105,38 +105,77 @@ Also confirmed as first-class docs the judges will recognise:
 PayPal JavaScript SDK v6, REST API, Payouts, Disputes, Subscriptions, Invoicing, Webhooks,
 PayPal MCP server quickstart, Agent tools reference, `github.com/paypal/AI-Toolkit`.
 
-## 7. The "Tools" answer (draft, ready to paste)
+## 7. English submission draft — implemented scope
 
-> **AgentMeter's AI stack**
->
-> - **MCP (Model Context Protocol), Streamable HTTP.** AgentMeter *is* an MCP server. Any
->   MCP-capable agent — Claude Desktop, Cursor, Pi, a Zapier MCP client — can point at
->   `POST /mcp`, list the metered tools, and call them. Metering happens at the protocol
->   boundary rather than inside any one agent.
-> - **Gemini 2.x Flash (Google).** Three jobs, all bounded: (1) turning a natural-language
->   budget instruction into a machine-checked cap ("keep summarise under $0.50 this
->   month"), (2) narrating the buyer agent's decisions for the demo, (3) semantic labelling
->   of tool-call clusters for the analytics view. The model is never on the money path —
->   pricing, reservation and settlement are deterministic, because a balance must not
->   depend on a model's mood.
-> - **Deterministic planner for the buyer agent.** The agent that spends money is a state
->   machine reacting to real tool output (including the `INSUFFICIENT_FUNDS` JSON-RPC
->   error), with the LLM narrating. This is a deliberate reliability choice for a live
->   demo.
-> - **APIMatic Context Plugin for PayPal (Claude Code).** Used during development to keep
->   the agent's view of the PayPal Contracts API aligned with the real schema.
-> - **AG Grid (Studio / Grid + Charts).** The analytics surface at `/grid`, with a custom
->   cell renderer and a themed design system.
-> - **Render.** Hosting for the demo build, using the hackathon credits.
+**Title:** AgentMeter
+
+**Tagline:** Every agent tool call gets a price, a budget check, and a receipt.
+
+**Problem and audience:** Developers publishing small AI tools need usage accounting
+that works below a conventional checkout's useful granularity. Agent developers need
+to bound spending and explain what each result cost. AgentMeter brings both sides
+into one inspectable ledger.
+
+**What it does:** A consumer prepays tool credit, an agent calls deterministic tools,
+and AgentMeter reserves, executes, then settles or releases each charge. A repeated
+request replays its result rather than charging again. Monthly caps include reserved
+funds. Authors accumulate earnings and request a payout. A separate reconciliation
+screen compares ledger entries with external receipts and exposes fees.
+
+**Why PayPal is central:** Orders creates and captures prepaid funding; Payouts sends
+accumulated author earnings; Transaction Search supplies the independent comparison;
+verified webhooks provide an idempotent event path. PayPal is the funding and payout
+rail, rather than a decorative checkout beside an unrelated application.
+
+**What is proven:** The complete local simulation runs with Node 26 and `npm start`,
+without a package install or credentials. It demonstrates $5.00 → three $0.01 calls →
+$4.97 buyer balance → $0.03 author earnings → simulated payout → two receipt matches.
+Tests exercise integer accounting, retries, caps, failures, HTTP MCP and receipt checks.
+The current demonstration must be labeled **MOCK / simulated funds**.
+
+**Actual sandbox limitations:** OAuth, app capabilities, order creation and Reporting
+access work. Buyer approval/capture and real SDK v6 checkout remain to be completed.
+A $0.03 Payouts attempt returned HTTP 422 `INSUFFICIENT_FUNDS`; the seller currently
+has JPY funding while this integration uses USD. No public backend exists for webhook
+delivery yet. Actual automatic payouts and end-to-end sandbox reconciliation are not
+claimed. Reporting fallback rows are explicitly labeled stored receipts rather than
+independent matches.
+
+**Tools used:** Native Node.js 26, `node:sqlite`, native fetch, `node:test`; PayPal Orders,
+Payouts, Transaction Search, Webhook Verification REST and optional JS SDK v6 approval;
+MCP Streamable HTTP; Codex; APIMatic Context Plugin for PayPal as a source-grounded
+coding reference (native REST remains the runtime). Dotfield/Cloudflare hosts public
+information pages. Render has not been deployed.
+
+**Optional AI and analytics:** Gemini adapters for constrained intent, narration and
+synthetic labels are implemented, with deterministic fallbacks. No Gemini key has
+been supplied: real model use is not yet verified. AG Grid 36.2.0 and AG Studio 3.0.0
+adapters implement theming, custom cells, a receipt widget, layout and a custom Studio
+agent delegating to the built-in page agent. No license has been supplied: successful
+licensed execution and AG Grid sponsor readiness remain pending. The offline analytics
+table, CSV and rule-driven widgets are working. Do not submit optional integrations
+as verified until they are exercised.
+
+**What we learned:** A timeout is not a failed transfer. Unresolved payout requests
+must retain their reservation and external identity. Tool prices and budget decisions
+must use exact integers, while external fees and capture receipts remain distinct
+from purchased tool credit.
+
+**Next:** Complete USD sandbox funding, capture, payout, webhook and Reporting evidence;
+verify licensed Studio and optional Gemini; then record the English video. Durable
+hosting, refunds, FX and production account onboarding are future work.
+
+Copy this draft only after updating it against the final evidence. See README for the
+full Tools inventory and `01-demo-script.md` for the under-three-minute recording plan.
 
 ## 8. Submission checklist (tick at submit time)
 
 - [ ] Repository public, **LICENSE visible in the About section**
-- [ ] README: English, setup + run instructions that work on a clean machine
-- [ ] README: "Tools" section naming every model/API and what it does
-- [ ] README: sandbox verification result table filled in
+- [x] README: English, setup + run instructions that work on a clean machine
+- [x] README: "Tools" section naming every model/API and what it does
+- [x] README: sandbox verification result table filled in (including pending/failed checks)
 - [ ] Working demo reachable (hosted URL **or** reproducible local run — both for us)
-- [ ] Text description: problem, audience, how PayPal is central (≤ the form's limit)
+- [x] English description draft: problem, audience, PayPal integration and limitations
 - [ ] Demo video < 3:00, uploaded to YouTube, public, link on the form
 - [ ] Video shows the app running on the device it was built for
 - [ ] Video contains no third-party trademarks or copyrighted music

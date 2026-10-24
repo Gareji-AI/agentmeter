@@ -11,6 +11,7 @@ export function creditCapture(db, topupId, order) {
     const capture=captures.find(c=>c.status==='COMPLETED');
     if(order.id!==topup.paypal_order_id || order.status!=='COMPLETED' || !capture || captures.length!==1 || capture.amount.currency_code!=='USD' || paypalAmountToMicro(capture.amount.value)!==topup.amount_micro) throw new Error('Capture does not match the expected order, currency or amount');
     const breakdown=capture.seller_receivable_breakdown;
+    for(const field of ['gross_amount','paypal_fee','net_amount'])if(breakdown?.[field]&&breakdown[field].currency_code!=='USD')throw new Error('Capture breakdown must use USD');
     const fee=breakdown?.paypal_fee ? paypalAmountToMicro(breakdown.paypal_fee.value) : breakdown?.net_amount ? topup.amount_micro-paypalAmountToMicro(breakdown.net_amount.value) : null;
     if(fee===null)throw new Error('Capture fee or net amount is required for reconciliation');
     integer(fee);if(fee>topup.amount_micro)throw new Error('Invalid fee');
@@ -101,7 +102,7 @@ export async function payOut(db,paypal,providerId,{dryRun=false}={}) {
     const amount=Number(BigInt(account.balance_micro-account.reserved_micro)/10_000n*10_000n);
     if(!amount)throw new MeteringError(-32002,'No whole-cent earnings available');
     const id=newId('payout');
-    const payload={senderBatchId:id,emailSubject:'AgentMeter sandbox earnings',items:[{recipient_type:'EMAIL',amount:{currency:'USD',value:microToPayPalAmount(amount)},receiver:account.paypal_email,sender_item_id:id}]};
+    const payload={sender_batch_header:{sender_batch_id:id,email_subject:'AgentMeter sandbox earnings'},items:[{recipient_type:'EMAIL',amount:{currency:'USD',value:microToPayPalAmount(amount)},receiver:account.paypal_email,sender_item_id:id}]};
     db.prepare('INSERT INTO payouts (id,provider_account_id,amount_micro,status,dry_run,payload,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)').run(id,providerId,amount,dryRun?'DRY_RUN':'QUEUED',dryRun?1:0,JSON.stringify(payload),nowIso(),nowIso());
     if(!dryRun)db.prepare('UPDATE accounts SET reserved_micro=reserved_micro+? WHERE id=?').run(amount,providerId);
     emit(db,'payout.queued',{payout_id:id,account_id:providerId,dry_run:dryRun});
@@ -109,11 +110,13 @@ export async function payOut(db,paypal,providerId,{dryRun=false}={}) {
   });
   if(row.status==='DRY_RUN')return row;
   try {
-    const batch=row.paypal_batch_id?await paypal.getPayout(row.paypal_batch_id):await paypal.createPayout(JSON.parse(row.payload));
+    const payload=JSON.parse(row.payload);
+    const batch=row.paypal_batch_id?await paypal.getPayout(row.paypal_batch_id):await paypal.createPayout({senderBatchId:payload.sender_batch_header?.sender_batch_id||payload.senderBatchId,emailSubject:payload.sender_batch_header?.email_subject||payload.emailSubject,items:payload.items});
     return applyPayoutStatus(db,row.id,batch);
   } catch(error) {
     // Ambiguous network failures keep the reservation; retries reuse senderBatchId.
-    if(error.status>=400&&error.status<500&&![408,409,429].includes(error.status))transaction(db,()=>{
+    let rejection;try{rejection=JSON.parse(error.body||'{}').name;}catch{}
+    if(!row.paypal_batch_id&&['INSUFFICIENT_FUNDS','VALIDATION_ERROR','INVALID_REQUEST','AUTHORIZATION_ERROR','NOT_AUTHORIZED'].includes(rejection))transaction(db,()=>{
       const current=db.prepare('SELECT * FROM payouts WHERE id=?').get(row.id);
       if(!['QUEUED','SENT'].includes(current.status))return;
       db.prepare("UPDATE payouts SET status='FAILED',raw=?,updated_at=? WHERE id=?").run(JSON.stringify({error:error.message,status:error.status}),nowIso(),row.id);

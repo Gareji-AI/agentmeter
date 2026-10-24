@@ -40,7 +40,7 @@ export function parseBudget(db,text) {
   return {capMicro:toMicro(values[0][1]),toolId:named[0]?.id||null,sourceText:text};
 }
 
-export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.PUBLIC_BASE_URL||'http://localhost:8787',render}={}) {
+export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.PUBLIC_BASE_URL||env.RENDER_EXTERNAL_URL||`http://localhost:${env.PORT||8787}`,render}={}) {
   const config=paypalConfigFromEnv(env);
   db ||= openDb(env.DATABASE_PATH||`data/agentmeter-${config.mode==='mock'?'mock':'sandbox'}.sqlite`);
   paypal ||= createPayPal(env,{db});

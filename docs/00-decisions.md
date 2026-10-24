@@ -1,13 +1,14 @@
 # AgentMeter — Design Decisions
 
 Target: PayPal AI Hackathon (submission deadline 2026-11-12 12:00 PST).
-Prizes targeted: Grand Prize, Best Use of Agentic Commerce, Best Use of PayPal + AI,
-Most Creative, Best Demo Delivery, Best Use of AG Grid (stretch), Best Use of APIMatic (stretch).
+Prize strategy: one Grand Prize or Honorable Mention, plus at most one Sponsor Prize.
+AG Grid is the primary sponsor target; actual licensed Studio verification is pending.
 
 ## 1. One-line pitch
 
-**AgentMeter is a metered billing rail for AI tools: an AI agent pays $0.01 per tool
-call in PayPal, and tool authors get paid out automatically.**
+**AgentMeter is a metered billing rail for AI tools: an agent spends prepaid credit per tool
+call, with PayPal sandbox funding and traceable author payout settlement. The current
+verified demonstration uses simulated funds; real payout success remains unproven.**
 
 ## 2. Locked decisions
 
@@ -15,14 +16,14 @@ call in PayPal, and tool authors get paid out automatically.**
 |---|----------|-------|-----|
 | D1 | Judge-facing language | **English** | Rules require English submission materials. |
 | D2 | Dev-facing language | English (code, comments, commits) | Keeps the repo coherent for judges. |
-| D3 | Language / runtime | **TypeScript on Node 26**, zero native deps | `node:sqlite` is built in — judges can run it with only `npm install`. |
+| D3 | Language / runtime | **JavaScript ES modules on Node 26**, zero npm deps | `node:sqlite` is built in — judges can run `npm start` without an install. |
 | D4 | Money representation | **Integer micro-dollars** (`price_micro`) , 1 USD = 1,000,000 micro | Floating point on money is a disqualifying smell for a payments hackathon. Displayed as `$0.0100`. |
 | D5 | Store of record | **agentmeter ledger**, not PayPal | PayPal sandbox has no realistic settlement lag model. Payouts are *initiated* by AgentMeter; PayPal is the money rail. |
 | D6 | MCP transport | **Streamable HTTP** (`tools/list`, `tools/call`) at `POST /mcp` | Judges get a live URL; no `npx` install required. stdio bridge is a stretch goal. |
 | D7 | UI | Server-rendered HTML + SSE live feed, no build step | A build step is a judge-experience risk. |
-| D8 | Buyer agent | **scripted plan, LLM narration** | See §5 — this is the load-bearing decision. |
+| D8 | Buyer agent | **scripted three-call plan, optional LLM narration** | See §5 — this is the load-bearing decision. |
 | D9 | Top-up | **PayPal JS SDK v6 buttons** (client-side) + server capture | Judges click a real PayPal button. This is the strongest "PayPal is central" signal. |
-| D10 | Payouts | Payouts API, one batch at a time, dry-run flag default **off**, `sandbox` only | Live payouts need approval; sandbox only. |
+| D10 | Payouts | Payouts API, one batch at a time, `sandbox` only; no flag executes, copied `.env.example` selects dry-run | Live payouts need approval; sandbox only. |
 | D11 | Reconciliation | AgentMeter ledger vs PayPal Transaction Search, **explicit fee column** | Shows we understand that `order total ≠ money received`. This is the highest-credibility screen in the demo. |
 | D12 | Hosting | Public information pages on Dotfield; Node backend deployed separately, with "run locally" in README | Dotfield provides stable public URLs; the backend needs a Node runtime and durable ledger storage. Render free instances lose local SQLite data on sleep/restart, so a persistent hosted ledger requires a paid instance with a disk or another suitable host. |
 
@@ -112,24 +113,21 @@ reads as "genuine effort" under Technological Implementation.
 
 ## 5. The buyer-agent decision (load-bearing)
 
-A hackathon demo that spends LLM tokens live will hang on stage. But the judging rubric
-rewards AI being *meaningful*, not *flaky*.
+The buyer demonstration executes a fixed plan of three deterministic entity-extraction
+calls. Each call passes through the same reservation, cap and settlement path as MCP.
+Insufficient funds or a cap stops spending; a tool failure releases its reservation.
+There is no autonomous model-driven purchase or cheaper-tool retry in this version.
 
-**Decision: the buyer agent is a deterministic planner with an LLM narrator.**
+Optional Gemini adapters interpret budget/widget intent, narrate already-settled
+facts, and label synthetic historical examples. Model output is validated against
+explicit user amounts, named tools and whitelisted fields; it cannot change prices,
+execute tools, generate SQL or initiate payments. Without a key, budget and analytics
+requests use a documented rule parser and narration is literal. No actual Gemini
+response has been verified as of 2026-10-24.
 
-- The planner is a small state machine that reacts to real tool output
-  (e.g. it stops when a `402`-equivalent comes back, it retries with a cheaper tool when
-  over budget).
-- The LLM (Gemini Flash) produces the *narration* and the *budget intent* from natural
-  language ("keep this tool under $0.50 this month") → parsed into
-  `monthly_cap_micro`.
-- The LLM also performs the one genuinely AI-hard step: **semantic batch assignment** of
-  historical calls to tools (for the AG Grid analytics view) — i.e. it reads tool
-  descriptions + call args and labels clusters.
-
-This is defensible in the submission text: "AI decides intent and budget policy; the
-metering path is deterministic so money never depends on a model's mood." Judges who
-have shipped payments will read that as a *plus*.
+Optional AG Studio uses a custom analyst agent delegating to the built-in page agent.
+Its adapter is implemented but requires a trial/license key and browser verification.
+The offline table and local widgets are the verified analytics path today.
 
 ## 6. Data model
 
@@ -175,15 +173,26 @@ payouts(
 events(id integer pk autoincrement, kind text, payload text, created_at text)
 ```
 
-Invariant enforced in code and asserted by a test:
-`balance_micro = Σ(settled calls and completed topups) − Σ(payouts and refunds)`.
+Invariants enforced in code and asserted by tests:
+
+- Consumer balance = captured top-ups − settled call prices.
+- Provider balance = settled author credits − successful payout amounts.
+- Consumer reserved = active call reservations; provider reserved = queued/sent payouts.
+- Every balance/reservation is a safe, nonnegative integer; reserved cannot exceed balance.
+- Fees are recorded separately; this prototype does not implement refunds or FX.
+
+The SQL above is a domain sketch; `src/db.mjs` is the complete executable schema,
+including `webhook_events`, `budget_policies`, capture IDs and snapshotted author credits.
+Tools are pure local functions between reservation and settlement transactions. One
+server process recovers stale tool reservations on startup. Payouts retain unresolved
+reservations across restart and reuse the same external batch identity.
 
 ## 7. Scope
 
 ### Must ship (Day 1–10)
 
 1. Ledger + reserve/settle metering + idempotency.
-2. MCP Streamable HTTP with 3–5 built-in metered tools.
+2. MCP Streamable HTTP with six built-in metered tools.
 3. PayPal Orders top-up (JS SDK v6 + server capture) + webhook idempotency.
 4. Consumer dashboard (`/app`): balance, live call feed, natural-language cap.
 5. Provider dashboard (`/provider`): revenue per tool, unsettled balance, Pay out.

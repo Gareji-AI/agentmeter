@@ -37,7 +37,7 @@ function keywordScores(text) {
 
 /**
  * Every handler receives (args, ctx) and returns a plain JSON-serialisable object.
- * Handlers must be pure and fast: they run inside the metering transaction.
+ * Handlers must be pure and fast: they run between reservation and settlement.
  */
 export const BUILTIN_HANDLERS = {
   extract_entities(args) {
