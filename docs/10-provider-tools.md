@@ -91,4 +91,52 @@ The command starts an ephemeral Codex app-server thread and calls MCP directly;
 it never starts a model turn or creates a persistent user chat. Do not describe
 this as autonomous model selection. Keep the input/proof files outside Git.
 
-Hosted sandbox verification will be recorded here after deployment and real payout.
+## Hosted sandbox evidence — 2026-10-24
+
+Runtime commit `450f47f`, Render deployment `dep-dbea741srm7s73bfi81g`.
+The original frozen ledger was checked unchanged across the feature deployment
+before registering or executing anything new. Subsequent changes below are
+intentional, authorized sandbox usage, not an unchanged original demo balance.
+
+| Check | Observed result |
+| --- | --- |
+| Provider onboarding | New personal workspace and separate provider account; own recipient settings |
+| HTTPS API | Chrome draft registration at $0.01 → successful probe → publication |
+| Streamable HTTP MCP | Separate registration, encrypted synthetic test credential, successful probe and publication |
+| Actual Codex transport | Installed app-server discovers the published names; API → MCP → API, each SETTLED at 10000 micro-USD |
+| Buyer credit | Existing funded sandbox buyer $4.9700 → $4.9400; no new funding or capture |
+| Provider credit | New provider $0 → $0.0300; original built-in author remains $0 |
+| Replay / failure / quote | Codex retry charged zero; hosted deliberately failed upstream released its hold; underquote rejected before work |
+| Provider payout | Batch `RJEHDT8JUTF5N` and item SUCCESS; transaction `38K4028854295883W`; USD $0.03 and recipient match |
+| Fresh rail read | PayPal Payouts GET VERIFIED, outgoing 30000 micro-USD, fee 0 |
+| Reporting | Original capture and payout remain MATCH; new payout is PENDING_REPORT until Transaction Search returns it |
+| Restart | New process ID, identical ledger hash, provider state, tool definitions, call receipts and payout receipts; browser session survives |
+| Encrypted credential | MCP connection probe succeeds after restart using the persisted encrypted synthetic credential; no buyer charge |
+
+This verifies the Codex MCP client calling tools directly in an ephemeral test
+thread. No model turn was started; autonomous model selection is not claimed.
+Both sample upstreams run on the same public backend. The synthetic Bearer credential
+exercises encryption/decryption; the free example itself does not enforce that token.
+External authentication/session/SSE behavior is additionally tested with independent
+local upstream servers. No production funds moved.
+
+The new global ledger identity is
+`0bd6984c905e93428af993f7812dd6329ef74be770261aa489dd1815ba11a36d`.
+All earlier tools, calls, top-ups, payout records and buyer API-key identity were
+compared against the pre-feature proof and retained. The extra RELEASED call carries
+zero charge. No old archive or original receipt was rewritten to manufacture a pass.
+
+Private evidence is Git-ignored under `data/verification/providers/`: pre/post-deploy
+snapshots, Codex receipts, payout API receipt, pre/post-restart snapshots and the
+post-restart encrypted-credential probe. Recovery codes, cookies, client keys and
+recipient email remain private. Recheck the hosted financial state read-only with:
+
+```sh
+npm run verify:deployment -- --allow-pending-report
+```
+
+The opt-in flag permits a separately verified fresh API receipt while preserving
+PENDING_REPORT. Without it, every rail receipt must independently match Transaction
+Search. Reporting can advance between restart snapshots; permanent receipt identities,
+amounts and fees must remain the same. Tests: **79 passing**; the legacy demo,
+personal workspace and provider mock verification commands also pass.

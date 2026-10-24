@@ -6,10 +6,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fixture,request } from './helpers.mjs';
 import { createWorkspace } from '../src/workspaces.mjs';
-import { createProvider,registerProviderTool,toolForOwner,setToolPublished,changeToolPrice,replaceToolCredential,providerSnapshot } from '../src/providers.mjs';
+import { createProvider,registerProviderTool,toolForOwner,setToolPublished,changeToolPrice,replaceToolCredential,providerSnapshot,updateProvider } from '../src/providers.mjs';
 import { createGateway } from '../src/gateway.mjs';
 import { openDb } from '../src/db.mjs';
 import { assertLedger } from '../src/metering.mjs';
+import { payOut } from '../src/payments.mjs';
 import { openSecret } from '../src/upstream-secrets.mjs';
 import { endpointUrl,resolveEndpoint,publicAddress } from '../src/upstream-http.mjs';
 import { invokeUpstream } from '../src/upstream.mjs';
@@ -132,4 +133,12 @@ test('remote balance exhaustion and monthly caps prevent network work before res
  const db=fixture(10000);t.after(()=>db.close());const {provider}=seller(db);let calls=0;const gateway=createGateway(db,{invoke:async()=>{calls++;return {};}}),tool=await published(db,gateway,provider);
  db.prepare("UPDATE accounts SET monthly_cap_micro=0 WHERE id='buyer'").run();await assert.rejects(gateway.call(call(tool,'cap')),e=>e.code===-32004);assert.equal(calls,1);
  db.prepare("UPDATE accounts SET monthly_cap_micro=NULL WHERE id='buyer'").run();await gateway.call(call(tool,'spent'));await assert.rejects(gateway.call(call(tool,'empty')),e=>e.code===-32002);assert.equal(calls,2);assertLedger(db);
+});
+
+
+test('a pending provider payout locks its recipient and preserves funds across repeated polling',async t=>{
+ const db=fixture();t.after(()=>db.close());const {provider,workspace}=seller(db),gateway=createGateway(db,{invoke:async()=>({ok:true})}),tool=await published(db,gateway,provider);await gateway.call(call(tool));
+ let sends=0,polls=0;const pending={batch_header:{payout_batch_id:'PENDING-BATCH',batch_status:'PENDING'},items:[]};const paypal={async createPayout(){sends++;return pending;},async getPayout(id){polls++;assert.equal(id,'PENDING-BATCH');return pending;}};
+ const payout=await payOut(db,paypal,provider.id);assert.equal(payout.status,'SENT');assert.throws(()=>updateProvider(db,workspace.id,{name:'Changed',paypal_email:'different@example.com'}),/pending payout/);
+ await payOut(db,paypal,provider.id);assert.equal(sends,1);assert.equal(polls,1);const account=db.prepare('SELECT * FROM accounts WHERE id=?').get(provider.id);assert.equal(account.balance_micro,10000);assert.equal(account.reserved_micro,10000);assert.equal(account.paypal_email,'test-owner@example.com');assertLedger(db);
 });

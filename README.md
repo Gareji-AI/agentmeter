@@ -124,7 +124,9 @@ npm run verify:provider
 
 This starts an isolated mock ledger, registers/tests/publishes both HTTP and MCP,
 runs three paid calls, proves replay/failure charge zero, pays the new provider
-$0.03, and matches both mock rail receipts. See [provider protocol and evidence](docs/10-provider-tools.md).
+$0.03, and matches both mock rail receipts. On Render, the installed Codex MCP client
+also ran API → MCP → API; a real sandbox $0.03 payout succeeded and survived restart.
+This is direct Codex transport verification, without a model turn. See [provider protocol and evidence](docs/10-provider-tools.md).
 
 ## Record the English demo
 
@@ -245,8 +247,8 @@ See [actual sandbox evidence and restart instructions](docs/06-sandbox-evidence.
 The persistent sandbox backend is now deployed on **Render**:
 [Open AgentMeter sandbox](https://agentmeter-sandbox.onrender.com/app).
 Personal registration starts at `/join`; the original operator screens require the
-operator demo token. All records are sandbox test data, not
-individual customer accounts. The service uses Node 26.10.0, one Singapore instance
+operator demo token. Financial records are sandbox test data; personal workspaces
+have separate accounts and scoped access. The service uses Node 26.10.0, one Singapore instance
 and a 1 GB persistent disk. Its reviewed base price is **$7.25/month** before any
 additional usage or taxes. Auto-deploy and Blueprint Auto Sync are off.
 
@@ -261,8 +263,15 @@ public information pages; the active sandbox ledger belongs to Render.
 To repeat read-only checks, keep `DEMO_ACCESS_TOKEN` in local `.env` and run:
 
 ```sh
-npm run verify:deployment -- --base https://agentmeter-sandbox.onrender.com
+npm run verify:deployment -- --base https://agentmeter-sandbox.onrender.com --allow-pending-report
 ```
+
+The original $4.97/three-call snapshot above is historical. The later provider
+verification intentionally spent another $0.03: the buyer is now **$4.94**, the new
+provider has a successful **$0.03** sandbox payout, and global reporting contains a
+third rail receipt. Its fresh Payouts API check is VERIFIED; Transaction Search is
+still pending. The opt-in flag preserves that distinction and never manufactures
+a reporting MATCH. See [provider evidence](docs/10-provider-tools.md).
 
 See [deployment and restart evidence](docs/07-hosting.md) for source and
 before/after comparisons. The local `verify:sandbox:ledger` command checks the

@@ -16,7 +16,7 @@ export function ledgerIdentity(state) {
   };
   return {sha256:createHash('sha256').update(JSON.stringify(identity)).digest('hex'),identity};
 }
-export async function verifyDeployment({base,token,expected,previous}) {
+export async function verifyDeployment({base,token,expected,previous,allowPendingReport=false}) {
   const origin=new URL(base);
   if(origin.protocol!=='https:'||origin.username||origin.password)throw new Error('A public HTTPS backend origin is required');
   if(!token)throw new Error('DEMO_ACCESS_TOKEN is required');
@@ -32,8 +32,8 @@ export async function verifyDeployment({base,token,expected,previous}) {
   if(previous&&health.instance_id===previous.health.instance_id)throw new Error('Process identity did not change after restart');
   const reportResponse=await get('/api/reconcile');if(reportResponse.status!==200)throw new Error('Hosted reconciliation failed');
   const report=await reportResponse.json();
-  if(report.rows.length!==2||report.matched!==2||report.rows.some(r=>r.status!=='MATCH'))throw new Error('Both actual sandbox receipts must reconcile');
-  if(previous&&JSON.stringify(report.rows.map(r=>[r.id,r.reference,r.gross_micro,r.fee_micro,r.status]).sort())!==JSON.stringify(previous.report.rows.map(r=>[r.id,r.reference,r.gross_micro,r.fee_micro,r.status]).sort()))throw new Error('Rail receipt identities changed after restart');
+  if(!report.rows.length||report.rows.some(r=>r.api_status==='MISMATCH'||r.status!=='MATCH'&&!(allowPendingReport&&r.api_status==='VERIFIED')))throw new Error(allowPendingReport?'Every rail receipt must match reporting or a fresh PayPal API check':'Every actual sandbox receipt must reconcile in Transaction Search');
+  if(previous&&JSON.stringify(report.rows.map(r=>[r.id,r.reference,r.gross_micro,r.fee_micro]).sort())!==JSON.stringify(previous.report.rows.map(r=>[r.id,r.reference,r.gross_micro,r.fee_micro]).sort()))throw new Error('Rail receipt identities changed after restart');
   return {at:new Date().toISOString(),base:origin.origin,health,anonymous_state_http_status:anonymous.status,ledger,report,recent_events:state.events.map(e=>({id:e.id,kind:e.kind,created_at:e.created_at,payload:e.payload})),pass:true};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
@@ -41,8 +41,8 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
     try{process.loadEnvFile();}catch(e){if(e.code!=='ENOENT')throw e;}
     const value=flag=>{const i=process.argv.indexOf(flag);return i<0?undefined:process.argv[i+1];};
     const expected=value('--expected'),previous=value('--previous');
-    const proof=await verifyDeployment({base:value('--base')||process.env.PUBLIC_BASE_URL,token:process.env.DEMO_ACCESS_TOKEN,expected:expected?JSON.parse(readFileSync(expected)):undefined,previous:previous?JSON.parse(readFileSync(previous)):undefined});
+    const proof=await verifyDeployment({base:value('--base')||process.env.PUBLIC_BASE_URL,token:process.env.DEMO_ACCESS_TOKEN,expected:expected?JSON.parse(readFileSync(expected)):undefined,previous:previous?JSON.parse(readFileSync(previous)):undefined,allowPendingReport:process.argv.includes('--allow-pending-report')});
     const output=value('--out')||'data/verification/sandbox/deployment-latest.json';mkdirSync(dirname(output),{recursive:true});writeFileSync(output,JSON.stringify(proof,null,2),{mode:0o600});
-    console.log(`PASS: hosted sandbox health; anonymous 401; ledger identity${expected?' matches frozen source':''}; 2 reconciled receipts${previous?'; new process identity after restart':''}. Private evidence: ${output}`);
+    console.log(`PASS: hosted sandbox health; anonymous 401; ledger identity${expected?' matches frozen source':''}; ${proof.report.matched}/${proof.report.rows.length} reporting matches${process.argv.includes('--allow-pending-report')?'; all rail receipts verified':''}${previous?'; new process identity after restart':''}. Private evidence: ${output}`);
   }catch(error){console.error(error.message);process.exitCode=1;}
 }

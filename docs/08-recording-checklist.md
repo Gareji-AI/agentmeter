@@ -17,7 +17,9 @@ the actual assets; a script timing estimate is not a measured video.
 - [ ] Prepare this prompt in a text editor: “Plot what I paid each calendar day
   during the current month.” Paste into **Studio's AI Assistant** during the take.
 - [ ] Pre-authenticate the separate hosted `/reconcile` tab privately. Confirm two
-  MATCH rows and explicit fee sources. Leave the completed hosted funds untouched.
+  original MATCH rows and explicit fee sources. The later provider payout adds a
+  third row, independently API-verified and still pending Transaction Search. Show
+  its actual status. Leave the completed hosted funds untouched.
 - [ ] Use a desktop viewport at least 1440 × 900. At this Mac's display size, Chrome
   80% zoom fits Studio's chat, receipt and chart; verify readable exported text.
   Scroll Studio into view before its scene. At narrow widths its canvas can scroll.

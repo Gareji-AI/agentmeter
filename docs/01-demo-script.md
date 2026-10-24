@@ -89,3 +89,13 @@ Application: https://agentmeter-sandbox.onrender.com (operator access required)
 Source: https://github.com/Gareji-AI/agentmeter (judge access must be arranged)
 
 Actual YouTube URL: pending recording, export inspection and public upload.
+
+## Later provider run — separate evidence
+
+The hosted ledger has since completed provider onboarding and three more one-cent
+Codex MCP calls: API → MCP → API. The existing buyer is now $4.94; the new provider
+received a $0.03 sandbox payout. The original capture/payout remain reporting
+matches, while the new payout has a fresh verified Payouts receipt and a visibly
+pending Transaction Search row. Scene 8 must show the actual labels, not imply all
+three reporting rows match. See [provider walkthrough and proof](10-provider-tools.md).
+The original local 2:50 rehearsal still starts at $5 and uses its own fresh ledger.

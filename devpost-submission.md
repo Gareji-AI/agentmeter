@@ -30,7 +30,12 @@ idempotency key reuses the receipt. Monthly and per-tool caps include reservatio
 The demo starts with $5 of simulated credit. Three scripted one-cent calls leave
 $4.97 and credit the author $0.03. A failed call costs nothing. The author requests
 a payout, then reconciliation compares the ledger against the selected payment rail.
-The six metered tools are deterministic and run without a model or network access.
+The six built-in tools are deterministic and run without a model or network access.
+Providers can also register read-only HTTPS APIs or Streamable HTTP MCP tools with
+a schema and price, test the connection, then publish. Buyer calls reserve the
+agreed price, invoke the service, and credit that tool’s author only on success.
+A maximum-price argument prevents silent price increases. Providers manage their
+own sandbox payouts in a separate account.
 
 A personal sandbox workspace lets a buyer sign up with a nickname, save a one-time
 recovery code, fund their own credit, issue/revoke client keys and copy Codex MCP
@@ -175,7 +180,9 @@ sandbox wallet needed USD prefunding before payout; capture does not prove immed
 payout liquidity. Transaction Search can lag and omits the outgoing fee; a fresh
 Payouts item read verifies it with an explicit source. Missing reports stay pending.
 Analytics includes labeled synthetic history. Single-instance SQLite is a prototype;
-refunds, FX, high availability, public author/tool registration and production onboarding are future work. Personal buyer workspaces have no email recovery; save the recovery code.
+refunds, FX, high availability and production seller onboarding are future work.
+Provider registration supports read-only retry-safe APIs/MCP tools; it does not
+host code or verify ownership of the sandbox recipient email. Personal buyer workspaces have no email recovery; save the recovery code.
 Grid/Charts trial expires 2026-11-23 and Studio trial 2026-12-08; the application
 suppresses expired keys and retains its fallback. Gemini/CDN availability and
 free-tier quotas can affect optional analytics. Use synthetic model questions.
@@ -187,3 +194,19 @@ Map this copy to those fields, check any length limits and confirm the intended
 single sponsor target (AG Grid). Add the real public video URL, arrange code/demo
 access and review required acknowledgments. No registration, rule acknowledgment,
 team membership or form-specific answer is inferred here.
+
+## Additional provider verification
+
+On the hosted service, a new provider registered a one-cent invoice API and MCP
+tool, tested and published both. The installed Codex MCP client executed API → MCP
+→ API, leaving the existing buyer at $4.94 from $4.97 and crediting the new provider
+$0.03. A repeated execution charged zero; an upstream failure released its hold.
+The provider requested a real PayPal sandbox payout: batch and item both SUCCESS,
+with a matching USD amount and receiver. A service restart retained the tools,
+credentials, balances and receipts. This test used direct Codex app-server tool
+calls, without a model turn; autonomous model selection is not claimed. Both sample
+upstreams run on this same backend and are publicly free demonstration endpoints.
+
+The original capture and payout remain Transaction Search matches. The new payout
+is independently verified through fresh Payouts GET and remains visibly pending in
+Transaction Search. See `docs/10-provider-tools.md` for the exact evidence boundary.
