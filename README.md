@@ -178,6 +178,9 @@ Payment routes: `/api/topup`, `/api/topup/:id/capture`, `/api/payout`,
   informed USD breakdown validation, explicit deadlines and conservative payout
   retries. AgentMeter uses native REST, not the SDK as a runtime dependency. See
   [development evidence](docs/04-development-evidence.md).
+- **Open Design 0.19.1 (MCP)**: five-screen audit and design-polish reference; its
+  visual system was adapted into the live SSR views and browser renderers. Prototype
+  fixtures remain outside the application. See [design notes](docs/05-ui-design.md).
 - **Codex**: implementation and browser-assisted checks. **Dotfield / Cloudflare**:
   public information pages, not the Node application. Render is not deployed.
 

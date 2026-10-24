@@ -20,3 +20,25 @@ test('unauthenticated sandbox page never renders account keys',()=>{
   const html=renderPage('/app',{authenticated:false,mode:'sandbox',buyer:{api_key:'do-not-render'}});
   assert.ok(!html.includes('do-not-render'));assert.ok(html.includes('login-form'));
 });
+
+test('live receipt panels keep synthetic entries separate even on the same date',t=>{
+  const db=fixture();t.after(()=>db.close());
+  const data={...snapshot(db,{mode:'mock'}),authenticated:true,mode:'mock',query:{}};
+  const call={id:'live_receipt_123456',tool_name:'live_tool',status:'SETTLED',price_micro:10_000,author_credit_micro:10_000,latency_ms:0,created_at:new Date().toISOString(),response_preview:'{}'};
+  data.calls=[{...call,id:'seed_same_day',tool_name:'synthetic_only'},call];
+  const html=renderPage('/app',data);
+  const current=html.split('<div id="calls-table">')[1].split('<div class="receipt-detail">')[0];
+  assert.match(current,/live_tool/);assert.doesNotMatch(current,/synthetic_only/);assert.match(html,/synthetic_only/);
+  const payout={id:'live_payout',paypal_batch_id:'live-batch',status:'SUCCESS',amount_micro:10_000,payload:'{}',raw:'{}'};
+  data.payouts=[{...payout,id:'seed_payout',paypal_batch_id:'synthetic-batch'},payout];
+  const author=renderPage('/provider',data).split('<div id="payouts-table">')[1].split('Latest 15 live payouts')[0];
+  assert.match(author,/live-batch/);assert.doesNotMatch(author,/synthetic-batch/);
+});
+test('reconciliation presents returned receipt states instead of a static all-clear',t=>{
+  const db=fixture();t.after(()=>db.close());const data={...snapshot(db,{mode:'mock'}),authenticated:true,mode:'mock',query:{}};
+  const row={kind:'Top-up',reference:'rail-ref',gross_micro:5_000_000,fee_micro:660_000,net_micro:4_340_000,rail_micro:5_000_000};
+  for(const [statuses,outcome,title] of [[[],'pending','Your receipt trail starts here.'],[['MATCH'],'matched','The receipts agree.'],[['MATCH','MISMATCH'],'mismatch','Review the flagged receipts.'],[['RECEIPT_ONLY'],'pending','Waiting for independent reporting.']]){
+    const html=renderPage('/reconcile',{...data,report:{rows:statuses.map(status=>({...row,status})),matched:999,source:'Test reporting'}});
+    assert.ok(html.includes(`data-state="${outcome}"`));assert.ok(html.includes(title));assert.doesNotMatch(html,/Balanced|>999</);
+  }
+});

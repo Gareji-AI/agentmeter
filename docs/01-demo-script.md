@@ -22,7 +22,10 @@ No deletion of existing data is necessary. If 8788 is occupied, choose another p
 Use a 1440 × 900 or larger desktop viewport at 100% zoom. Pre-open Buyer, Provider,
 Reconcile and Analytics in tabs, refresh them after actions, and keep navigation
 visible. Remove any existing local widget cards with their Remove buttons so the
-widget creation is clear. Synthetic history is expected and is not external evidence.
+widget creation is clear. Synthetic history is expected and is not external evidence. Keep its disclosures
+closed during the main sequence; the Recent call receipts panel shows live calls
+beside the tool controls. The new money-trail links connect Buyer, Provider and
+Reconciliation.
 
 ## Timed narration and actions
 

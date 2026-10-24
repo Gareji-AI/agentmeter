@@ -231,6 +231,13 @@ reservations across restart and reuse the same external batch identity.
 - Empty states explain what to click.
 - The three screens a judge touches are reachable from `/` in one click.
 
+2026-10-24 refinement: Open Design 0.19.1 supplied a five-screen design-polish
+reference. The live SSR app adopts its forest palette, warm surfaces, 52px primary
+balance, larger working labels, and paired tool/receipt panels. Synthetic history
+is disclosed separately from live receipts. Reconciliation summaries derive from
+returned receipt states; there is no static all-clear. Route navigation and a
+three-step money trail remain ordinary links. See `05-ui-design.md`.
+
 ## 10. Public information pages
 
 The project website and English information pages live on the existing Dotfield site:

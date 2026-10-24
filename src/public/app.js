@@ -4,7 +4,8 @@ const h=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;',
 export const dollars=value=>{const n=BigInt(value||0);const abs=n<0n?-n:n;return `${n<0n?'-':''}$${abs/1000000n}.${String(abs%1000000n).padStart(6,'0').slice(0,4)}`;};
 const cash=value=>`<span class="money">${dollars(value)}</span>`;
 const badge=value=>`<span class="status ${h(String(value).toLowerCase())}">${h(value)}</span>`;
-export const rowsTable=(headings,rows)=>`<div class="table-scroll"><table><thead><tr>${headings.map(t=>`<th>${h(t)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(cell=>`<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+const empty=message=>`<div class="empty">${h(message)}</div>`;
+export const rowsTable=(headings,rows,label='Data table')=>`<div class="table-scroll" tabindex="0" role="region" aria-label="${h(label)}"><table><thead><tr>${headings.map(t=>`<th scope="col">${h(t)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(cell=>`<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 let noticeTimer;
 export function notice(message){$('#notice').textContent=message;clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>{$('#notice').textContent='';},8000);}
 const pendingKeys=new Map();
@@ -18,27 +19,44 @@ export async function api(path,body,key) {
 }
 async function busy(button,fn){if(button.disabled)return;button.disabled=true;const label=button.textContent;button.textContent='Working…';try{await fn();}catch(e){notice(e.message+(e.code===-32002?' — add test funds to continue.':''));}finally{button.disabled=false;button.textContent=label;}}
 function text(id,value){const node=$(id);if(node)node.textContent=value;}
+function resultText(value){const result=$('#tool-result');if(result)result.textContent=value;}
 export let state;
 export async function refreshState() {
   state=await api('/api/state');
   const buyer=state.buyer,author=state.provider;
+  const calls=state.calls.filter(c=>!c.id.startsWith('seed_')),successful=calls.filter(c=>c.status==='SETTLED');
+  const authorCredits=successful.reduce((n,c)=>n+c.author_credit_micro,0);
   text('#buyer-balance',dollars(buyer.balance_micro));text('#available-balance',dollars(buyer.balance_micro-buyer.reserved_micro));text('#reserved-balance',dollars(buyer.reserved_micro));
   text('#author-balance',dollars(author.balance_micro));text('#author-available',dollars(author.balance_micro-author.reserved_micro));text('#payout-reserved',dollars(author.reserved_micro));
-  text('#session-spend',dollars(state.calls.filter(c=>c.status==='SETTLED'&&!c.id.startsWith('seed_')).reduce((n,c)=>n+c.price_micro,0)));
-  if($('#calls-table'))$('#calls-table').innerHTML=rowsTable(['Tool / call','State','Price','Latency','Time (UTC)'],state.calls.slice(0,35).map(c=>[`<strong>${h(c.tool_name)}</strong><small class="mono">${h(c.id.slice(-12))}</small>`,badge(c.status),cash(c.status==='RELEASED'?0:c.price_micro),`${c.latency_ms??'—'} ms`,h(c.created_at.slice(11,19))]));
-  if($('#events-feed'))$('#events-feed').innerHTML=`<ol class="event-feed">${state.events.slice(0,10).map(e=>`<li><span class="event-dot"></span><span><strong>${h(e.kind)}</strong><small>${h(JSON.parse(e.payload).call_id?.slice(-12)||JSON.parse(e.payload).payout_id?.slice(-12)||'Ledger event')}</small></span><time>${h(e.created_at.slice(11,19))}</time></li>`).join('')}</ol>`;
-  if($('#policies'))$('#policies').innerHTML=state.policies.map(p=>`<p class="policy">${h(p.tool_id||'All tools')}<b>${cash(p.cap_micro)} / month</b></p>`).join('')||'<p class="muted">No custom cap. Available funds still limit spending.</p>';
-  if($('#payouts-table'))$('#payouts-table').innerHTML=state.payouts.length?rowsTable(['Batch','State','Amount','Receipt / payload'],state.payouts.slice(0,15).map(p=>[h(p.paypal_batch_id||p.id),badge(p.id.startsWith('seed_')?'SEED_HISTORY':p.status),cash(p.amount_micro),`<details><summary>View details</summary><pre>${h(JSON.stringify({request:JSON.parse(p.payload||'{}'),response:JSON.parse(p.raw||'{}')},null,2))}</pre></details>`])):'<p class="muted">No payouts yet. Run tool calls as a buyer first.</p>';
+  text('#session-spend',dollars(successful.reduce((n,c)=>n+c.price_micro,0)));
+  text('#live-author-credit',dollars(authorCredits));text('#live-call-count',String(successful.length));text('#current-call-reference',calls[0]?.id.slice(-12)||'Awaiting first call');
+  text('#provider-call-count',String(successful.length));text('#provider-call-credits',dollars(authorCredits));
+  if($('#calls-table'))$('#calls-table').innerHTML=calls.length?rowsTable(['Tool / call','State','Price','Latency','Time (UTC)'],calls.slice(0,35).map(c=>[`<strong>${h(c.tool_name)}</strong><small class="mono">${h(c.id.slice(-12))}</small>`,badge(c.status),cash(c.status==='RELEASED'?0:c.price_micro),c.latency_ms==null?'—':`${c.latency_ms} ms`,h(c.created_at.slice(11,19))]),'Call receipts'):empty('No live calls yet. Run the three-call demo to create your first receipts.');
+  if($('#events-feed'))$('#events-feed').innerHTML=`<ol class="event-feed">${state.events.slice(0,7).map(e=>`<li><span class="event-dot"></span><span><strong>${h(e.kind)}</strong><small>${h(JSON.parse(e.payload).call_id?.slice(-12)||JSON.parse(e.payload).payout_id?.slice(-12)||'Ledger event')}</small></span><time>${h(e.created_at.slice(11,19))}</time></li>`).join('')}</ol>`;
+  if($('#policies'))$('#policies').innerHTML=state.policies.map(p=>`<p class="policy">${h(p.tool_id||'All tools')}<b>${cash(p.cap_micro)} / month</b></p>`).join('')||'<p class="footnote">No custom cap. Available funds still limit spending.</p>';
+  const payouts=state.payouts.filter(p=>!p.id.startsWith('seed_'));
+  if($('#payouts-table'))$('#payouts-table').innerHTML=payouts.length?rowsTable(['Batch / reference','State','Amount','Receipt / payload'],payouts.slice(0,15).map(p=>[`<strong class="mono">${h(p.paypal_batch_id||p.id)}</strong>`,badge(p.status),cash(p.amount_micro),`<details><summary>View details</summary><pre>${h(JSON.stringify({request:JSON.parse(p.payload||'{}'),response:JSON.parse(p.raw||'{}')},null,2))}</pre></details>`]),'Payout receipts'):empty('No live payout yet. Run tool calls as a buyer, then pay out the earnings here.');
   window.dispatchEvent(new CustomEvent('agentmeter:state',{detail:state}));return state;
 }
-async function refreshReport(){const report=await api('/api/reconcile');text('#matched-records',String(report.matched));text('#reconcile-source',report.source+(report.error?` · ${report.error}`:''));if($('#reconcile-table'))$('#reconcile-table').innerHTML=rowsTable(['Record / rail reference','Ledger gross','Fee','Net cash','Rail amount','Result'],report.rows.map(r=>[`<strong>${h(r.kind)}</strong><small class="mono">${h(r.reference)}</small>`,cash(r.gross_micro),cash(r.fee_micro),cash(r.net_micro),r.rail_micro===null?'Awaiting report':cash(r.rail_micro),badge(r.status)]));return report;}
+async function refreshReport(){
+  const report=await api('/api/reconcile'),matched=report.rows.filter(r=>r.status==='MATCH').length;
+  const mismatch=report.rows.some(r=>r.status==='MISMATCH');
+  const outcome=mismatch?'mismatch':report.rows.length&&matched===report.rows.length?'matched':'pending';
+  text('#matched-records',String(matched));text('#report-count',String(report.rows.length));
+  if($('#reconcile-summary'))$('#reconcile-summary').dataset.state=outcome;
+  text('#reconcile-heading',mismatch?'Review the flagged receipts.':outcome==='matched'?'The receipts agree.':report.rows.length?'Waiting for independent reporting.':'Your receipt trail starts here.');
+  text('#reconcile-description',mismatch?'At least one reporting receipt differs from the ledger. Inspect the row before treating it as settled.':outcome==='matched'?'Every returned reporting receipt agrees with its ledger record.':'Missing reports and stored capture receipts remain visible without an all-clear.');
+  text('#reconcile-source',report.source+(report.error?` · ${report.error}`:''));
+  if($('#reconcile-table'))$('#reconcile-table').innerHTML=report.rows.length?rowsTable(['Record / rail reference','Ledger gross','Fee','Net cash','Rail amount','Result'],report.rows.map(r=>[`<strong>${h(r.kind)}</strong><small class="mono">${h(r.reference)}</small>`,cash(r.gross_micro),cash(r.fee_micro),cash(r.net_micro),r.rail_micro===null?'Awaiting report':cash(r.rail_micro),badge(r.status)]),'Reconciliation receipts'):empty('No current receipts yet. Create a top-up or complete an author payout, then refresh.');
+  return report;
+}
 
 $('#login-form')?.addEventListener('submit',event=>{event.preventDefault();busy(event.submitter,async()=>{await api('/api/session',{token:new FormData(event.target).get('token')});location.reload();});});
-$('#demo-run')?.addEventListener('click',event=>busy(event.currentTarget,async()=>{const run=await api('/api/demo',{});notice(run.narration);await refreshState();if(boot.aiEnabled){api('/api/narrate',{call_ids:run.results.map(r=>r.call.id)}).then(story=>notice(story.source+': '+story.text)).catch(()=>{});}}));
+$('#demo-run')?.addEventListener('click',event=>busy(event.currentTarget,async()=>{const run=await api('/api/demo',{});resultText(run.results.map((r,i)=>`Call ${i+1} · ${r.call.status} · ${dollars(r.call.price_micro)}\n${JSON.stringify(r.result)}`).join('\n\n'));notice(run.narration);await refreshState();if(boot.aiEnabled){api('/api/narrate',{call_ids:run.results.map(r=>r.call.id)}).then(story=>notice(story.source+': '+story.text)).catch(()=>{});}}));
 $('#tool-form')?.addEventListener('submit',event=>{event.preventDefault();busy(event.submitter,async()=>{const form=new FormData(event.target);const called=await api('/api/call',{name:form.get('name'),arguments:JSON.parse(form.get('arguments'))});$('#tool-result').textContent=JSON.stringify(called.result,null,2);notice(`Settled ${dollars(called.call.price_micro)} · ${called.reused?'existing receipt replayed':'author credited'}`);await refreshState();});});
 const samples={extract_entities:{text:'Contact demo@example.com about $5.00.'},summarize_text:{text:'Agents use tools. Every call needs a receipt. Budgets keep costs predictable.',maxSentences:2},keyword_extract:{text:'Metering creates receipts. Receipts explain metering costs.',limit:5},diff_json:{left:{plan:'free'},right:{plan:'paid'}},slugify_batch:{items:['Agent Meter','Tool receipts']},validate_links:{text:'See https://example.com and http://example.org.'}};
 const toolSelect=$('#tool-form select');if(toolSelect){toolSelect.value='extract_entities';toolSelect.addEventListener('change',()=>{$('#tool-form textarea').value=JSON.stringify(samples[toolSelect.value],null,2);});}
-$('#failure-drill')?.addEventListener('click',event=>busy(event.currentTarget,async()=>{try{await api('/api/call',{name:'slugify_batch',arguments:{items:Array(201).fill('failure drill')}});}catch(e){if(e.code!==-32006)throw e;notice('Tool failed. The $0.0200 reservation was released. No charge.');await refreshState();}}));
+$('#failure-drill')?.addEventListener('click',event=>busy(event.currentTarget,async()=>{try{await api('/api/call',{name:'slugify_batch',arguments:{items:Array(201).fill('failure drill')}});}catch(e){if(e.code!==-32006)throw e;resultText('Tool failed. The $0.0200 reservation was released. No charge.');notice('Tool failed. The $0.0200 reservation was released. No charge.');await refreshState();}}));
 $('#budget-form')?.addEventListener('submit',event=>{event.preventDefault();busy(event.submitter,async()=>{const result=await api('/api/budget',{text:new FormData(event.target).get('text')});notice(`Monthly cap: ${dollars(result.intent.capMicro)} · ${result.intent.toolId||'all tools'}`);await refreshState();});});
 $('#payout-run')?.addEventListener('click',event=>busy(event.currentTarget,async()=>{const payout=await api('/api/payout',{});notice(`Payout ${payout.status.toLowerCase()} · ${dollars(payout.amount_micro)}${payout.status==='SENT'||payout.status==='QUEUED'?' — click again to poll safely with the same batch.':''}`);await refreshState();}));
 $('#reconcile-run')?.addEventListener('click',event=>busy(event.currentTarget,async()=>{const report=await refreshReport();notice(`${report.matched} records match ${boot.mode==='mock'?'simulated reporting':'PayPal reporting'}.`);}));
