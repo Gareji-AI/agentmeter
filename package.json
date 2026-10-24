@@ -23,7 +23,8 @@
     "reset": "node scripts/reset.mjs",
     "verify:demo": "node scripts/smoke.mjs",
     "verify:sandbox:ledger": "node scripts/verify-sandbox-ledger.mjs",
-    "verify:deployment": "node scripts/verify-deployment.mjs"
+    "verify:deployment": "node scripts/verify-deployment.mjs",
+    "verify:ai": "node scripts/verify-ai.mjs"
   },
   "dependencies": {},
   "files": [

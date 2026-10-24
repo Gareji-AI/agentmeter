@@ -209,18 +209,22 @@ Payment routes: `/api/topup`, `/api/topup/:id/capture`, `/api/payout`,
   receipt widget, editable layout, and a custom Studio agent delegating to the built-in
   Page agent run through Studio's Agent Framework. Licensed execution was verified
   locally and on Render in Chrome on 2026-10-24: exact receipt totals, monthly filters, delegation,
-  task completion, and widget resizing. Intent interpretation currently uses the
-  validated rule parser; no LLM inference is claimed. Without active licenses, the
+  task completion, and widget resizing. Intent interpretation uses Gemini when configured, with a validated rule-parser
+  fallback. Without active licenses, the
   SSR table, CSV, rule-based widgets and local card layout work offline. Expired
   trials are omitted before rendering. Set `AG_GRID_LICENSE_KEY` (Grid + Charts
   bundle) and `AG_STUDIO_LICENSE_KEY` in ignored `.env` or private hosting settings.
   The current evaluation keys expire on 2026-11-23 and 2026-12-08 respectively.
   Keys are never committed. See [analytics verification](docs/04-analytics-verification.md).
-- **Gemini**: optional REST adapter for validated budget/widget intent, narration
-  after settlement, and semantic labels of synthetic history. Default model:
-  `gemini-3.8-flash`, configurable through `GEMINI_MODEL`. **No API key has been
-  supplied, so actual model use is not claimed.** Rules and literal narration are
-  used instead. Model output cannot generate SQL, prices, tool execution or payouts.
+- **Gemini 3.5 Flash-Lite**: REST structured output for validated widget intent,
+  verified through actual API requests and local Chrome Studio execution. Set private
+  `GEMINI_API_KEY` and optional `GEMINI_MODEL` (default `gemini-3.5-flash-lite`).
+  `npm run verify:ai` requires actual model success; the hosted form adds a ledger
+  identity check. [Gemini verification](docs/05-gemini-verification.md) records the
+  scope and prompts. Budget intent, narration and synthetic labeling adapters have
+  unit coverage; their live model paths are not claimed as verified. Without a key
+  or on model failure, deterministic fallbacks remain. Models cannot generate SQL,
+  prices, tool execution or payouts.
 - **APIMatic Context Plugin for PayPal / Codex**: installed from the hackathon's
   [PayPal plugin source](https://github.com/paypaldev/server-sdk-context-plugin-preview).
   Its TypeScript getting-started, authentication, error and resilience skills were
