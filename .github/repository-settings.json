@@ -1,0 +1,14 @@
+{
+  "description": "Metered billing for AI tools: publish paid APIs and MCP tools, enforce prepaid budgets, and pay providers through PayPal sandbox with auditable receipts.",
+  "homepage": "https://dotfield.xyz/apps/agentmeter/",
+  "allow_squash_merge": true,
+  "allow_merge_commit": false,
+  "allow_rebase_merge": false,
+  "delete_branch_on_merge": true,
+  "allow_auto_merge": false,
+  "squash_merge_commit_title": "PR_TITLE",
+  "squash_merge_commit_message": "PR_BODY",
+  "has_issues": true,
+  "has_projects": false,
+  "has_wiki": false
+}

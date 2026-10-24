@@ -9,6 +9,10 @@ network access, or a build step. Actual sandbox funding, SDK v6 approval, verifi
 webhooks, author payout and Transaction Search reconciliation have also passed.
 See the evidence table below.
 
+GitHub uses the organization's Free plan with $0 stop-usage budgets. Repository
+metadata, CI permissions and the private-repository branch protection limitation
+are documented in [repository settings](docs/11-repository-settings.md).
+
 ## Run in one minute
 
 Requirements: **Node.js 26+** and Git.
