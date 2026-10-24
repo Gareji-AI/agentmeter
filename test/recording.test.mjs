@@ -7,8 +7,8 @@ import { recordingEnvironment } from '../scripts/recording.mjs';
 test('recording isolates sandbox credentials and keeps local browser origins working while only widgets use Gemini',async t=>{
   const env=recordingEnvironment({PAYPAL_MODE:'sandbox',PUBLIC_BASE_URL:'https://hosted.example',
     DATABASE_PATH:'never-open-this.sqlite',PAYPAL_CLIENT_ID:'never-send',PAYPAL_CLIENT_SECRET:'never-send',
-    GEMINI_API_KEY:'fixture-model-key'},':memory:');
-  assert.equal(env.PAYPAL_MODE,'mock');assert.equal(env.PAYPAL_CLIENT_SECRET,'');
+    GEMINI_API_KEY:'fixture-model-key',PUBLIC_WORKSPACES:'1'},':memory:');
+  assert.equal(env.PAYPAL_MODE,'mock');assert.equal(env.PAYPAL_CLIENT_SECRET,'');assert.equal(env.PUBLIC_WORKSPACES,'0');
   const db=fixture();const app=createApplication({db,env});
   await new Promise(r=>app.server.listen(0,'127.0.0.1',r));
   const base=`http://127.0.0.1:${app.server.address().port}`;app.ctx.publicBaseUrl=base;app.paypal.config.publicBaseUrl=base;

@@ -272,3 +272,26 @@ The verified interactive sandbox is https://agentmeter-sandbox.onrender.com.
 It requires the operator demo token. Public pages link to it and identify sandbox
 test funds. Actual migration, redelivery and restart checks are recorded in
 `07-hosting.md`; the earlier local sandbox writer and tunnel are stopped.
+
+## 11. Personal sandbox workspaces — 2026-10-24
+
+Public buyer onboarding lives at `/join`, `/sign-in` and `/workspace`, separately
+from the original operator demo. Registration uses a nickname and a one-time,
+high-entropy recovery code; no email or password service is implied. New accounts
+start at zero and receive credit only after a verified sandbox/mock capture.
+New client keys, recovery codes and browser sessions use hash-only storage.
+A client key authorizes MCP tools only. The recovery code authorizes the personal
+console; neither credential grants operator access. Revocation affects the next
+request. Cookie sessions persist for seven days and survive service restart.
+
+Personal snapshots query only the signed-in account and omit raw payment payloads,
+other accounts, event streams and secret key material. The existing global ledger,
+provider payouts, Gemini and licensed analytics remain operator-only. This release
+does not add public author registration, external tool registration or real payments.
+
+Personal MCP clients supply a unique `_request_id` per intended call, advertised in
+the input schema. JSON-RPC IDs are insufficient across independent connections.
+Legacy operator keys retain their previous protocol behavior and evidence identities.
+The public console sets an explicit monthly cap without invoking a model.
+The shared mock profile uses `PUBLIC_WORKSPACES=1`; the offline legacy demo's
+auto-login is appropriate only for trusted local use. See `09-personal-workspaces.md`.

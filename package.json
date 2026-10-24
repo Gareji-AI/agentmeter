@@ -26,7 +26,9 @@
     "verify:deployment": "node scripts/verify-deployment.mjs",
     "verify:ai": "node scripts/verify-ai.mjs",
     "demo:record": "node scripts/recording.mjs",
-    "verify:recording": "node scripts/verify-recording.mjs"
+    "verify:recording": "node scripts/verify-recording.mjs",
+    "verify:workspace": "node scripts/verify-workspace.mjs",
+    "demo:users": "node scripts/recording.mjs --workspaces"
   },
   "dependencies": {},
   "files": [

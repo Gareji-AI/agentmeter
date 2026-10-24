@@ -12,6 +12,7 @@ import { bodyJson, bodyText, json, validOrigin } from './http.mjs';
 import { renderPage } from './views/index.mjs';
 import { interpretWidget,interpretBudget,narrate,classifySyntheticHistory } from './ai.mjs';
 import { availableAnalyticsLicense } from './analytics-license.mjs';
+import { handleWorkspace } from './workspace-http.mjs';
 
 const equal=(a,b)=>typeof a==='string'&&typeof b==='string'&&Buffer.byteLength(a)===Buffer.byteLength(b)&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
 
@@ -51,6 +52,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
   if(storedMode&&storedMode!==paypal.mode)throw new Error('This database belongs to a different payment mode. Use a separate DATABASE_PATH.');
   db.prepare("INSERT OR IGNORE INTO metadata (key,value) VALUES ('payment_mode',?)").run(paypal.mode);
   const sessions=new Map();
+  const autoOperator=paypal.mode==='mock'&&env.PUBLIC_WORKSPACES!=='1';
   const accessToken=env.DEMO_ACCESS_TOKEN||randomUUID();
   const ctx={db,paypal,publicBaseUrl,sessions,accessToken,env,boot:{id:randomUUID(),started_at:nowIso()}};
   const sessionFor=req=>{
@@ -68,6 +70,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
       return row;
     }
     const row=accountForKey(db,req.headers.authorization?.replace(/^Bearer /,''));
+    if(row.public_customer)throw new MeteringError(-32001,'Client keys are for MCP tools. Sign in to your workspace for credit management.');
     if(row.kind!==kind)throw new MeteringError(-32001,`${kind.toUpperCase()}_REQUIRED`);
     return row;
   };
@@ -87,6 +90,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
       if(path==='/mcp')return await handleMcp(req,res,ctx);
       if(path==='/health')return json(res,200,{status:'ok',mode:paypal.mode==='mock'?'mock':'sandbox',instance_id:ctx.boot.id,started_at:ctx.boot.started_at});
       if(req.method==='POST'&&!validOrigin(req,ctx.publicBaseUrl))return json(res,403,{error:'Invalid Origin'});
+      if(await handleWorkspace(req,res,ctx))return;
       if(path==='/api/webhooks/paypal'&&req.method==='POST') {
         const rawBody=await bodyText(req);const event=JSON.parse(rawBody);
         const verification=await verifyWebhookSignature({config:paypal.config,headers:req.headers,rawBody});
@@ -94,13 +98,13 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
         return json(res,200,await processWebhook(db,paypal,event,{verified:true}));
       }
       if(path.startsWith('/assets/')&&req.method==='GET') {
-        const files={'/assets/app.css':['./public/app.css','text/css'],'/assets/app.js':['./public/app.js','text/javascript'],'/assets/grid.js':['./public/grid.js','text/javascript'],'/assets/studio.js':['./public/studio.js','text/javascript'],'/assets/studio-session.js':['./public/studio-session.js','text/javascript']};
+        const files={'/assets/app.css':['./public/app.css','text/css'],'/assets/app.js':['./public/app.js','text/javascript'],'/assets/grid.js':['./public/grid.js','text/javascript'],'/assets/studio.js':['./public/studio.js','text/javascript'],'/assets/studio-session.js':['./public/studio-session.js','text/javascript'],'/assets/workspace.js':['./public/workspace.js','text/javascript']};
         const file=files[path];if(!file)return json(res,404,{error:'Not found'});
         try { const content=await readFile(new URL(file[0],import.meta.url));res.writeHead(200,{'Content-Type':file[1]+'; charset=utf-8'});return res.end(content); }catch(e){if(e.code==='ENOENT')return json(res,404,{error:'Not found'});throw e;}
       }
       if(path==='/api/session'&&req.method==='POST') {
         const input=await bodyJson(req);
-        if(paypal.mode!=='mock'&&!equal(input.token,accessToken))return json(res,401,{error:'Invalid demo access token'});
+        if(!autoOperator&&!equal(input.token,accessToken))return json(res,401,{error:'Invalid demo access token'});
         establish(res);return json(res,200,{ok:true});
       }
       if(path.startsWith('/api/')&&req.method==='POST'&&!req.headers['content-type']?.startsWith('application/json'))return json(res,415,{error:'Use application/json'});
@@ -176,7 +180,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
       }
       if(req.method==='GET'&&['/','/app','/provider','/reconcile','/grid','/paypal/return'].includes(path)||req.method==='GET'&&path.startsWith('/mock/checkout/')) {
         let authenticated=operator(req);
-        if(!authenticated&&paypal.mode==='mock'){establish(res);authenticated=true;}
+        if(!authenticated&&autoOperator){establish(res);authenticated=true;}
         const data=authenticated?snapshot(db,paypal):{};
         const rendering=render||renderPage;
         const html=await rendering(path,{...data,authenticated,report:authenticated&&path==='/reconcile'?await reconcile(db,paypal):null,mode:paypal.mode==='mock'?'mock':'sandbox',payoutMode:env.PAYOUT_MODE||'sandbox',clientId:paypal.mode==='live'?paypal.config.clientId:null,query:Object.fromEntries(url.searchParams),studioLicense:authenticated&&path==='/grid'?availableAnalyticsLicense(env.AG_STUDIO_LICENSE_KEY):'',gridLicense:authenticated&&path==='/grid'?availableAnalyticsLicense(env.AG_GRID_LICENSE_KEY):'',geminiConfigured:Boolean(env.GEMINI_API_KEY),geminiGeneralConfigured:Boolean(generalAiEnv.GEMINI_API_KEY)});
@@ -185,8 +189,8 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
       return json(res,404,{error:'Not found'});
     } catch(error) {
       if(res.headersSent)return res.end();
-      const status=error instanceof SyntaxError?400:error.code===-32001?401:error instanceof MeteringError?400:error.status===413?413:502;
-      return json(res,status,{error:error instanceof MeteringError?error.message:error instanceof SyntaxError?'Invalid JSON':'Request failed',code:error.code,data:error.data});
+      const status=error instanceof SyntaxError?400:error.code===-32001?401:error instanceof MeteringError?400:[413,429].includes(error.status)?error.status:502;
+      return json(res,status,{error:error instanceof MeteringError||error.status===429?error.message:error instanceof SyntaxError?'Invalid JSON':'Request failed',code:error.code,data:error.data});
     }
   });
   return {server,ctx,db,paypal};
@@ -202,7 +206,7 @@ export async function start() {
   const port=Number(process.env.PORT||8787);const host=process.env.HOST||'127.0.0.1';
   await new Promise((resolve,reject)=>{app.server.once('error',reject);app.server.listen(port,host,resolve);});
   console.log(`AgentMeter: http://${host}:${app.server.address().port} (${app.paypal.mode==='mock'?'MOCK — simulated funds':'PAYPAL SANDBOX — test funds'})`);
-  if(app.paypal.mode!=='mock'&&!process.env.DEMO_ACCESS_TOKEN)console.log(`Demo access token: ${app.ctx.accessToken}`);
+  if((app.paypal.mode!=='mock'||process.env.PUBLIC_WORKSPACES==='1')&&!process.env.DEMO_ACCESS_TOKEN)console.log(`Demo access token: ${app.ctx.accessToken}`);
   let closing=false;
   const close=()=>{if(closing)return;closing=true;app.server.closeAllConnections();app.server.close(()=>app.db.close());};
   process.once('SIGINT',close);process.once('SIGTERM',close);

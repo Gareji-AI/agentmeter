@@ -32,6 +32,11 @@ $4.97 and credit the author $0.03. A failed call costs nothing. The author reque
 a payout, then reconciliation compares the ledger against the selected payment rail.
 The six metered tools are deterministic and run without a model or network access.
 
+A personal sandbox workspace lets a buyer sign up with a nickname, save a one-time
+recovery code, fund their own credit, issue/revoke client keys and copy Codex MCP
+settings. Their receipts and spending limit are separate from the operator demo.
+New credentials are hash-stored; client keys authorize tools, not console administration.
+
 PayPal is the funding, payout and reporting rail. Orders creates and captures
 prepaid funding; Payouts transfers accumulated author earnings; Transaction Search
 provides independent reporting; verified webhooks recover events without duplicate
@@ -77,6 +82,7 @@ and Chrome outcomes instead of treating generated code as proof of integration.
 ## Key Features
 
 - Reserve → execute → settle/release, exact integer micro-USD accounting and replay-safe receipts.
+- Personal buyer signup, recovery-code sign-in, hash-stored client keys, revocation and scoped receipts.
 - MCP Streamable HTTP tools with budget enforcement and insufficient-credit top-up links.
 - PayPal sandbox funding, verified webhook deduplication, author payouts and reconciliation.
 - Real Gemini intent → custom Studio analyst → Page agent → chart, with source labels.
@@ -123,14 +129,17 @@ See README and the evidence documents for reproducible verification boundaries.
 ## Public Demo Link
 
 - Information: https://dotfield.xyz/apps/agentmeter/
-- Running sandbox: https://agentmeter-sandbox.onrender.com — operator access required.
-  Arrange access through an appropriate private judge channel; never publish tokens.
+- Personal sandbox entry: https://agentmeter-sandbox.onrender.com/join — create your own zero-credit workspace.
+- Operator evidence screens: https://agentmeter-sandbox.onrender.com — operator access required.
+  Arrange that access privately; never publish tokens.
 - Local mock: complete reproduction instructions above; no payment credentials needed.
 
 ## Public Repository Link
 
-https://github.com/Gareji-AI/agentmeter — currently private. Judge access or an
-explicitly approved public release must be arranged before delivery. MIT license.
+https://github.com/Gareji-AI/agentmeter — currently private. The event requires a
+public, open-source repository; publish it only after an explicit release decision
+and a committed-history secret review. MIT license is present. Private judge access
+alone does not satisfy that requirement.
 
 ## Demo Video
 
@@ -166,7 +175,7 @@ sandbox wallet needed USD prefunding before payout; capture does not prove immed
 payout liquidity. Transaction Search can lag and omits the outgoing fee; a fresh
 Payouts item read verifies it with an explicit source. Missing reports stay pending.
 Analytics includes labeled synthetic history. Single-instance SQLite is a prototype;
-refunds, FX, high availability and production onboarding are future work.
+refunds, FX, high availability, public author/tool registration and production onboarding are future work. Personal buyer workspaces have no email recovery; save the recovery code.
 Grid/Charts trial expires 2026-11-23 and Studio trial 2026-12-08; the application
 suppresses expired keys and retains its fallback. Gemini/CDN availability and
 free-tier quotas can affect optional analytics. Use synthetic model questions.

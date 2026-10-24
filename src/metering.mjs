@@ -14,7 +14,9 @@ export function canonical(value) {
 }
 
 export function accountForKey(db, apiKey) {
-  const account = db.prepare('SELECT * FROM accounts WHERE api_key = ?').get(apiKey || '');
+  const hash=createHash('sha256').update(typeof apiKey==='string'?apiKey:'').digest('hex');
+  const account = db.prepare('SELECT a.*,1 public_customer FROM accounts a JOIN client_keys k ON k.account_id=a.id WHERE k.key_hash=? AND k.revoked_at IS NULL').get(hash)
+    || db.prepare('SELECT a.* FROM accounts a WHERE a.api_key = ? AND NOT EXISTS (SELECT 1 FROM workspace_credentials w WHERE w.account_id=a.id)').get(apiKey || '');
   if (!account) throw new MeteringError(-32001, 'UNAUTHORIZED');
   return account;
 }

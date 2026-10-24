@@ -103,6 +103,25 @@ CREATE TABLE IF NOT EXISTS events (
   payload    TEXT NOT NULL,
   created_at TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS workspace_credentials (
+  account_id TEXT PRIMARY KEY REFERENCES accounts(id),
+  recovery_hash TEXT NOT NULL UNIQUE
+);
+CREATE TABLE IF NOT EXISTS workspace_sessions (
+  token_hash TEXT PRIMARY KEY,
+  account_id TEXT NOT NULL REFERENCES workspace_credentials(account_id),
+  expires_at INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS client_keys (
+  id TEXT PRIMARY KEY,
+  account_id TEXT NOT NULL REFERENCES workspace_credentials(account_id),
+  key_hash TEXT NOT NULL UNIQUE,
+  label TEXT NOT NULL,
+  suffix TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  revoked_at TEXT
+);
 `;
 
 export function openDb(path = process.env.DATABASE_PATH || 'data/agentmeter.sqlite') {

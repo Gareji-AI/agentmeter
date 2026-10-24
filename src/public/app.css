@@ -369,3 +369,15 @@ main{padding:24px 18px}
 #ag-grid .status{line-height:1.2;vertical-align:middle}
 .studio-note{margin:0 0 16px;max-width:none}
 #studio-panel{margin-bottom:24px}
+
+/* Personal workspaces keep connection material readable and distinct from balances. */
+.connection-url{display:block;overflow-wrap:anywhere;margin:12px 0}
+.onboarding-steps{padding-left:22px;display:grid;gap:18px}
+.onboarding-steps p{margin-top:6px}
+#customer-notice{position:sticky;bottom:16px;background:var(--dark);color:white;padding:12px;border-radius:5px;z-index:10}
+#customer-notice:empty{display:none}
+#recovery-code,#client-key-value,#customer-config{overflow-wrap:anywhere;white-space:pre-wrap}
+#customer-login{max-width:580px}
+.status.revoked{color:var(--muted)}
+
+body[data-customer] main>.panel{margin-block:22px}

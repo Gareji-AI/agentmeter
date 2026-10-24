@@ -24,15 +24,22 @@ export async function handleMcp(req,res,{db,publicBaseUrl='http://localhost:8787
   try {
     let result;
     switch(message.method) {
-      case 'initialize': result={protocolVersion:PROTOCOL_VERSIONS.includes(message.params?.protocolVersion)?message.params.protocolVersion:PROTOCOL_VERSIONS[0],capabilities:{tools:{listChanged:false}},serverInfo:{name:'AgentMeter',version:'0.1.0'},instructions:'Metered sandbox tools. Set a unique Idempotency-Key for each intended call; reuse it only for retries.'};break;
+      case 'initialize': result={protocolVersion:PROTOCOL_VERSIONS.includes(message.params?.protocolVersion)?message.params.protocolVersion:PROTOCOL_VERSIONS[0],capabilities:{tools:{listChanged:false}},serverInfo:{name:'AgentMeter',version:'0.1.0'},instructions:'Sandbox tool credits only. Set a unique _request_id (UUID) for each intended tool execution; reuse that value only for retries. Check the listed prices before spending.'};break;
       case 'ping': result={};break;
-      case 'tools/list': result={tools:db.prepare('SELECT * FROM tools WHERE enabled=1 ORDER BY name').all().map(tool=>({name:tool.name,description:`${tool.description} Price: ${tool.price_micro} micro-USD per successful call.`,inputSchema:JSON.parse(tool.input_schema)}))};break;
+      case 'tools/list': result={tools:db.prepare('SELECT * FROM tools WHERE enabled=1 ORDER BY name').all().map(tool=>{const schema=JSON.parse(tool.input_schema);return {name:tool.name,description:`${tool.description} Price: ${tool.price_micro} micro-USD per successful call.`,inputSchema:account.public_customer?{...schema,properties:{...schema.properties,_request_id:{type:'string',description:'Unique UUID for this intended execution. Reuse only for retries.'}},required:[...(schema.required||[]),'_request_id']}:schema};})};break;
       case 'tools/call': {
         if(typeof message.params?.name!=='string') throw new MeteringError(-32602,'Tool name is required');
-        const args=message.params.arguments||{};
-        const idempotencyKey=req.headers['idempotency-key']||`rpc:${typeof message.id}:${message.id}`;
+        const supplied=message.params.arguments||{};
+        if(typeof supplied!=='object'||Array.isArray(supplied))throw new MeteringError(-32602,'arguments must be an object');
+        const {_request_id,...args}=supplied;
+        if(account.public_customer&&!req.headers['idempotency-key']&&(typeof _request_id!=='string'||!_request_id||_request_id.length>200))throw new MeteringError(-32602,'A unique _request_id is required; reuse only for retries');
+        const idempotencyKey=req.headers['idempotency-key']||_request_id||`rpc:${typeof message.id}:${message.id}`;
         const called=callTool(db,{accountId:account.id,toolName:message.params.name,args,idempotencyKey});
-        result={content:[{type:'text',text:JSON.stringify(called.result)}],structuredContent:called.result,isError:false,_meta:{agentmeter:{call_id:called.call.id,status:called.call.status,price_micro:called.call.price_micro,reused:called.reused}}};break;
+        const balance=db.prepare('SELECT balance_micro,reserved_micro FROM accounts WHERE id=?').get(account.id);
+        const receipt={call_id:called.call.id,status:called.call.status,price_micro:called.call.price_micro,charged_this_request_micro:called.reused?0:called.call.price_micro,balance_available_micro:balance.balance_micro-balance.reserved_micro,reused:called.reused};
+        // Public clients see the receipt in ordinary tool content, not only transport metadata.
+        const output=account.public_customer?{...called.result,_agentmeter_receipt:receipt}:called.result;
+        result={content:[{type:'text',text:JSON.stringify(output)}],structuredContent:output,isError:false,_meta:{agentmeter:receipt}};break;
       }
       default: throw new MeteringError(-32601,'Method not found');
     }
@@ -40,7 +47,7 @@ export async function handleMcp(req,res,{db,publicBaseUrl='http://localhost:8787
   } catch(e) {
     if(e instanceof MeteringError) {
       const data={...e.data};
-      if(data.topup_url)data.topup_url=new URL(data.topup_url,publicBaseUrl).href;
+      if(data.topup_url)data.topup_url=new URL(account.public_customer?'/workspace#funds':data.topup_url,publicBaseUrl).href;
       return error(200,message.id,e.code,e.message,data);
     }
     return error(200,message.id,-32603,'Internal error');

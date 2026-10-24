@@ -46,6 +46,54 @@ Existing `.env` credentials select sandbox unless `PAYPAL_MODE=mock` is explicit
 Modes use separate SQLite files under ignored `data/`, and reject a database marked
 for the other mode. Seed is idempotent.
 
+## Personal sandbox workspaces
+
+Open `/join` to create your own buyer workspace. Save the one-time recovery code;
+it signs you back in at `/sign-in`. New workspaces start with **zero** credit.
+Approve a sandbox top-up, create a named client key, then copy the MCP URL and
+Codex configuration from `/workspace`. Your page contains only your balance,
+funding receipts, keys and tool-call receipts. Operator analytics, payout controls
+and the global ledger remain behind the separate operator sign-in.
+
+For a fresh, isolated local demonstration with no credentials or model calls:
+
+```sh
+npm run demo:users
+```
+
+Open its printed `/join` URL. It uses a new mock ledger, clears payment/model/license
+credentials and requires operator sign-in even in mock mode. The private `take.json`
+contains the local operator token for demonstrating author payout separately.
+The ordinary offline `npm start` demo retains its convenience auto-login in mock
+mode. Set `PUBLIC_WORKSPACES=1` and a private `DEMO_ACCESS_TOKEN` when sharing a mock
+server; sandbox mode always requires operator authentication.
+
+Personal client keys are shown once and stored as hashes. Copy a new key privately
+into `AGENTMETER_BUYER_KEY` in the environment that launches Codex. The configuration
+on the workspace page contains only an environment-variable reference. Client keys
+cannot sign into the web console or use operator/credit-management APIs.
+Recovery codes and seven-day session tokens are also hashed at rest. Legacy seeded
+operator-demo account keys retain their existing representation for compatibility.
+
+Public-key MCP calls require a unique `_request_id` argument (or explicit
+`Idempotency-Key` header). The schema advertises it. Reuse it only for retries;
+JSON-RPC IDs alone can repeat across client connections. A monthly limit set on
+the workspace page includes settled and reserved usage; changing a prompt is not
+a server-side budget control. Revoke a key to block its next request.
+
+```sh
+npm run verify:workspace
+```
+
+This isolated HTTP check proves signup → $5 mock credit → personal key → two
+invoice-text extractions and one URL-format check → $4.97 → $0.03 author payout,
+plus replay, cap, isolation and revocation. Global mock reporting has three matches:
+the seeded operator top-up, personal top-up and author payout. Personal funding
+receipts are scoped and do not claim independent Transaction Search verification.
+Actual Codex app-server Bearer authentication and discovery of six tools were also
+verified locally; model-driven Codex execution has not yet been filmed/verified.
+See [workspace evidence and usage](docs/09-personal-workspaces.md).
+
 ## Record the English demo
 
 The [2:50 script](docs/01-demo-script.md), [voiceover](docs/demo-voiceover.txt),
@@ -164,7 +212,8 @@ See [actual sandbox evidence and restart instructions](docs/06-sandbox-evidence.
 
 The persistent sandbox backend is now deployed on **Render**:
 [Open AgentMeter sandbox](https://agentmeter-sandbox.onrender.com/app).
-It requires the operator demo token; records are shared sandbox test data, not
+Personal registration starts at `/join`; the original operator screens require the
+operator demo token. All records are sandbox test data, not
 individual customer accounts. The service uses Node 26.10.0, one Singapore instance
 and a 1 GB persistent disk. Its reviewed base price is **$7.25/month** before any
 additional usage or taxes. Auto-deploy and Blueprint Auto Sync are off.
