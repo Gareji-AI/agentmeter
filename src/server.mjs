@@ -9,9 +9,9 @@ import { captureTopup, createTopup, payOut, processWebhook, reconcile } from './
 import { toMicro } from './money.mjs';
 import { handleMcp } from './mcp.mjs';
 import { bodyJson, bodyText, json, validOrigin } from './http.mjs';
+import { renderPage } from './views/index.mjs';
 
-const escape = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const equal=(a,b)=>typeof a==='string'&&typeof b==='string'&&a.length===b.length&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
+const equal=(a,b)=>typeof a==='string'&&typeof b==='string'&&Buffer.byteLength(a)===Buffer.byteLength(b)&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
 
 export function snapshot(db,paypal) {
   const buyer=db.prepare("SELECT * FROM accounts WHERE kind='consumer' ORDER BY created_at LIMIT 1").get();
@@ -153,8 +153,8 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
         let authenticated=operator(req);
         if(!authenticated&&paypal.mode==='mock'){establish(res);authenticated=true;}
         const data=authenticated?snapshot(db,paypal):{};
-        const rendering=render||((route,state)=>`<!doctype html><html lang="en"><meta charset="utf-8"><title>AgentMeter</title><h1>AgentMeter</h1><nav><a href="/app">Buyer</a> <a href="/provider">Author</a> <a href="/reconcile">Reconcile</a> <a href="/grid">Analytics</a></nav><pre>${escape(JSON.stringify(state,null,2))}</pre></html>`);
-        const html=await rendering(path,{...data,authenticated,mode:paypal.mode==='mock'?'mock':'sandbox',payoutMode:env.PAYOUT_MODE||'sandbox',clientId:paypal.mode==='live'?paypal.config.clientId:null,query:Object.fromEntries(url.searchParams),studioLicense:env.AG_STUDIO_LICENSE_KEY||'',gridLicense:env.AG_GRID_LICENSE_KEY||'',geminiConfigured:Boolean(env.GEMINI_API_KEY)});
+        const rendering=render||renderPage;
+        const html=await rendering(path,{...data,authenticated,report:authenticated&&path==='/reconcile'?await reconcile(db,paypal):null,mode:paypal.mode==='mock'?'mock':'sandbox',payoutMode:env.PAYOUT_MODE||'sandbox',clientId:paypal.mode==='live'?paypal.config.clientId:null,query:Object.fromEntries(url.searchParams),studioLicense:env.AG_STUDIO_LICENSE_KEY||'',gridLicense:env.AG_GRID_LICENSE_KEY||'',geminiConfigured:Boolean(env.GEMINI_API_KEY)});
         res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});return res.end(html);
       }
       return json(res,404,{error:'Not found'});
