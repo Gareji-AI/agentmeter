@@ -127,25 +127,26 @@ accumulated author earnings; Transaction Search supplies the independent compari
 verified webhooks provide an idempotent event path. PayPal is the funding and payout
 rail, rather than a decorative checkout beside an unrelated application.
 
-**What is proven:** The complete local simulation runs with Node 26 and `npm start`,
-without a package install or credentials. It demonstrates $5.00 → three $0.01 calls →
-$4.97 buyer balance → $0.03 author earnings → simulated payout → two receipt matches.
-Tests exercise integer accounting, retries, caps, failures, HTTP MCP and receipt checks.
-The current demonstration must be labeled **MOCK / simulated funds**.
+**What is proven:** A local simulation runs with Node 26 and `npm start`, without a
+package install or credentials. Actual PayPal sandbox verification also completed:
+SDK v6 buyer approval, $5.00 capture, three $0.01 calls, $4.97 remaining buyer credit,
+$0.03 author earnings and a successful Payouts batch and item. A signed Webhook
+arrived through public HTTPS and did not duplicate the credit. Fresh Orders/Payouts
+API reads agree with both ledger receipts. Sandbox funds are test funds only.
 
-**Actual sandbox limitations:** OAuth, app capabilities, order creation and Reporting
-access work. Buyer approval/capture and real SDK v6 checkout remain to be completed.
-A $0.03 Payouts attempt returned HTTP 422 `INSUFFICIENT_FUNDS`; the seller currently
-has JPY funding while this integration uses USD. No public backend exists for webhook
-delivery yet. Actual automatic payouts and end-to-end sandbox reconciliation are not
-claimed. Reporting fallback rows are explicitly labeled stored receipts rather than
-independent matches.
+**Actual sandbox limitations:** Transaction Search has not yet included the new
+capture/payout; reporting rows stay pending and fresh API verification is separately
+labeled. The $5 capture had a $0.48 fee and $4.52 net cash. The platform absorbs
+funding fees; tool credit is not cash received. An initial payout was rejected for
+insufficient USD funds, preserving author earnings. Converting JPY 1,000 of existing
+fake sandbox funds to USD 6.16 prefunded the business wallet before successful
+payout. The public backend is a temporary tunnel to a local Mac, not durable hosting.
 
 **Tools used:** Native Node.js 26, `node:sqlite`, native fetch, `node:test`; PayPal Orders,
 Payouts, Transaction Search, Webhook Verification REST and optional JS SDK v6 approval;
 MCP Streamable HTTP; Codex; APIMatic Context Plugin for PayPal as a source-grounded
 coding reference (native REST remains the runtime). Dotfield/Cloudflare hosts public
-information pages. Render has not been deployed.
+information pages and a temporary tunnel to the local backend. Render is not deployed.
 
 **Optional AI and analytics:** Gemini adapters for constrained intent, narration and
 synthetic labels are implemented, with deterministic fallbacks. No Gemini key has
@@ -161,8 +162,8 @@ must retain their reservation and external identity. Tool prices and budget deci
 must use exact integers, while external fees and capture receipts remain distinct
 from purchased tool credit.
 
-**Next:** Complete USD sandbox funding, capture, payout, webhook and Reporting evidence;
-verify licensed Studio and optional Gemini; then record the English video. Durable
+**Next:** Recheck Transaction Search after reporting refreshes, verify licensed Studio
+and optional Gemini, then record the English video. Durable
 hosting, refunds, FX and production account onboarding are future work.
 
 Copy this draft only after updating it against the final evidence. See README for the

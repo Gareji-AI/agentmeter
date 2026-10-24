@@ -17,7 +17,7 @@ export async function api(path,body,key) {
   if(!response.ok){if(response.status<500)pendingKeys.delete(operation);const error=new Error(result.error||'Request failed');error.code=result.code;error.data=result.data;throw error;}
   pendingKeys.delete(operation);return result;
 }
-async function busy(button,fn){if(button.disabled)return;button.disabled=true;const label=button.textContent;button.textContent='Working…';try{await fn();}catch(e){notice(e.message+(e.code===-32002?' — add test funds to continue.':''));}finally{button.disabled=false;button.textContent=label;}}
+async function busy(button,fn){if(button.disabled)return;button.disabled=true;const label=Array.from(button.childNodes);button.textContent='Working…';try{await fn();}catch(e){notice(e.message+(e.code===-32002?' — add test funds to continue.':''));}finally{button.disabled=false;button.replaceChildren(...label);}}
 function text(id,value){const node=$(id);if(node)node.textContent=value;}
 function resultText(value){const result=$('#tool-result');if(result)result.textContent=value;}
 export let state;
@@ -40,15 +40,19 @@ export async function refreshState() {
 }
 async function refreshReport(){
   const report=await api('/api/reconcile'),matched=report.rows.filter(r=>r.status==='MATCH').length;
-  const mismatch=report.rows.some(r=>r.status==='MISMATCH');
-  const outcome=mismatch?'mismatch':report.rows.length&&matched===report.rows.length?'matched':'pending';
-  text('#matched-records',String(matched));text('#report-count',String(report.rows.length));
+  const verified=report.rows.filter(r=>r.status==='MATCH'||r.api_status==='VERIFIED').length;
+  const mismatch=report.rows.some(r=>r.status==='MISMATCH'||r.api_status==='MISMATCH');
+  const total=report.rows.length,outcome=mismatch?'mismatch':total&&matched===total?'matched':total&&verified===total?'receipts_verified':'pending';
+  text('#matched-records',String(matched));text('#report-count',String(total));text('#reporting-total',String(total));
+  text('#receipt-count',String(outcome==='receipts_verified'?verified:matched));text('#receipt-count-label',outcome==='receipts_verified'?'PayPal receipts verified':'Reporting receipts matched');
   if($('#reconcile-summary'))$('#reconcile-summary').dataset.state=outcome;
-  text('#reconcile-heading',mismatch?'Review the flagged receipts.':outcome==='matched'?'The receipts agree.':report.rows.length?'Waiting for independent reporting.':'Your receipt trail starts here.');
-  text('#reconcile-description',mismatch?'At least one reporting receipt differs from the ledger. Inspect the row before treating it as settled.':outcome==='matched'?'Every returned reporting receipt agrees with its ledger record.':'Missing reports and stored capture receipts remain visible without an all-clear.');
+  text('#reconcile-heading',mismatch?'Review the flagged receipts.':outcome==='matched'?'The reporting receipts agree.':outcome==='receipts_verified'?'Fresh PayPal receipts agree.':total?'Waiting for independent reporting.':'Your receipt trail starts here.');
+  text('#reconcile-description',mismatch?'At least one independent receipt differs from the ledger. Inspect the row before treating it as settled.':outcome==='matched'?'Every returned reporting receipt agrees with its ledger record.':outcome==='receipts_verified'?'Orders and Payouts API reads verify the ledger. Transaction Search is still catching up.':'Missing reports and stored capture receipts remain visible without an all-clear.');
+  text('#reporting-as-of',report.reporting_as_of||'Not supplied');
   text('#reconcile-source',report.source+(report.error?` · ${report.error}`:''));
-  if($('#reconcile-table'))$('#reconcile-table').innerHTML=report.rows.length?rowsTable(['Record / rail reference','Ledger gross','Fee','Net cash','Rail amount','Result'],report.rows.map(r=>[`<strong>${h(r.kind)}</strong><small class="mono">${h(r.reference)}</small>`,cash(r.gross_micro),cash(r.fee_micro),cash(r.net_micro),r.rail_micro===null?'Awaiting report':cash(r.rail_micro),badge(r.status)]),'Reconciliation receipts'):empty('No current receipts yet. Create a top-up or complete an author payout, then refresh.');
-  return report;
+  const live=report.rows.some(r=>r.api_status);
+  if($('#reconcile-table'))$('#reconcile-table').innerHTML=report.rows.length?rowsTable(['Record / rail reference','Ledger gross','Fee','Net cash','Rail amount',...(live?['Live API check']:[]),'Reporting'],report.rows.map(r=>[`<strong>${h(r.kind)}</strong><small class="mono">${h(r.reference)}</small>`,cash(r.gross_micro),cash(r.fee_micro),cash(r.net_micro),r.rail_micro===null?'Awaiting report':cash(r.rail_micro),...(live?[`${badge(r.api_status||'NOT_CHECKED')}${r.api_amount_micro===undefined?'':`<small>${cash(r.api_amount_micro)}</small>`}`]:[]),badge(r.status)]),'Reconciliation receipts'):empty('No current receipts yet. Create a top-up or complete an author payout, then refresh.');
+  return {...report,matched};
 }
 
 $('#login-form')?.addEventListener('submit',event=>{event.preventDefault();busy(event.submitter,async()=>{await api('/api/session',{token:new FormData(event.target).get('token')});location.reload();});});
@@ -59,7 +63,7 @@ const toolSelect=$('#tool-form select');if(toolSelect){toolSelect.value='extract
 $('#failure-drill')?.addEventListener('click',event=>busy(event.currentTarget,async()=>{try{await api('/api/call',{name:'slugify_batch',arguments:{items:Array(201).fill('failure drill')}});}catch(e){if(e.code!==-32006)throw e;resultText('Tool failed. The $0.0200 reservation was released. No charge.');notice('Tool failed. The $0.0200 reservation was released. No charge.');await refreshState();}}));
 $('#budget-form')?.addEventListener('submit',event=>{event.preventDefault();busy(event.submitter,async()=>{const result=await api('/api/budget',{text:new FormData(event.target).get('text')});notice(`Monthly cap: ${dollars(result.intent.capMicro)} · ${result.intent.toolId||'all tools'}`);await refreshState();});});
 $('#payout-run')?.addEventListener('click',event=>busy(event.currentTarget,async()=>{const payout=await api('/api/payout',{});notice(`Payout ${payout.status.toLowerCase()} · ${dollars(payout.amount_micro)}${payout.status==='SENT'||payout.status==='QUEUED'?' — click again to poll safely with the same batch.':''}`);await refreshState();}));
-$('#reconcile-run')?.addEventListener('click',event=>busy(event.currentTarget,async()=>{const report=await refreshReport();notice(`${report.matched} records match ${boot.mode==='mock'?'simulated reporting':'PayPal reporting'}.`);}));
+$('#reconcile-run')?.addEventListener('click',event=>busy(event.currentTarget,async()=>{const report=await refreshReport();notice(`${report.matched} reporting matches · ${report.api_verified||0} fresh API verifications${boot.mode==='mock'?' · simulated funds':''}.`);}));
 
 let checkoutOrder;
 async function newOrder(){checkoutOrder=await api('/api/topup',{amount:new FormData($('#topup-form')).get('amount')});return {orderId:checkoutOrder.order_id};}
@@ -83,5 +87,9 @@ if(boot.authenticated) {
   try{await refreshState();const events=new EventSource('/events?after='+(state.events[0]?.id||0));let timer;events.addEventListener('ledger',()=>{clearTimeout(timer);timer=setTimeout(()=>refreshState().catch(()=>{}),100);});window.addEventListener('pagehide',()=>events.close(),{once:true});}
   catch(e){notice('Workspace could not refresh: '+e.message);}
   setupPayPal();
+  // Cross-window updates and tunnels may not deliver an SSE stream promptly.
+  const refreshVisible=()=>{if(!document.hidden)refreshState().catch(()=>{});};
+  window.addEventListener('focus',refreshVisible);document.addEventListener('visibilitychange',refreshVisible);
+  const fallback=setInterval(refreshVisible,15000);window.addEventListener('pagehide',()=>clearInterval(fallback),{once:true});
   if(location.pathname==='/grid')import('/assets/grid.js').catch(()=>notice('Analytics extension unavailable. The table remains usable.'));
 }

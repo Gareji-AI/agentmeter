@@ -13,6 +13,7 @@ test('captured top-ups and distinct webhook events credit an order only once',as
   const row=db.prepare('SELECT * FROM topups').get();const event=paypal.synthesiseCaptureEvent(row.paypal_capture_id,row.paypal_order_id);
   assert.equal((await processWebhook(db,paypal,event,{verified:true})).duplicate,false);
   assert.equal((await processWebhook(db,paypal,event,{verified:true})).duplicate,true);
+  assert.equal(db.prepare("SELECT COUNT(*) n FROM events WHERE kind='webhook.duplicate'").get().n,1);
   await processWebhook(db,paypal,{...event,id:'distinct-id'},{verified:true});
   await assert.rejects(()=>processWebhook(db,paypal,{...event,id:'forged'}));
   assert.equal(db.prepare("SELECT balance_micro FROM accounts WHERE id='buyer'").get().balance_micro,5_000_000);
@@ -39,7 +40,7 @@ test('ambiguous payout failure holds funds and retries the identical batch',asyn
 test('definite payout rejection releases reservation without deleting earnings',async t=>{
   const db=fixture();t.after(()=>db.close());callTool(db,request());
   await assert.rejects(()=>payOut(db,{async createPayout(){const e=new Error('Rejected');e.status=422;e.body=JSON.stringify({name:'INSUFFICIENT_FUNDS'});throw e;}},'author'));
-  assert.equal(db.prepare('SELECT status FROM payouts').get().status,'FAILED');assertLedger(db);
+  assert.equal(db.prepare('SELECT status FROM payouts').get().status,'FAILED');assert.equal(JSON.parse(db.prepare('SELECT raw FROM payouts').get().raw).response.name,'INSUFFICIENT_FUNDS');assertLedger(db);
 });
 test('dry-run payout never consumes real ledger earnings',async t=>{
   const db=fixture();t.after(()=>db.close());callTool(db,request());
@@ -57,4 +58,37 @@ test('a known payout batch lookup failure keeps its reservation',async t=>{
   await assert.rejects(()=>payOut(db,paypal,'author'));
   assert.equal(db.prepare("SELECT reserved_micro FROM accounts WHERE id='author'").get().reserved_micro,10_000);
   assert.equal(db.prepare('SELECT status FROM payouts').get().status,'SENT');assertLedger(db);
+});
+
+async function completedRail(db) {
+  const rail=createPayPal({PAYPAL_MODE:'mock'},{db});
+  const topup=await createTopup(db,rail,'buyer',5_000_000,'real-read-shape');
+  await rail.approveOrder(topup.order_id);await captureTopup(db,rail,'buyer',topup.id);
+  for(let i=0;i<3;i++)callTool(db,request('fresh-'+i));
+  await payOut(db,rail,'author');
+  return rail;
+}
+const delayedReporting={transaction_details:[],last_refreshed_datetime:'2026-10-24T02:29:59Z'};
+test('fresh API receipts verify both rails without pretending delayed reporting matched',async t=>{
+  const db=fixture(0);t.after(()=>db.close());const rail=await completedRail(db);
+  const before=db.prepare('SELECT * FROM accounts ORDER BY id').all();let orders=0,payouts=0;
+  const live={...rail,mode:'live',async listTransactions(){return delayedReporting;},async getOrder(id){orders++;return rail.getOrder(id);},async getPayout(id){payouts++;return rail.getPayout(id);}};
+  const report=await reconcile(db,live);
+  assert.equal(report.matched,0);assert.equal(report.api_verified,2);assert.equal(orders,1);assert.equal(payouts,1);
+  assert.equal(report.reporting_as_of,delayedReporting.last_refreshed_datetime);
+  assert.ok(report.rows.every(r=>r.status==='PENDING_REPORT'&&r.api_status==='VERIFIED'));
+  assert.deepEqual(db.prepare('SELECT * FROM accounts ORDER BY id').all(),before);assertLedger(db);
+});
+test('fresh receipt checks reject changed currencies, amounts and payout recipients',async t=>{
+  const db=fixture(0);t.after(()=>db.close());const rail=await completedRail(db);
+  const live={...rail,mode:'live',async listTransactions(){return delayedReporting;},async getOrder(id){const order=structuredClone(await rail.getOrder(id));order.purchase_units[0].payments.captures[0].seller_receivable_breakdown.paypal_fee.currency_code='JPY';return order;},async getPayout(id){const batch=structuredClone(await rail.getPayout(id));batch.items[0].payout_item.receiver='different@example.com';return batch;}};
+  const report=await reconcile(db,live);assert.equal(report.api_verified,0);assert.ok(report.rows.every(r=>r.api_status==='MISMATCH'));assertLedger(db);
+  live.getOrder=async id=>{const order=structuredClone(await rail.getOrder(id));order.purchase_units[0].payments.captures[0].amount.value='6.00';return order;};
+  assert.equal((await reconcile(db,live)).rows.find(r=>r.kind==='Top-up').api_status,'MISMATCH');
+});
+test('stored successful receipts do not substitute for a failed fresh API read',async t=>{
+  const db=fixture(0);t.after(()=>db.close());const rail=await completedRail(db);
+  const unavailable=async()=>{throw new Error('API unavailable');};
+  const report=await reconcile(db,{...rail,mode:'live',listTransactions:unavailable,getOrder:unavailable,getPayout:unavailable});
+  assert.equal(report.api_verified,0);assert.equal(report.matched,0);assert.ok(report.rows.every(r=>r.api_status==='UNAVAILABLE'));assertLedger(db);
 });

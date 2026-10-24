@@ -361,3 +361,6 @@ h2{font-size:18px}
 .receipt-panel td{padding-block:9px}
 @media(min-width:1181px){#notice{left:258px;right:auto}}
 @media(min-width:721px) and (max-width:1180px){#notice{left:216px;right:auto;max-width:min(420px,calc(100vw - 242px))}}
+.reconcile-summary[data-state=receipts_verified]{border-left:4px solid var(--accent)}
+.status.unavailable,.status.not_checked{background:var(--bg);color:var(--muted)}
+.status.pending{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)}

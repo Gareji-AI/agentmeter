@@ -5,8 +5,9 @@ Built for the PayPal AI Hackathon. This prototype supports **simulated funds and
 PayPal sandbox test funds only**; production PayPal hosts are rejected.
 
 The complete local mock demo works without accounts, API keys, a package install,
-network access, or a build step. Real sandbox approval and payout verification are
-still incomplete; see the evidence table below.
+network access, or a build step. Actual sandbox funding, SDK v6 approval, verified
+webhooks and author payout have also passed; Transaction Search is still catching
+up. See the evidence table below.
 
 ## Run in one minute
 
@@ -79,8 +80,9 @@ Use a USD-funded sandbox business account for USD payouts. Optional separate
 Sandbox starts with **zero spendable credit**. Open the server, sign in with the
 startup console's demo access token (or set `DEMO_ACCESS_TOKEN`), then approve a
 top-up with a personal sandbox buyer. The JS SDK v6 checkout is implemented with a
-PayPal approval-link fallback; server capture alone credits the ledger. Browser
-rendering and completed real checkout still need verification.
+PayPal approval-link fallback; server capture credits the ledger once, and a verified
+webhook can recover a missed capture. Completed SDK v6 checkout was verified in
+Google Chrome (SDK 6.70.0). The in-app browser could not open its approval popup.
 
 The copied template sets `PAYOUT_MODE=dry-run`: the provider sees the exact REST
 payload without sending it. Set `PAYOUT_MODE=execute` to send sandbox test funds.
@@ -102,24 +104,46 @@ npm run verify:sandbox -- --order-id APPROVED_ORDER_ID
 npm run verify:sandbox -- --order-id APPROVED_ORDER_ID --payout
 ```
 
-Private raw evidence goes to `data/verification/{mock,sandbox}/latest.json`.
+To recheck an already completed application flow **without sending more funds**:
+
+```sh
+npm run verify:sandbox:ledger
+```
+
+This opens `DATABASE_PATH` read-only, validates ledger invariants, and fetches existing
+Orders, Payouts and Transaction Search receipts. It never approves, captures or pays.
+SDK v6 browser evidence is a separately recorded observation, not a CLI checkout.
+Private raw evidence goes to `data/verification/{mock,sandbox}/latest.json`; the
+read-only check writes `data/verification/sandbox/ledger-latest.json`.
 Manual checks remain MANUAL; simulated passes never count as real PayPal passes.
 
 ## Sandbox verification — 2026-10-24
 
 | Check | Local simulation | Actual PayPal sandbox evidence |
 | --- | --- | --- |
-| V1 Orders / capture / fee | PASS | PENDING: order creation works; buyer approval/capture not completed |
-| V2 JS SDK v6 | Separate browser step | MANUAL: real checkout not yet verified |
-| V3 webhook / signature | PASS for replay logic only | MANUAL: public backend and webhook registration missing |
-| V4 $0.03 payout | PASS; also exercised in browser | FAIL: HTTP 422 `INSUFFICIENT_FUNDS`; seller has JPY funding, no usable USD funding |
-| V5 Transaction Search | PASS; gross/fee/net match | API accessible; capture match PENDING until completed funding is reported |
+| V1 Orders / capture / fee | PASS | **PASS**: completed $5.00 capture; fee $0.48, net $4.52 |
+| V2 JS SDK v6 | Separate browser step | **PASS**: Google Chrome SDK 6.70.0 buyer approval and server capture |
+| V3 webhook / signature | PASS for replay logic only | **PASS**: actual signed capture event accepted through public HTTPS; no double credit |
+| V4 $0.03 payout | PASS; also exercised in browser | **PASS**: actual batch SUCCESS and item SUCCESS; author balance and reservation both zero |
+| V5 Transaction Search | PASS; gross/fee/net match | **PENDING**: delayed reporting; two fresh Orders/Payouts API receipt checks VERIFIED separately |
 | V6 PayPal Agent Toolkit | SKIP | SKIP: direct REST selected; Toolkit use is not claimed |
 | V7 account reset | Local reset implemented | MANUAL: PayPal account reset not executed |
 
-OAuth and Payouts/Reporting app capabilities were checked. This is **not** evidence
-that real automatic author payouts have passed. The working video path currently
-uses simulated funds. See [the verification plan](docs/02-sandbox-verification.md).
+The initial payout failed with `INSUFFICIENT_FUNDS` and preserved author earnings.
+Converting **JPY 1,000 of existing fake sandbox funds to USD 6.16** in the business
+wallet resolved USD prefunding; a new payout succeeded. This is separate platform
+test funding, not evidence that the captured $5 became available cash immediately.
+The buyer received $5 credit, spent exactly $0.03 and retained $4.97. Actual fresh
+API reads verify the capture and outgoing payout; they **do not** upgrade pending
+Transaction Search rows to reporting matches. PayPal documents up to three hours of
+[reporting delay](https://developer.paypal.com/api/transaction-search/v1/search-get).
+See [actual sandbox evidence and restart instructions](docs/06-sandbox-evidence.md).
+
+A Cloudflare Quick Tunnel currently exposes the local sandbox backend for verified
+Webhook delivery. It is temporary and requires the Mac, Node server and tunnel to
+stay running. It is not a durable hosted demo. Quick Tunnels do not support SSE;
+visible pages refresh state every 15 seconds and on focus as a fallback. Dotfield
+continues to serve static information pages; Render has not been deployed.
 
 ## MCP and HTTP
 
@@ -182,7 +206,8 @@ Payment routes: `/api/topup`, `/api/topup/:id/capture`, `/api/payout`,
   visual system was adapted into the live SSR views and browser renderers. Prototype
   fixtures remain outside the application. See [design notes](docs/05-ui-design.md).
 - **Codex**: implementation and browser-assisted checks. **Dotfield / Cloudflare**:
-  public information pages, not the Node application. Render is not deployed.
+  public information pages and a temporary Quick Tunnel to the local Node application.
+  Render is not deployed.
 
 ## Ledger boundaries and hosting
 

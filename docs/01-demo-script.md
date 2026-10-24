@@ -3,7 +3,9 @@
 Language: English. Target duration: **2 minutes 50 seconds**, including opening and
 closing frames. Hard limit: under 3:00. This script describes the verified **mock**
 path. Keep the application's “MOCK / simulated funds” indicator visible throughout.
-Do not imply that the recording proves a real PayPal capture, payout or webhook.
+This recording does not itself prove a sandbox capture or payout. A separate actual
+sandbox run has now passed capture, SDK v6, signed Webhook and successful payout;
+its Transaction Search rows remain pending. See `06-sandbox-evidence.md`.
 
 ## Prepare a clean recording
 
@@ -38,7 +40,7 @@ Reconciliation.
 | 1:20–1:45 | Reconcile. Refresh if needed. Show 2 matches and gross / fee / net columns. | “Reconciliation compares our ledger with independent reporting from the selected rail. Both current mock receipts match. The five-dollar top-up has a separate illustrative fee and net cash amount. Tool credit and cash received are different quantities. Synthetic history is excluded from this comparison.” |
 | 1:45–2:10 | Analytics. Submit **Show daily spend this month**. Show the widget; move a card if available. | “The analytics workspace starts with thirty days of synthetic usage. A natural-language request produces this daily-spend widget using a validated rule parser. The table, widgets and CSV work without a license or model. Licensed Grid and Studio adapters are implemented but await actual license verification.” |
 | 2:10–2:30 | Buyer. Replace budget text with **Keep extract_entities under $0.00 this month**; Apply budget, then Run 3-call demo. Show BUDGET_EXCEEDED and unchanged balance. | “Now I set this tool's monthly cap to zero. The next call is blocked before execution, so no new charge appears. Intent may be interpreted by an optional model, but prices, reservations and settlement always use exact integer arithmetic.” |
-| 2:30–2:50 | Hold Reconcile or Buyer; end on title and local-run instruction. | “AgentMeter runs from a clean clone with Node twenty-six and npm start, without installing packages. The mock money loop is complete. Real USD sandbox funding, delivered webhooks, licensed Studio and optional Gemini still need verification. The repository includes tests, evidence boundaries and reproducible instructions.” |
+| 2:30–2:50 | Hold Reconcile or Buyer; end on title and local-run instruction. | “AgentMeter runs from a clean clone with Node twenty-six and npm start, without installing packages. The mock money loop is complete. A separate real sandbox run verified funding, signed webhooks and author payout. Transaction Search, licensed Studio and optional Gemini remain pending. The repository includes tests, evidence boundaries and reproducible instructions.” |
 
 Aim for a calm pace. Rehearse to the timestamps; shorten narration if any click takes
 longer. Leave the last two seconds silent on the application. Do not add a long outro.
@@ -66,8 +68,9 @@ AgentMeter: every agent tool call gets a price, a budget check and a receipt.
 
 This video demonstrates simulated funds: $5.00 prepaid credit, three $0.01 tool
 calls, $4.97 remaining, $0.03 author earnings, a simulated payout and receipt
-reconciliation. Real sandbox payout success and webhook delivery are still pending;
-see the README's evidence table. Optional licensed Studio and Gemini paths are not
+reconciliation. A separate actual sandbox run verified SDK v6 funding, signed Webhook
+delivery and successful author payout. Transaction Search is still catching up; see
+the README's evidence table. Optional licensed Studio and Gemini paths are not
 represented as verified in this recording.
 
 Run locally with Node 26+: clone the repository, then `npm start`. No package
@@ -77,8 +80,11 @@ Repository: https://github.com/Gareji-AI/agentmeter (ensure judge access before 
 
 ## Upgrade the recording only after new evidence
 
-If real USD funding/capture, payout, webhook and reporting checks pass, update the
-README and submission draft first, then replace the mock claim with exact verified
-sandbox evidence. If a Studio trial or Gemini key becomes available, verify the live
+Actual USD capture, payout and Webhook checks have now passed. To record a separate
+sandbox take, keep the sandbox badge visible and use the actual receipts. While
+Transaction Search is pending, say “Fresh Orders and Payouts API reads verify both
+receipts; aggregate reporting is still catching up.” Never call that two reporting
+matches. A new take with a new purchase must use another buyer-approved sandbox
+top-up; preserve the completed ledger. Update the README after V5 actually passes. If a Studio trial or Gemini key becomes available, verify the live
 path and only then name it as used in the narration. Keep the total video under
 three minutes. Do not splice simulated receipts into a sandbox sequence.

@@ -1,0 +1,112 @@
+# Actual PayPal sandbox evidence — 2026-10-24
+
+This run used PayPal's real **sandbox APIs and fake sandbox funds**, not production
+money and not AgentMeter's mock driver. Credentials, account profiles and raw
+receipts remain in ignored `.env` and `data/verification/sandbox/` (mode 0600).
+The repository contains no passwords, secrets or operator access tokens.
+
+## Observed money loop
+
+| Step | Actual result |
+| --- | --- |
+| Browser approval | Google Chrome PayPal popup identified SDK **6.70.0**, `integration_artifact=JS_SDK_V6`; buyer approved $5.00 |
+| Orders capture | Order and capture COMPLETED; USD gross $5.00, fee $0.48, net $4.52 |
+| Ledger funding | Buyer credited exactly 5,000,000 micro-USD once |
+| Metering | Three live `extract_entities` calls SETTLED at 10,000 micro-USD each |
+| After calls | Buyer 4,970,000 micro-USD; author 30,000 micro-USD |
+| Payout | Actual $0.03 batch SUCCESS **and** single item SUCCESS; USD payout-item fee $0.00 |
+| Final ledger | Buyer $4.9700; author $0.0000; both reservations $0.0000; invariants pass |
+| Fresh receipt comparison | Independent Orders GET and Payouts GET verify capture amount/currency/fee/net and payout batch/item/transaction/receiver/amount/fee |
+| Transaction Search | **PENDING**: new receipts not yet included; no reporting MATCH is claimed |
+
+The in-app browser rendered the SDK button but could not open its approval popup.
+The completed checkout used native Google Chrome. The order created by the earlier
+popup attempt remains unapproved and uncharged; it is not a second capture.
+
+The server credited capture at **04:00:52 UTC**. The signed
+`PAYMENT.CAPTURE.COMPLETED` event was accepted at **04:01:12 UTC**, about 20 seconds
+later, through the public HTTPS backend. The endpoint calls PayPal's signature
+verification API before processing or deduplicating events. The buyer remained
+credited once, as shown by the capture/call/payout invariant. Webhook registration
+subscribes to `PAYMENT.CAPTURE.COMPLETED` and `PAYMENT.CAPTURE.DENIED`.
+
+PayPal's actual resend endpoint then returned HTTP 202. The re-delivered,
+signature-verified duplicate was audited as `webhook.duplicate` at **04:28:25 UTC**.
+Before/after account balances and reservations were identical. Private proof is
+`data/verification/sandbox/webhook-replay.json`; no second credit occurred.
+
+## USD prefunding and failed attempts
+
+Two actual $0.03 payout attempts returned HTTP 422 `INSUFFICIENT_FUNDS` before any
+batch was created. Their local FAILED records retain the failure evidence. Each
+released its reservation and preserved the author's $0.03 earnings.
+
+The business wallet showed existing JPY 5,000 test funding and USD 0. Its sandbox
+currency-conversion flow exchanged **JPY 1,000 for USD 6.16**, leaving JPY 4,000.
+The subsequent USD payout succeeded. This is platform test prefunding. It does not
+prove the captured $5 became available cash immediately, or that gross tool credit
+can fund payouts without covering fees. AgentMeter does not implement FX; this
+conversion was sandbox account setup outside the application.
+
+The $0.48 capture fee remains a platform expense, separate from buyer credit and
+from the $0.03 author earnings. No production transfer occurred.
+
+## Reconciliation boundaries
+
+`MATCH` means Transaction Search returned a successful USD transaction with the
+expected signed gross and fee. `VERIFIED` in **Live API check** means a fresh,
+read-only Orders/Payouts request independently agreed with the ledger. A stored
+successful response alone cannot produce either result. A failed fresh request is
+`UNAVAILABLE`; contradictory data is `MISMATCH`. A mismatch in either source keeps
+the summary in a review state.
+
+On the latest verification, Transaction Search's refresh watermark still preceded
+the capture and payout. PayPal documents up to three hours before a new transaction
+appears in [Transaction Search](https://developer.paypal.com/api/transaction-search/v1/search-get).
+V5 stays PENDING until that report actually includes both records. The reconciliation
+screen shows the reporting watermark and keeps the pending rows visible.
+
+Repeat the existing flow verification without creating any additional payment:
+
+```sh
+npm run verify:sandbox:ledger
+```
+
+The script uses a read-only SQLite connection and GET requests only. It checks the
+exact one-capture/three-call/one-successful-payout flow and prints V1–V7 plus FLOW.
+V2 uses a separate, matching browser observation file; the command does not claim
+to automate checkout. V7 remains MANUAL because no sandbox account was reset.
+Private output: `data/verification/sandbox/ledger-latest.json`.
+
+## Public backend and restart
+
+The verified endpoint is a **Cloudflare Quick Tunnel to the local Node server** on
+port 8791. The actual URL and registered webhook ID are in local `.env`.
+`PUBLIC_BASE_URL` is the HTTPS backend origin; it is not the static Dotfield site.
+Public `/health` returns sandbox mode. Without an operator token or session,
+`/api/state` returns 401. Incoming webhooks are separately signature-authenticated.
+
+Keep the Mac awake, the Node process running and the tunnel running during testing.
+No paid hosting or durable remote backend has been provisioned. The SQLite ledger
+persists on this Mac. The hostname changes when a Quick Tunnel is recreated;
+Cloudflare provides no uptime guarantee and does not support SSE on Quick Tunnels.
+The app therefore also refreshes visible state every 15 seconds and on focus.
+See [Cloudflare Quick Tunnel limitations](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/).
+
+To restart after the existing tunnel stops:
+
+1. Keep `.env` and the existing sandbox SQLite file. Do not reset/reseed test money.
+2. Start `cloudflared tunnel --url http://127.0.0.1:8791 --no-autoupdate --protocol http2`.
+3. Set `PUBLIC_BASE_URL` in `.env` to its new HTTPS origin; retain `PORT=8791`,
+   `DATABASE_PATH=data/agentmeter-sandbox.sqlite`, and `PAYPAL_MODE=sandbox`.
+4. Update the **existing AgentMeter sandbox app webhook** to that origin plus
+   `/api/webhooks/paypal`, retaining both event types and its webhook ID. Verify
+   `PAYPAL_WEBHOOK_ID` agrees with the registration. Do not create duplicate listeners.
+5. Run `npm start`; sign in with local `DEMO_ACCESS_TOKEN`. `/health` should return
+   sandbox mode publicly; unauthenticated `/api/state` must still return 401.
+6. Re-run the read-only verifier. Existing receipts remain intact. Test a signed
+   PayPal event delivery before recording another checkout.
+
+A permanent hosted demo still needs one Node process, stable HTTPS and durable
+SQLite storage. Dotfield remains the public information site; Render is not deployed.
+Do not publish a temporary hostname as a permanent submission demo URL.

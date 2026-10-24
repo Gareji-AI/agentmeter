@@ -87,9 +87,12 @@ GET /v1/reporting/transactions?start_date=...&end_date=...&fields=all
 ```
 
 Pass criteria: the captured top-up appears with `transaction_amount`,
-`fee_amount`, `net_amount`, and `transaction_status` fields.
+`fee_amount` and `transaction_status` fields. Compare gross and fee with the ledger;
+derive net from those amounts. Preserve a returned net field when supplied.
 
-Fallback: reconcile against locally stored capture responses and note the limitation.
+Fallback: display fresh Orders/Payouts GET verification separately. Stored capture
+responses are labeled receipt-only; neither fallback counts as a Transaction Search
+match. Reporting may take up to three hours to include a new transaction.
 
 ### V6 — Agent Toolkit MCP tool availability
 
@@ -142,9 +145,15 @@ must be reflected in the 3-minute script, not discovered on Day 17.
 
 ## 4. Implementation checkpoint — 2026-10-24
 
-The Day-1 gate was not fully passed before implementation. The local simulation is
-complete; actual sandbox V1 capture, V2, V3, V4 success, V5 capture match and V7 are
-still open. V4 returned HTTP 422 `INSUFFICIENT_FUNDS`; do not describe real author
-payouts as verified. The README contains the current result table and commands for
-`scripts/verify-sandbox.mjs`. `--mock` passes only the corresponding simulation checks;
-V2/V7 stay manual and V6 is explicitly skipped because direct REST is used.
+The Day-1 gate was not fully passed before implementation. On 2026-10-24 actual
+sandbox V1, V2, V3 and V4 passed. The initial V4 `INSUFFICIENT_FUNDS` rejection was
+resolved by converting existing JPY sandbox test funds to USD before retrying.
+V5 is pending delayed Transaction Search; fresh API receipt checks separately pass.
+V7 remains manual; no account evidence was erased. V6 is skipped because direct
+REST is used. The README contains the current table and `06-sandbox-evidence.md`
+records the completed money loop and operational limits.
+
+Use `npm run verify:sandbox:ledger` to repeat read-only checks of the existing
+application ledger. The original `verify:sandbox` script creates/captures a test
+order and optionally sends a new payout; it is not the repeat-verification path.
+`--mock` only proves simulation checks. Neither CLI command automates browser V2.

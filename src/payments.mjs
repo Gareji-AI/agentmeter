@@ -50,7 +50,7 @@ export async function captureTopup(db,paypal,accountId,topupId) {
 export async function processWebhook(db,paypal,event,{verified=false}={}) {
   if(!verified)throw new MeteringError(-32001,'UNVERIFIED_WEBHOOK');
   if(typeof event.id!=='string'||!event.id||event.id.length>200||typeof event.event_type!=='string')throw new Error('Invalid webhook');
-  if(db.prepare('SELECT id FROM webhook_events WHERE id=?').get(event.id))return {duplicate:true};
+  if(db.prepare('SELECT id FROM webhook_events WHERE id=?').get(event.id)){emit(db,'webhook.duplicate',{event_id:event.id,event_type:event.event_type});return {duplicate:true};}
   const orderId=event.resource?.supplementary_data?.related_ids?.order_id;
   const topup=orderId?db.prepare('SELECT * FROM topups WHERE paypal_order_id=?').get(orderId):null;
   let order;
@@ -60,7 +60,7 @@ export async function processWebhook(db,paypal,event,{verified=false}={}) {
     if(capture?.id!==event.resource?.id)throw new Error('Webhook capture id mismatch');
   }
   return transaction(db,()=>{
-    if(db.prepare('SELECT id FROM webhook_events WHERE id=?').get(event.id))return {duplicate:true};
+    if(db.prepare('SELECT id FROM webhook_events WHERE id=?').get(event.id)){emit(db,'webhook.duplicate',{event_id:event.id,event_type:event.event_type});return {duplicate:true};}
     db.prepare('INSERT INTO webhook_events (id,event_type,verified,payload,received_at) VALUES (?,?,1,?,?)').run(event.id,event.event_type,JSON.stringify(event),nowIso());
     if(order)creditCapture(db,topup.id,order);
     if(topup&&event.event_type==='PAYMENT.CAPTURE.DENIED'&&topup.status!=='CAPTURED')db.prepare("UPDATE topups SET status='FAILED' WHERE id=? AND status!='CAPTURED'").run(topup.id);
@@ -119,7 +119,8 @@ export async function payOut(db,paypal,providerId,{dryRun=false}={}) {
     if(!row.paypal_batch_id&&['INSUFFICIENT_FUNDS','VALIDATION_ERROR','INVALID_REQUEST','AUTHORIZATION_ERROR','NOT_AUTHORIZED'].includes(rejection))transaction(db,()=>{
       const current=db.prepare('SELECT * FROM payouts WHERE id=?').get(row.id);
       if(!['QUEUED','SENT'].includes(current.status))return;
-      db.prepare("UPDATE payouts SET status='FAILED',raw=?,updated_at=? WHERE id=?").run(JSON.stringify({error:error.message,status:error.status}),nowIso(),row.id);
+      let response;try{const body=JSON.parse(error.body||'{}');response={name:body.name,message:body.message,details:body.details,debug_id:body.debug_id};}catch{}
+      db.prepare("UPDATE payouts SET status='FAILED',raw=?,updated_at=? WHERE id=?").run(JSON.stringify({error:error.message,status:error.status,response}),nowIso(),row.id);
       db.prepare('UPDATE accounts SET reserved_micro=reserved_micro-? WHERE id=?').run(current.amount_micro,current.provider_account_id);
       emit(db,'payout.updated',{payout_id:row.id,account_id:providerId,status:'FAILED'});
     });
@@ -127,27 +128,61 @@ export async function payOut(db,paypal,providerId,{dryRun=false}={}) {
   }
 }
 
+/** Independent, read-only API evidence. Never upgrades a delayed reporting row to MATCH. */
+async function verifyCurrentReceipt(paypal,record,kind) {
+  const api_source=kind==='Top-up'?'PayPal Orders GET':'PayPal Payouts GET';
+  try {
+    let valid,amount,fee;
+    if(kind==='Top-up') {
+      const order=await paypal.getOrder(record.paypal_order_id);
+      const captures=order.purchase_units?.flatMap(unit=>unit.payments?.captures||[])||[];
+      const capture=captures.find(c=>c.id===record.paypal_capture_id);
+      if(order.id!==record.paypal_order_id||order.status!=='COMPLETED'||capture?.status!=='COMPLETED')return {api_status:'MISMATCH',api_source,api_checked_at:nowIso()};
+      const b=capture.seller_receivable_breakdown;
+      if(!b?.paypal_fee&&!b?.net_amount)return {api_status:'UNAVAILABLE',api_source,api_checked_at:nowIso()};
+      amount=paypalAmountToMicro(capture.amount.value);
+      fee=b.paypal_fee?paypalAmountToMicro(b.paypal_fee.value):amount-paypalAmountToMicro(b.net_amount.value);
+      valid=order.id===record.paypal_order_id&&captures.length===1&&capture.amount.currency_code==='USD'&&amount===record.amount_micro&&fee===record.fee_micro;
+      for(const field of ['gross_amount','paypal_fee','net_amount'])if(b[field]&&b[field].currency_code!=='USD')valid=false;
+      if(b.gross_amount&&paypalAmountToMicro(b.gross_amount.value)!==record.amount_micro)valid=false;
+      if(b.net_amount&&paypalAmountToMicro(b.net_amount.value)!==record.amount_micro-record.fee_micro)valid=false;
+    }else{
+      const batch=await paypal.getPayout(record.paypal_batch_id),items=batch.items||[];
+      if(batch.batch_header?.batch_status!=='SUCCESS'||items[0]?.transaction_status!=='SUCCESS')return {api_status:'MISMATCH',api_source,api_checked_at:nowIso()};
+      const item=items[0],expected=JSON.parse(record.payload).items[0];
+      if(!item.payout_item_fee)return {api_status:'UNAVAILABLE',api_source,api_checked_at:nowIso()};
+      amount=-paypalAmountToMicro(item.payout_item.amount.value);fee=paypalAmountToMicro(item.payout_item_fee.value);
+      const stored=JSON.parse(record.raw||'{}').items?.[0]?.transaction_id;
+      valid=batch.batch_header.payout_batch_id===record.paypal_batch_id&&items.length===1&&typeof stored==='string'&&stored.length>0&&item.transaction_id===stored&&item.payout_item.receiver===expected.receiver&&item.payout_item.amount.currency==='USD'&&item.payout_item_fee.currency==='USD'&&amount===-record.amount_micro&&fee===record.fee_micro;
+    }
+    return {api_status:valid?'VERIFIED':'MISMATCH',api_source,api_amount_micro:amount,api_fee_micro:fee,api_checked_at:nowIso()};
+  }catch(error){return {api_status:'UNAVAILABLE',api_source,api_checked_at:nowIso(),api_error:error.message};}
+}
+
 export async function reconcile(db,paypal) {
   const now=new Date();let remote;let source='PayPal Transaction Search';let error=null;
   try { remote=await paypal.listTransactions({startDate:new Date(now.getTime()-30*86400000).toISOString(),endDate:now.toISOString()}); }
-  catch(e){source='Stored capture receipts only';error=e.message;remote={transaction_details:[]};}
+  catch(e){source='PayPal Transaction Search unavailable';error=e.message;remote={transaction_details:[]};}
   const transactions=new Map((remote.transaction_details||[]).map(row=>[row.transaction_info.transaction_id,row.transaction_info]));
-  const rows=[];
+  const rows=[],checks=[];
+  const check=(row,record)=>{if(paypal.mode==='live'&&row.status!=='MATCH'){row.api_status='NOT_CHECKED';checks.push(async()=>Object.assign(row,await verifyCurrentReceipt(paypal,record,row.kind)));}rows.push(row);};
   for(const topup of db.prepare("SELECT * FROM topups WHERE status='CAPTURED' ORDER BY created_at DESC").all()) {
     const raw=JSON.parse(topup.raw||'{}');if(raw.seed)continue;
     const capture=raw.purchase_units?.[0]?.payments?.captures?.[0];
     const external=transactions.get(topup.paypal_capture_id);
     const amount=external?.transaction_amount?.currency_code==='USD'?paypalAmountToMicro(external.transaction_amount.value):null;
-    const fee=external?.fee_amount?Math.abs(paypalAmountToMicro(external.fee_amount.value)):null;
+    const fee=external?.fee_amount?.currency_code==='USD'?Math.abs(paypalAmountToMicro(external.fee_amount.value)):null;
     const match=external?.transaction_status==='S'&&amount===topup.amount_micro&&fee===topup.fee_micro;
-    rows.push({id:topup.id,reference:topup.paypal_capture_id||topup.paypal_order_id,kind:'Top-up',gross_micro:topup.amount_micro,fee_micro:topup.fee_micro,net_micro:topup.amount_micro-topup.fee_micro,rail_micro:amount,status:match?'MATCH':error&&capture?'RECEIPT_ONLY':external?'MISMATCH':'PENDING_REPORT'});
+    check({id:topup.id,reference:topup.paypal_capture_id||topup.paypal_order_id,kind:'Top-up',gross_micro:topup.amount_micro,fee_micro:topup.fee_micro,net_micro:topup.amount_micro-topup.fee_micro,rail_micro:amount,status:match?'MATCH':error&&capture?'RECEIPT_ONLY':external?'MISMATCH':'PENDING_REPORT'},topup);
   }
   for(const payout of db.prepare("SELECT * FROM payouts WHERE status='SUCCESS' ORDER BY created_at DESC").all()) {
     const raw=JSON.parse(payout.raw||'{}');if(raw.seed)continue;
     const ref=raw.items?.[0]?.transaction_id;const external=transactions.get(ref);
     const amount=external?.transaction_amount?.currency_code==='USD'?paypalAmountToMicro(external.transaction_amount.value):null;
-    const fee=external?.fee_amount?Math.abs(paypalAmountToMicro(external.fee_amount.value)):null;
-    rows.push({id:payout.id,reference:ref||payout.paypal_batch_id,kind:'Payout',gross_micro:-payout.amount_micro,fee_micro:payout.fee_micro,net_micro:-payout.amount_micro-payout.fee_micro,rail_micro:amount,status:external?.transaction_status==='S'&&amount===-payout.amount_micro&&fee===payout.fee_micro?'MATCH':external?'MISMATCH':'PENDING_REPORT'});
+    const fee=external?.fee_amount?.currency_code==='USD'?Math.abs(paypalAmountToMicro(external.fee_amount.value)):null;
+    check({id:payout.id,reference:ref||payout.paypal_batch_id,kind:'Payout',gross_micro:-payout.amount_micro,fee_micro:payout.fee_micro,net_micro:-payout.amount_micro-payout.fee_micro,rail_micro:amount,status:external?.transaction_status==='S'&&amount===-payout.amount_micro&&fee===payout.fee_micro?'MATCH':external?'MISMATCH':'PENDING_REPORT'},payout);
   }
-  return {source:paypal.mode==='mock'?'Mock PayPal reporting (simulated)':source,error,rows,matched:rows.filter(r=>r.status==='MATCH').length};
+  // Bound network fan-out when old records fall outside the reporting window.
+  await Promise.all(checks.slice(0,20).map(run=>run()));
+  return {source:paypal.mode==='mock'?'Mock PayPal reporting (simulated)':source,error,rows,matched:rows.filter(r=>r.status==='MATCH').length,api_verified:rows.filter(r=>r.api_status==='VERIFIED').length,reporting_as_of:remote.last_refreshed_datetime||remote.end_date||null};
 }

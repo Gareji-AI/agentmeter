@@ -21,7 +21,8 @@
     "test": "node --test test/*.test.mjs",
     "check": "node --test test/*.test.mjs",
     "reset": "node scripts/reset.mjs",
-    "verify:demo": "node scripts/smoke.mjs"
+    "verify:demo": "node scripts/smoke.mjs",
+    "verify:sandbox:ledger": "node scripts/verify-sandbox-ledger.mjs"
   },
   "dependencies": {},
   "files": [

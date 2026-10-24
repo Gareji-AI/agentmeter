@@ -37,8 +37,17 @@ test('live receipt panels keep synthetic entries separate even on the same date'
 test('reconciliation presents returned receipt states instead of a static all-clear',t=>{
   const db=fixture();t.after(()=>db.close());const data={...snapshot(db,{mode:'mock'}),authenticated:true,mode:'mock',query:{}};
   const row={kind:'Top-up',reference:'rail-ref',gross_micro:5_000_000,fee_micro:660_000,net_micro:4_340_000,rail_micro:5_000_000};
-  for(const [statuses,outcome,title] of [[[],'pending','Your receipt trail starts here.'],[['MATCH'],'matched','The receipts agree.'],[['MATCH','MISMATCH'],'mismatch','Review the flagged receipts.'],[['RECEIPT_ONLY'],'pending','Waiting for independent reporting.']]){
+  for(const [statuses,outcome,title] of [[[],'pending','Your receipt trail starts here.'],[['MATCH'],'matched','The reporting receipts agree.'],[['MATCH','MISMATCH'],'mismatch','Review the flagged receipts.'],[['RECEIPT_ONLY'],'pending','Waiting for independent reporting.']]){
     const html=renderPage('/reconcile',{...data,report:{rows:statuses.map(status=>({...row,status})),matched:999,source:'Test reporting'}});
     assert.ok(html.includes(`data-state="${outcome}"`));assert.ok(html.includes(title));assert.doesNotMatch(html,/Balanced|>999</);
   }
+});
+
+test('fresh receipt verification remains distinct from reporting and flags contradictory receipts',t=>{
+  const db=fixture();t.after(()=>db.close());const data={...snapshot(db,{mode:'mock'}),authenticated:true,mode:'sandbox',query:{}};
+  const row={kind:'Top-up',reference:'capture',gross_micro:5_000_000,fee_micro:480_000,net_micro:4_520_000,rail_micro:null,status:'PENDING_REPORT',api_status:'VERIFIED',api_amount_micro:5_000_000};
+  const html=renderPage('/reconcile',{...data,report:{rows:[row],matched:0,source:'PayPal Transaction Search'}});
+  assert.match(html,/data-state="receipts_verified"/);assert.match(html,/Fresh PayPal receipts agree/);assert.match(html,/PENDING_REPORT/);assert.match(html,/Transaction Search matches/);
+  const mismatch=renderPage('/reconcile',{...data,report:{rows:[{...row,api_status:'MISMATCH'}],matched:0}});
+  assert.match(mismatch,/data-state="mismatch"/);assert.doesNotMatch(mismatch,/Fresh PayPal receipts agree/);
 });

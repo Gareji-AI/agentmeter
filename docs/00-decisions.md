@@ -8,7 +8,8 @@ AG Grid is the primary sponsor target; actual licensed Studio verification is pe
 
 **AgentMeter is a metered billing rail for AI tools: an agent spends prepaid credit per tool
 call, with PayPal sandbox funding and traceable author payout settlement. The current
-verified demonstration uses simulated funds; real payout success remains unproven.**
+verified demonstrations cover simulated funds and actual sandbox capture, signed
+webhook delivery and successful author payout. Transaction Search matching is pending.**
 
 ## 2. Locked decisions
 
@@ -24,7 +25,7 @@ verified demonstration uses simulated funds; real payout success remains unprove
 | D8 | Buyer agent | **scripted three-call plan, optional LLM narration** | See §5 — this is the load-bearing decision. |
 | D9 | Top-up | **PayPal JS SDK v6 buttons** (client-side) + server capture | Judges click a real PayPal button. This is the strongest "PayPal is central" signal. |
 | D10 | Payouts | Payouts API, one batch at a time, `sandbox` only; no flag executes, copied `.env.example` selects dry-run | Live payouts need approval; sandbox only. |
-| D11 | Reconciliation | AgentMeter ledger vs PayPal Transaction Search, **explicit fee column** | Shows we understand that `order total ≠ money received`. This is the highest-credibility screen in the demo. |
+| D11 | Reconciliation | AgentMeter ledger vs PayPal Transaction Search plus separately labeled fresh Orders/Payouts checks, **explicit fee column** | Shows we understand that `order total ≠ money received`. This is the highest-credibility screen in the demo. |
 | D12 | Hosting | Public information pages on Dotfield; Node backend deployed separately, with "run locally" in README | Dotfield provides stable public URLs; the backend needs a Node runtime and durable ledger storage. Render free instances lose local SQLite data on sleep/restart, so a persistent hosted ledger requires a paid instance with a disk or another suitable host. |
 
 ## 3. Verified vs. unverified PayPal surface
@@ -45,18 +46,22 @@ verified demonstration uses simulated funds; real payout success remains unprove
   → "Best Use of Agentic Commerce" is targeted by *implementing the ACP payment flow
   ourselves* (agent-initiated checkout, mandate/consent record), not by waiting on access.
 
-**Unverified (must be proven on Day 1 — see `02-sandbox-verification.md`):**
+**Actual sandbox verified — 2026-10-24:**
 
-- Payouts API sandbox batch behaviour (toolkit has no payouts tool → direct REST).
-- Whether the `/v1/payments/payouts` sandbox requires extra business account setup.
-- Webhook signature verification headers on sandbox.
-- Whether `Transaction Search` returns a fee breakdown field usable for reconciliation.
-- Whether JS SDK v6 buttons render on a sandbox-only client ID without a business account.
+- Google Chrome SDK v6.70.0 approval; Orders capture completed for $5.00 USD.
+- Capture fee $0.48 and net $4.52 are distinct from $5 of purchased tool credit.
+- Public HTTPS capture Webhook passed PayPal signature verification and did not
+  credit an already captured order twice.
+- Three $0.01 calls settled; a $0.03 Payouts batch and its single item both reached
+  SUCCESS after USD platform test prefunding. No dry-run is used for this evidence.
+- Fresh GET Orders/Payouts reads independently agree with the ledger.
 
-**Kill switches:** if Payouts sandbox fails → auto-payout becomes "queued payout with
-documented REST payload + dry-run mode"; the Payouts integration still counts, but the
-demo stops there. If Transaction Search fee data is unavailable → the reconciliation view
-computes the fee as `order_total − net_amount` where net comes from the `/capture` response.
+**Still pending:** Transaction Search has not reported the new capture/payout yet.
+A fresh API verification is displayed separately from `MATCH`, which means actual
+Transaction Search amount, status and fee agreement. Stored receipts alone cannot
+produce either an API verification or a reporting match. API failures remain visible;
+checks are read-only and bounded to 20 non-matched records per refresh. See
+`06-sandbox-evidence.md` for observed evidence, prefunding and hosting limitations.
 
 ## 4. Architecture
 

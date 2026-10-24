@@ -139,6 +139,12 @@ function createMockDriver(config, db) {
       return order;
     },
 
+    async getOrder(orderId) {
+      const entry=state.orders.get(orderId);
+      if(!entry)throw new PayPalError('order not found',404,orderId);
+      return entry.captureResponse||entry.order;
+    },
+
     /** Simulates the buyer approving the order in the PayPal window. */
     async approveOrder(orderId) {
       const entry = state.orders.get(orderId);
@@ -313,6 +319,10 @@ function createLiveDriver(config) {
           },
         },
       });
+    },
+
+    async getOrder(orderId) {
+      return call(`/v2/checkout/orders/${orderId}`);
     },
 
     /** In live mode approval happens inside PayPal's own window. */
