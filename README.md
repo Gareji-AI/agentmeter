@@ -207,10 +207,15 @@ Payment routes: `/api/topup`, `/api/topup/:id/capture`, `/api/payout`,
 - **AG Grid 36.2.0 / AG Studio 3.0.0**: optional licensed analytics modules, loaded
   from pinned CDN versions. Quartz theming, custom money/status cells, a micro-USD
   receipt widget, editable layout, and a custom Studio agent delegating to the built-in
-  page agent are implemented. **No trial key yet: the licensed runtime path has not
-  been verified. AG Grid sponsor readiness is pending that check.** Without licenses,
-  the SSR table, CSV, rule-based natural-language widgets and local card layout work
-  offline. Set `AG_GRID_LICENSE_KEY` / `AG_STUDIO_LICENSE_KEY` to enable the adapters.
+  Page agent run through Studio's Agent Framework. Licensed execution was verified
+  in Chrome on 2026-10-24: exact receipt totals, monthly chart filters, delegation,
+  task completion, and widget resizing. Intent interpretation currently uses the
+  validated rule parser; no LLM inference is claimed. Without active licenses, the
+  SSR table, CSV, rule-based widgets and local card layout work offline. Expired
+  trials are omitted before rendering. Set `AG_GRID_LICENSE_KEY` (Grid + Charts
+  bundle) and `AG_STUDIO_LICENSE_KEY` in ignored `.env` or private hosting settings.
+  The current evaluation keys expire on 2026-11-23 and 2026-12-08 respectively.
+  Keys are never committed. See [analytics verification](docs/04-analytics-verification.md).
 - **Gemini**: optional REST adapter for validated budget/widget intent, narration
   after settlement, and semantic labels of synthetic history. Default model:
   `gemini-3.8-flash`, configurable through `GEMINI_MODEL`. **No API key has been

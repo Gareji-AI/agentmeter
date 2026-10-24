@@ -11,6 +11,7 @@ import { handleMcp } from './mcp.mjs';
 import { bodyJson, bodyText, json, validOrigin } from './http.mjs';
 import { renderPage } from './views/index.mjs';
 import { interpretWidget,interpretBudget,narrate,classifySyntheticHistory } from './ai.mjs';
+import { availableAnalyticsLicense } from './analytics-license.mjs';
 
 const equal=(a,b)=>typeof a==='string'&&typeof b==='string'&&Buffer.byteLength(a)===Buffer.byteLength(b)&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
 
@@ -92,7 +93,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
         return json(res,200,await processWebhook(db,paypal,event,{verified:true}));
       }
       if(path.startsWith('/assets/')&&req.method==='GET') {
-        const files={'/assets/app.css':['./public/app.css','text/css'],'/assets/app.js':['./public/app.js','text/javascript'],'/assets/grid.js':['./public/grid.js','text/javascript'],'/assets/studio.js':['./public/studio.js','text/javascript']};
+        const files={'/assets/app.css':['./public/app.css','text/css'],'/assets/app.js':['./public/app.js','text/javascript'],'/assets/grid.js':['./public/grid.js','text/javascript'],'/assets/studio.js':['./public/studio.js','text/javascript'],'/assets/studio-session.js':['./public/studio-session.js','text/javascript']};
         const file=files[path];if(!file)return json(res,404,{error:'Not found'});
         try { const content=await readFile(new URL(file[0],import.meta.url));res.writeHead(200,{'Content-Type':file[1]+'; charset=utf-8'});return res.end(content); }catch(e){if(e.code==='ENOENT')return json(res,404,{error:'Not found'});throw e;}
       }
@@ -177,7 +178,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
         if(!authenticated&&paypal.mode==='mock'){establish(res);authenticated=true;}
         const data=authenticated?snapshot(db,paypal):{};
         const rendering=render||renderPage;
-        const html=await rendering(path,{...data,authenticated,report:authenticated&&path==='/reconcile'?await reconcile(db,paypal):null,mode:paypal.mode==='mock'?'mock':'sandbox',payoutMode:env.PAYOUT_MODE||'sandbox',clientId:paypal.mode==='live'?paypal.config.clientId:null,query:Object.fromEntries(url.searchParams),studioLicense:env.AG_STUDIO_LICENSE_KEY||'',gridLicense:env.AG_GRID_LICENSE_KEY||'',geminiConfigured:Boolean(env.GEMINI_API_KEY)});
+        const html=await rendering(path,{...data,authenticated,report:authenticated&&path==='/reconcile'?await reconcile(db,paypal):null,mode:paypal.mode==='mock'?'mock':'sandbox',payoutMode:env.PAYOUT_MODE||'sandbox',clientId:paypal.mode==='live'?paypal.config.clientId:null,query:Object.fromEntries(url.searchParams),studioLicense:authenticated&&path==='/grid'?availableAnalyticsLicense(env.AG_STUDIO_LICENSE_KEY):'',gridLicense:authenticated&&path==='/grid'?availableAnalyticsLicense(env.AG_GRID_LICENSE_KEY):'',geminiConfigured:Boolean(env.GEMINI_API_KEY)});
         res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});return res.end(html);
       }
       return json(res,404,{error:'Not found'});

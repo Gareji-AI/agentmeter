@@ -2,18 +2,18 @@
 
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);font-size:15px;line-height:1.55}
-button,input,select,textarea{font:inherit}
-button,a,input,select,textarea,summary{-webkit-tap-highlight-color:transparent}
-button,.button{display:inline-flex;align-items:center;justify-content:center;gap:16px;min-height:44px;padding:11px 18px;border:1px solid var(--accent);border-radius:5px;background:var(--accent);color:var(--surface);font-size:14px;font-weight:600;letter-spacing:.02em;cursor:pointer;text-decoration:none;transition:background 150ms,border-color 150ms,box-shadow 150ms}
-button:hover,.button:hover{background:var(--accent-hover);color:var(--surface)}
-button:disabled{opacity:.55;cursor:not-allowed}
+@scope (:root) to (#ag-grid, #ag-studio){button,input,select,textarea{font:inherit}}
+@scope (:root) to (#ag-grid, #ag-studio){button,a,input,select,textarea,summary{-webkit-tap-highlight-color:transparent}}
+@scope (:root) to (#ag-grid, #ag-studio){button,.button{display:inline-flex;align-items:center;justify-content:center;gap:16px;min-height:44px;padding:11px 18px;border:1px solid var(--accent);border-radius:5px;background:var(--accent);color:var(--surface);font-size:14px;font-weight:600;letter-spacing:.02em;cursor:pointer;text-decoration:none;transition:background 150ms,border-color 150ms,box-shadow 150ms}}
+@scope (:root) to (#ag-grid, #ag-studio){button:hover,.button:hover{background:var(--accent-hover);color:var(--surface)}}
+@scope (:root) to (#ag-grid, #ag-studio){button:disabled{opacity:.55;cursor:not-allowed}}
 .secondary{background:var(--surface);border-color:var(--muted);color:var(--fg)}
 .secondary:hover{background:var(--soft);color:var(--fg);border-color:var(--fg)}
 .text-button{background:transparent;border-color:transparent;color:var(--fg);padding-inline:6px;text-decoration:underline;text-underline-offset:4px}
 .text-button:hover{background:var(--soft);color:var(--fg)}
 a{color:inherit;text-underline-offset:4px}
 a:hover{text-decoration-thickness:2px}
-:focus-visible{outline:3px solid var(--fg);outline-offset:4px}
+@scope (:root) to (#ag-grid, #ag-studio){:focus-visible{outline:3px solid var(--fg);outline-offset:4px}}
 .sidebar :focus-visible,.balance-focus :focus-visible{outline-color:var(--on-dark)}
 [hidden]{display:none!important}
 .skip{position:fixed;top:-100px;left:16px;z-index:20;background:var(--surface);padding:12px}
@@ -52,11 +52,11 @@ a:hover{text-decoration-thickness:2px}
 main{padding:30px 40px 40px;max-width:1580px;margin:0 auto}
 .page-title{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-bottom:24px}
 .eyebrow{display:block;font-size:11px;letter-spacing:.09em;font-weight:600;text-transform:uppercase;color:var(--muted)}
-h1,h2,h3{font-family:var(--font-display);font-weight:600}
-h1{font-size:32px;letter-spacing:-.02em;line-height:1.15;margin:8px 0 10px}
-h2{font-size:19px;letter-spacing:-.01em;line-height:1.3;margin:0}
-h3{font-size:16px;margin:0}
-p{margin:0 0 12px;max-width:65ch}
+@scope (:root) to (#ag-grid, #ag-studio){h1,h2,h3{font-family:var(--font-display);font-weight:600}}
+@scope (:root) to (#ag-grid, #ag-studio){h1{font-size:32px;letter-spacing:-.02em;line-height:1.15;margin:8px 0 10px}}
+@scope (:root) to (#ag-grid, #ag-studio){h2{font-size:19px;letter-spacing:-.01em;line-height:1.3;margin:0}}
+@scope (:root) to (#ag-grid, #ag-studio){h3{font-size:16px;margin:0}}
+@scope (:root) to (#ag-grid, #ag-studio){p{margin:0 0 12px;max-width:65ch}}
 .page-title p{color:var(--muted);font-size:14px;margin:0}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:24px;min-width:0}
 .panel-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:18px}
@@ -76,11 +76,11 @@ p{margin:0 0 12px;max-width:65ch}
 .support-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:24px}
 .support-grid h2{font-size:17px}
 .stack{display:grid;gap:22px}
-form{display:grid;gap:14px}
-label{display:grid;gap:7px;font-size:13px;font-weight:500;color:var(--fg)}
-input,textarea,select{width:100%;min-width:0;min-height:44px;padding:10px 12px;border:1px solid var(--muted);background:var(--surface);border-radius:4px;color:var(--fg);font-size:14px}
-textarea{font-family:var(--font-mono);font-size:12px;line-height:1.6;resize:vertical}
-form button{justify-self:start}
+@scope (:root) to (#ag-grid, #ag-studio){form{display:grid;gap:14px}}
+@scope (:root) to (#ag-grid, #ag-studio){label{display:grid;gap:7px;font-size:13px;font-weight:500;color:var(--fg)}}
+@scope (:root) to (#ag-grid, #ag-studio){input,textarea,select{width:100%;min-width:0;min-height:44px;padding:10px 12px;border:1px solid var(--muted);background:var(--surface);border-radius:4px;color:var(--fg);font-size:14px}}
+@scope (:root) to (#ag-grid, #ag-studio){textarea{font-family:var(--font-mono);font-size:12px;line-height:1.6;resize:vertical}}
+@scope (:root) to (#ag-grid, #ag-studio){form button{justify-self:start}}
 .actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px}
 form .actions{margin:0}
 .result{background:var(--soft);color:var(--fg);border:1px solid var(--border);padding:14px;margin:14px 0 0;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;max-height:180px;overflow:auto;border-radius:3px}
@@ -93,23 +93,23 @@ form .actions{margin:0}
 .status.released,.status.seed_history,.status.dry_run,.status.receipt_only{background:var(--bg);color:var(--muted)}
 .table-scroll{overflow-x:auto;max-width:100%;overscroll-behavior-x:contain;scrollbar-color:var(--muted) var(--bg)}
 .bounded{max-height:380px;overflow:auto}
-table{border-collapse:collapse;width:100%;text-align:left;font-size:13px}
-th{font-size:11px;letter-spacing:.02em;color:var(--muted);font-weight:500;padding:14px 14px 12px 0;border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:14px 14px 14px 0;vertical-align:middle;border-bottom:1px solid var(--border);white-space:nowrap}
-td:last-child,th:last-child{padding-right:0}
-td strong{font-weight:500;font-size:13px}
-td small{display:block;color:var(--muted);font-size:11px;margin-top:4px;letter-spacing:.01em}
-td .money{font-weight:500}
-tr:last-child td{border-bottom:0}
-td.num,th.num{text-align:right}
-caption{text-align:left;padding:0 0 10px;font-size:12px;color:var(--muted)}
+@scope (:root) to (#ag-grid, #ag-studio){table{border-collapse:collapse;width:100%;text-align:left;font-size:13px}}
+@scope (:root) to (#ag-grid, #ag-studio){th{font-size:11px;letter-spacing:.02em;color:var(--muted);font-weight:500;padding:14px 14px 12px 0;border-bottom:1px solid var(--border);white-space:nowrap}}
+@scope (:root) to (#ag-grid, #ag-studio){td{padding:14px 14px 14px 0;vertical-align:middle;border-bottom:1px solid var(--border);white-space:nowrap}}
+@scope (:root) to (#ag-grid, #ag-studio){td:last-child,th:last-child{padding-right:0}}
+@scope (:root) to (#ag-grid, #ag-studio){td strong{font-weight:500;font-size:13px}}
+@scope (:root) to (#ag-grid, #ag-studio){td small{display:block;color:var(--muted);font-size:11px;margin-top:4px;letter-spacing:.01em}}
+@scope (:root) to (#ag-grid, #ag-studio){td .money{font-weight:500}}
+@scope (:root) to (#ag-grid, #ag-studio){tr:last-child td{border-bottom:0}}
+@scope (:root) to (#ag-grid, #ag-studio){td.num,th.num{text-align:right}}
+@scope (:root) to (#ag-grid, #ag-studio){caption{text-align:left;padding:0 0 10px;font-size:12px;color:var(--muted)}}
 .footnote{font-size:12px;color:var(--muted);line-height:1.6;margin:12px 0 0}
 .history{margin-top:24px;padding:0;border:1px solid var(--border);background:var(--surface);border-radius:5px;min-width:0}
 .history>summary{padding:17px 22px;min-height:56px;font-size:14px;font-weight:500;cursor:pointer}
 .history>div{padding:0 22px 22px}
 .history p{font-size:13px;color:var(--muted)}
-summary{cursor:pointer;min-height:44px;padding-block:10px}
-details pre{white-space:pre-wrap;overflow-wrap:anywhere;max-width:360px;font-size:11px}
+@scope (:root) to (#ag-grid, #ag-studio){summary{cursor:pointer;min-height:44px;padding-block:10px}}
+@scope (:root) to (#ag-grid, #ag-studio){details pre{white-space:pre-wrap;overflow-wrap:anywhere;max-width:360px;font-size:11px}}
 .event-feed{list-style:none;padding:0;margin:0}
 .event-feed li{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
 .event-feed strong{font-size:12px;font-weight:500;display:block}
@@ -243,7 +243,7 @@ main{padding-inline:26px}
 .journey .money{font-size:11px}
 main{padding:24px 18px}
 .page-title{flex-direction:column;gap:16px;margin-bottom:20px}
-h1{font-size:28px}
+@scope (:root) to (#ag-grid, #ag-studio){h1{font-size:28px}}
 .page-title p{font-size:13px}
 .page-title>button{width:100%}
 .balance-strip{grid-template-columns:1fr 1fr;margin-bottom:20px}
@@ -257,7 +257,7 @@ h1{font-size:28px}
 .support-grid> :last-child{grid-column:auto}
 .panel{padding:20px}
 .panel-head{gap:10px}
-h2{font-size:18px}
+@scope (:root) to (#ag-grid, #ag-studio){h2{font-size:18px}}
 .support-grid{margin-top:20px}
 .overview-hero{grid-template-columns:1fr;padding-top:0;gap:24px}
 .overview-hero h1{font-size:44px;max-width:12ch}
@@ -364,3 +364,8 @@ h2{font-size:18px}
 .reconcile-summary[data-state=receipts_verified]{border-left:4px solid var(--accent)}
 .status.unavailable,.status.not_checked{background:var(--bg);color:var(--muted)}
 .status.pending,.status.pending_fee{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)}
+
+/* Vendor cells keep their own row metrics; only the custom badge is application-owned. */
+#ag-grid .status{line-height:1.2;vertical-align:middle}
+.studio-note{margin:0 0 16px;max-width:none}
+#studio-panel{margin-bottom:24px}
