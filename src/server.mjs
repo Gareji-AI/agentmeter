@@ -50,7 +50,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
   db.prepare("INSERT OR IGNORE INTO metadata (key,value) VALUES ('payment_mode',?)").run(paypal.mode);
   const sessions=new Map();
   const accessToken=env.DEMO_ACCESS_TOKEN||randomUUID();
-  const ctx={db,paypal,publicBaseUrl,sessions,accessToken,env};
+  const ctx={db,paypal,publicBaseUrl,sessions,accessToken,env,boot:{id:randomUUID(),started_at:nowIso()}};
   const sessionFor=req=>{
     const sid=req.headers.cookie?.split(';').map(c=>c.trim()).find(c=>c.startsWith('am_session='))?.slice(11);
     const session=sessions.get(sid);
@@ -83,7 +83,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
       res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('X-Frame-Options','DENY');res.setHeader('Referrer-Policy','same-origin');
       const url=new URL(req.url,ctx.publicBaseUrl);const path=url.pathname;
       if(path==='/mcp')return await handleMcp(req,res,ctx);
-      if(path==='/health')return json(res,200,{status:'ok',mode:paypal.mode==='mock'?'mock':'sandbox'});
+      if(path==='/health')return json(res,200,{status:'ok',mode:paypal.mode==='mock'?'mock':'sandbox',instance_id:ctx.boot.id,started_at:ctx.boot.started_at});
       if(req.method==='POST'&&!validOrigin(req,ctx.publicBaseUrl))return json(res,403,{error:'Invalid Origin'});
       if(path==='/api/webhooks/paypal'&&req.method==='POST') {
         const rawBody=await bodyText(req);const event=JSON.parse(rawBody);

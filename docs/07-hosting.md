@@ -59,7 +59,8 @@ There is no network-facing database import route.
    `webhook.duplicate` audit event and unchanged balances after signature checking.
 9. Fetch hosted reconciliation: both Search transactions must reconcile, with
    the omitted payout fee verified through fresh Payouts GET and labeled clearly.
-10. Restart the service; repeat health, auth, balances, receipt IDs and reporting
+10. Restart the service; confirm `/health` returns a different `instance_id` and
+    startup time, then repeat auth, balances, receipt IDs and reporting
     checks to prove disk persistence. Remove bootstrap variables and verify again.
 11. Record the actual URL, resource IDs, timestamp and checks in private deployment
     evidence. Then update the README and Dotfield demo link. Stop the old tunnel.
