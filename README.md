@@ -348,9 +348,13 @@ Payment routes: `/api/topup`, `/api/topup/:id/capture`, `/api/payout`,
   Page agent run through Studio's Agent Framework. Licensed execution was verified
   locally and on Render in Chrome on 2026-10-24: exact receipt totals, monthly filters,
   delegation, task completion, and widget resizing. Intent interpretation uses Gemini
-  when configured, with a validated rule-parser fallback. Without active licenses, the
-  SSR table, CSV, rule-based widgets and local card layout work offline. Expired
-  trials are omitted before rendering. Set `AG_GRID_LICENSE_KEY` (Grid + Charts
+  when configured, with a validated rule-parser fallback. Without analytics configuration,
+  the SSR table, CSV, rule-based widgets and local card layout work offline. Expired
+  trials switch to the vendor's keyless, watermarked evaluation; expired keys are
+  omitted before rendering. Set `AG_ANALYTICS_EVALUATION=1` to evaluate Grid and
+  Studio without keys. This requires CDN access. The AG Grid team permits watermarked
+  evaluation for this hackathon's judging ([sponsor reply](https://discord.com/channels/1491162723361362021/1555253366999752814/1559835236735393864)).
+  Set `AG_GRID_LICENSE_KEY` (Grid + Charts
   bundle) and `AG_STUDIO_LICENSE_KEY` in ignored `.env` or private hosting settings.
   The current evaluation keys expire on 2026-11-23 and 2026-12-08 respectively.
   Keys are never committed. See [analytics verification](docs/04-analytics-verification.md).

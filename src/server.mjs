@@ -11,7 +11,7 @@ import { handleMcp } from './mcp.mjs';
 import { bodyJson, bodyText, json, validOrigin } from './http.mjs';
 import { renderPage } from './views/index.mjs';
 import { interpretWidget,interpretBudget,narrate,classifySyntheticHistory } from './ai.mjs';
-import { availableAnalyticsLicense } from './analytics-license.mjs';
+import { analyticsConfiguration } from './analytics-license.mjs';
 import { handleWorkspace } from './workspace-http.mjs';
 import { createGateway } from './gateway.mjs';
 import { handleExample } from './example-upstreams.mjs';
@@ -187,7 +187,7 @@ export function createApplication({db,paypal,env=process.env,publicBaseUrl=env.P
         if(!authenticated&&autoOperator){establish(res);authenticated=true;}
         const data=authenticated?snapshot(db,paypal):{};
         const rendering=render||renderPage;
-        const html=await rendering(path,{...data,authenticated,report:authenticated&&path==='/reconcile'?await reconcile(db,paypal):null,mode:paypal.mode==='mock'?'mock':'sandbox',payoutMode:env.PAYOUT_MODE||'sandbox',clientId:paypal.mode==='live'?paypal.config.clientId:null,query:Object.fromEntries(url.searchParams),studioLicense:authenticated&&path==='/grid'?availableAnalyticsLicense(env.AG_STUDIO_LICENSE_KEY):'',gridLicense:authenticated&&path==='/grid'?availableAnalyticsLicense(env.AG_GRID_LICENSE_KEY):'',geminiConfigured:Boolean(env.GEMINI_API_KEY),geminiGeneralConfigured:Boolean(generalAiEnv.GEMINI_API_KEY)});
+        const html=await rendering(path,{...data,authenticated,report:authenticated&&path==='/reconcile'?await reconcile(db,paypal):null,mode:paypal.mode==='mock'?'mock':'sandbox',payoutMode:env.PAYOUT_MODE||'sandbox',clientId:paypal.mode==='live'?paypal.config.clientId:null,query:Object.fromEntries(url.searchParams),...(authenticated&&path==='/grid'?analyticsConfiguration(env):{}),geminiConfigured:Boolean(env.GEMINI_API_KEY),geminiGeneralConfigured:Boolean(generalAiEnv.GEMINI_API_KEY)});
         res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});return res.end(html);
       }
       return json(res,404,{error:'Not found'});
