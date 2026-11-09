@@ -1,10 +1,11 @@
 # AgentMeter — submission review package
 
-Status: not submitted. The official Devpost form, requirements, rules, registration,
-and dates were read on 2026-11-09. The existing empty project is 1536626.
+Status: the [project page](https://devpost.com/software/agentmeter) is public;
+the PayPal AI Hackathon entry is not submitted. The official form, requirements,
+rules, registration, and dates were read on 2026-11-09. Project ID: 1536626.
 The final public video and project thumbnail are prepared. The participant has
-authorized public repository release; final rules review and submission approval
-remain pending. The concise project story to be uploaded is
+authorized public repository release and confirmed the official rules review.
+Final submission approval remains required. The concise project story to be uploaded is
 [docs/15-devpost-project.md](docs/15-devpost-project.md). The longer notes below
 retain the build evidence and historical preparation context.
 
@@ -14,7 +15,7 @@ AgentMeter
 
 ## One-line Summary
 
-Every agent tool call gets a price, a budget check, and a receipt.
+Per-call billing for AI tools, with prepaid credit and PayPal sandbox payouts.
 
 ## Problem
 
@@ -67,8 +68,8 @@ chart creation. The paraphrase “Plot what I paid each calendar day during the
 current month” was verified with the actual model, locally and on Render; the
 ledger stayed unchanged. Rules remain available when inference is unavailable.
 
-Our custom metering analyst uses AG Studio's Agent Framework to delegate to the
-shipped Page agent definition, with our custom runner invoking its `add_widget`
+My custom metering analyst uses AG Studio's Agent Framework to delegate to the
+shipped Page agent definition, with my custom runner invoking its `add_widget`
 and `complete_task` tools. The visible chat records delegation and hand-back.
 The workspace combines a forest theme, a custom exact-USD receipt widget, editable
 layout and AG Grid custom money/status cells. It is a working analytics workflow.
@@ -84,10 +85,10 @@ recording profile uses deterministic behavior for those paths.
 ## How We Used Codex
 
 Codex supported ledger and HTTP implementation, test creation, browser verification,
-deployment and evidence-driven iteration. The APIMatic Context Plugin for PayPal
+deployment and debugging. The APIMatic Context Plugin for PayPal
 guided source inspection and error-handling review; native REST remains the runtime.
 For example, optional fee/net fields and ambiguous payout transport failures informed
-the reconciliation and reservation behavior. We checked actual sandbox API responses
+the reconciliation and reservation behavior. I checked actual sandbox API responses
 and Chrome outcomes instead of treating generated code as proof of integration.
 
 ## Key Features
@@ -106,7 +107,8 @@ ES modules. Zero npm runtime dependencies and no build step. Financial arithmeti
 uses integers; the PayPal decimal boundary is explicit. The sandbox backend runs
 on Render with a persistent SQLite disk and operator-token access. Dotfield hosts
 English project/privacy/terms/support information. Optional AG libraries load from
-pinned CDN versions only when licensed; Gemini API credentials remain server-side.
+pinned CDN versions when configured, including keyless watermarked evaluation;
+Gemini API credentials remain server-side.
 
 ## Testing Instructions
 
@@ -121,16 +123,19 @@ npm run verify:recording
 npm start
 ```
 
-A clean clone needs no `.env`, accounts, network or `npm install` for the complete
-mock money loop. Open http://localhost:8787, run the three-call demo, try a failure,
+After downloading, the mock needs no `.env`, accounts, network or `npm install`
+for the complete money loop. Open http://localhost:8787, run the three-call demo, try a failure,
 open Provider and pay out, then open Reconciliation: two simulated matches.
 Analytics retains a plain table, CSV and rule-based widgets without external keys.
 
-For the real-model/Studio recording, configure a private Gemini key and active
+For the real-model/Studio recording profile, configure a private Gemini key and active
 AG licenses, then run `npm run demo:record`. Its printed Chrome URL uses a fresh
 isolated mock ledger. Submit the prepared paraphrase in Studio's AI Assistant.
 Expect a Gemini source/model label, Page-agent delegation, hand-back and chart.
 The custom receipt includes synthetic history; it is not the buyer balance.
+For keyless Studio testing, set `AG_ANALYTICS_EVALUATION=1` and run `npm start`;
+the vendor's watermarks remain visible according to the libraries' own behavior.
+Expired configured trials switch to that evaluation path automatically.
 
 Automated coverage includes two-connection reservations, replay conflicts,
 exhaustion, caps, release/rollback, forged payment receipts, ambiguous payouts,
@@ -149,7 +154,7 @@ See README and the evidence documents for reproducible verification boundaries.
 
 https://github.com/Gareji-AI/agentmeter — public release authorized by the owner on
 2026-11-09 after a committed-history credential-pattern audit. MIT license is present.
-Live public visibility must be confirmed before submitting.
+Public visibility and MIT license were confirmed through GitHub on 2026-11-09.
 
 ## Demo Video
 
@@ -175,7 +180,8 @@ A local 2026-10-25 provisional edit adds English captions, restrained chapter
 motion made through Open Design MCP, a replaceable generic synthetic narrator,
 and an original score/effects synthesized locally with Earshot 0.4.0. It is still
 162 seconds. The participant's own face/voice will replace the rehearsal voice;
-the film has not been publicly uploaded. See `docs/14-narrated-demo-edit.md`.
+that rehearsal film was not the final upload. The public presenter composition
+linked above supersedes it. See `docs/14-narrated-demo-edit.md` for historical notes.
 
 ## Screenshot Shot List
 
@@ -194,9 +200,10 @@ are prepared. Chrome rehearsals verified the money loop and actual Gemini/Studio
 path. Recorded sandbox evidence covers SDK v6 approval, $5 capture, three $0.01
 calls, $0.03 successful payout, signed webhook replay, both Search matches and
 unchanged ledger identities after service restart. Raw evidence stays Git-ignored.
-The silent master and a narrated provisional composition exist; real presenter
-footage and the final presenter composition remain open. The live form has not
-been checked in this pass.
+The final presenter composition is public, and the application-based thumbnail
+has been uploaded to Devpost. All 22 live form questions were checked on November 9.
+The expiry fix passed 85 tests, isolated browser checks, and hosted deployment
+verification. See `docs/17-submission-copy-review.md` and `docs/18-analytics-evaluation.md`.
 
 ## Known Limitations
 
@@ -209,13 +216,14 @@ refunds, FX, high availability and production seller onboarding are future work.
 Provider registration supports read-only retry-safe APIs/MCP tools; it does not
 host code or verify ownership of the sandbox recipient email. Personal buyer workspaces have no email recovery; save the recovery code.
 Grid/Charts trial expires 2026-11-23 and Studio trial 2026-12-08; the application
-suppresses expired keys and retains its fallback. Gemini/CDN availability and
+omits expired keys and retains the configured modules in vendor-watermarked
+evaluation, permitted by the AG Grid team for this hackathon. Gemini/CDN availability and
 free-tier quotas can affect optional analytics. Use synthetic model questions.
 
 ## Current Official Form Preparation
 
 Official requirements and all 22 questions were read through Devpost on 2026-11-09.
-Registration is already complete; the existing project has no submitted_at value.
+Registration is already complete; the published project has no submitted_at value.
 The participant confirmed individual entry, Japan, eligibility attestations,
 permission for feedback contact, PayPal experience 10/10, significant learning,
 and useful career value from AI. Narrative feedback is drafted from recorded build
@@ -225,7 +233,7 @@ primary presentation emphasis. No additional opt-in prize IDs are assumed.
 The submission includes the public video, source repository, hosted personal
 sandbox entry, and complete offline testing instructions. A generated cover built
 around the actual analytics screen was uploaded as the project's thumbnail.
-Final rules review and the real-submit confirmation are still required.
+The participant has confirmed rules review. Real-submit confirmation is still required.
 
 ## Verified provider demonstration
 
