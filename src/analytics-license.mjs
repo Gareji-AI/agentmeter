@@ -7,3 +7,15 @@ export function availableAnalyticsLicense(key,now=Date.now()) {
   const expiry=Number(Buffer.from(payload,'base64').toString('utf8'));
   return Number.isSafeInteger(expiry)&&expiry>now?key:'';
 }
+
+/** Hackathon evaluation retains the vendor watermark; never alter a trial key. */
+export function analyticsConfiguration(env,now=Date.now()) {
+  const gridLicense=availableAnalyticsLicense(env.AG_GRID_LICENSE_KEY,now);
+  const studioLicense=availableAnalyticsLicense(env.AG_STUDIO_LICENSE_KEY,now);
+  const expiredTrial=(key,available)=>typeof key==='string'&&key.includes('[TRIAL]')&&!available;
+  const analyticsEvaluation=env.AG_ANALYTICS_EVALUATION==='1'
+    ||expiredTrial(env.AG_GRID_LICENSE_KEY,gridLicense)
+    ||expiredTrial(env.AG_STUDIO_LICENSE_KEY,studioLicense);
+  return {gridLicense,studioLicense,analyticsEvaluation,
+    studioEnabled:Boolean(studioLicense||analyticsEvaluation&&(env.AG_STUDIO_LICENSE_KEY?.trim()||env.AG_ANALYTICS_EVALUATION==='1'))};
+}

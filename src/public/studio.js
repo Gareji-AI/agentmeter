@@ -1,11 +1,11 @@
 import { api,dollars,notice } from './app.js';
 import { runStudioSession } from './studio-session.js';
 
-/** Optional AG Studio integration. Nothing is imported until a licence is supplied. */
+/** Optional AG Studio integration, including the vendor's watermarked evaluation. */
 export async function enableStudio({licenseKey,gridLicense,data}) {
   const ag=await import('https://cdn.jsdelivr.net/npm/ag-studio@3.0.0/+esm');
   if(gridLicense){const charts=await import('https://cdn.jsdelivr.net/npm/ag-charts-enterprise@14.2.0/+esm');charts.LicenseManager.setLicenseKey(gridLicense);}
-  ag.AgStudioLicenseManager.setLicenseKey(licenseKey);
+  if(licenseKey)ag.AgStudioLicenseManager.setLicenseKey(licenseKey);
   ag.AgStudioModuleRegistry.registerModules([ag.AgStudioAiModule]);
   const base=ag.createWidgets({});
   const valueDefinition=base.widgets.find(w=>w.id==='value');

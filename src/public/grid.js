@@ -21,10 +21,10 @@ $('#widget-form').addEventListener('submit',async event=>{event.preventDefault()
 $('#export-csv').addEventListener('click',event=>{event.preventDefault();const keys=['day','tool_name','status','calls','spend_micro','author_micro'];const quote=v=>'"'+String(v??'').replaceAll('"','""')+'"';const csv=[keys.map(quote).join(','),...latest.analytics.map(r=>keys.map(k=>quote(r[k])).join(','))].join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='agentmeter-usage-micro-usd.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 
 async function enableGrid(){
-  if(!boot.gridLicense&&!boot.studioLicense){$('#studio-status').textContent='Plain table mode · no licence configured. Widgets and CSV export remain available.';return;}
+  if(!boot.gridLicense&&!boot.studioEnabled&&!boot.analyticsEvaluation){$('#studio-status').textContent='Plain table mode · no licence configured. Widgets and CSV export remain available.';return;}
   try{
     const ag=await import('https://cdn.jsdelivr.net/npm/ag-grid-community@36.2.0/+esm');
-    if(boot.gridLicense){const enterprise=await import('https://cdn.jsdelivr.net/npm/ag-grid-enterprise@36.2.0/+esm');enterprise.LicenseManager.setLicenseKey(boot.gridLicense);ag.ModuleRegistry.registerModules([enterprise.AllEnterpriseModule]);}
+    if(boot.gridLicense||boot.analyticsEvaluation){const enterprise=await import('https://cdn.jsdelivr.net/npm/ag-grid-enterprise@36.2.0/+esm');if(boot.gridLicense)enterprise.LicenseManager.setLicenseKey(boot.gridLicense);ag.ModuleRegistry.registerModules([enterprise.AllEnterpriseModule]);}
     else ag.ModuleRegistry.registerModules([ag.AllCommunityModule]);
     const StatusCell=params=>{const span=document.createElement('span');span.className='status '+String(params.value).toLowerCase();span.textContent=params.value;return span;};
     const moneyCell=params=>{const span=document.createElement('span');span.className='money';span.textContent=dollars(params.value);return span;};
@@ -32,7 +32,7 @@ async function enableGrid(){
     gridApi=ag.createGrid($('#ag-grid'),{theme:ag.themeQuartz.withParams({accentColor:'#156e5d',backgroundColor:'#ffffff',foregroundColor:'#172c2b',headerBackgroundColor:'#f4f6f5',borderColor:'#dce4e1',fontFamily:'system-ui',fontSize:12,spacing:6}),rowData:latest.analytics,defaultColDef:{sortable:true,filter:true,resizable:true,flex:1,minWidth:110},columnDefs:[{field:'day',headerName:'Day (UTC)'},{field:'tool_name',headerName:'Tool',minWidth:180},{field:'status',cellRenderer:StatusCell},{field:'calls'},{field:'spend_micro',headerName:'Spend (USD)',cellRenderer:moneyCell,valueGetter:p=>p.data.status==='SETTLED'?p.data.spend_micro:0},{field:'author_micro',headerName:'Author (USD)',cellRenderer:moneyCell,valueGetter:p=>p.data.status==='SETTLED'?p.data.author_micro:0}],pagination:true,paginationPageSize:25,paginationPageSizeSelector:[25,50,100]});
     $('#analytics-table').hidden=true;
     $('#studio-status').textContent='AG Grid active · custom state and money cells · themed to AgentMeter.';
-    if(boot.studioLicense){try{const module=await import('./studio.js');studio=await module.enableStudio({licenseKey:boot.studioLicense,gridLicense:boot.gridLicense,data:latest});$('#analytics-widgets').hidden=true;}catch(error){$('#studio-panel').hidden=true;$('#studio-status').textContent='AG Grid active · Studio unavailable. Validated widget cards remain available.';console.error('Studio initialization failed:',error);}}
+    if(boot.studioEnabled){try{const module=await import('./studio.js');studio=await module.enableStudio({licenseKey:boot.studioLicense,gridLicense:boot.gridLicense,data:latest});$('#analytics-widgets').hidden=true;}catch(error){$('#studio-panel').hidden=true;$('#studio-status').textContent='AG Grid active · Studio unavailable. Validated widget cards remain available.';console.error('Studio initialization failed:',error);}}
   }catch(e){$('#ag-grid').hidden=true;$('#analytics-table').hidden=false;$('#studio-panel').hidden=true;$('#studio-status').textContent='Analytics library unavailable. Plain table mode remains fully usable.';}
 }
 window.addEventListener('agentmeter:state',event=>{latest=event.detail;renderWidgets();gridApi?.setGridOption('rowData',latest.analytics);studio?.update(latest);});
