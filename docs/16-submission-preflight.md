@@ -47,3 +47,12 @@ are not used in AgentMeter's assets or implementation.
 The Grid/Charts and Studio trials end before the judging period ends. The submitted
 story states these dates and the available table/CSV/rule fallback explicitly.
 Pending Transaction Search records remain described as pending.
+
+Discord research found sponsor guidance allowing watermarked Enterprise/Studio
+evaluation during this hackathon, with no judging penalty for the watermark or
+console error. See [the original reply](https://discord.com/channels/1491162723361362021/1555253366999752814/1559835236735393864)
+and [the research notes](17-submission-copy-review.md). The application now
+filters expired trial keys while retaining the analytics modules in vendor-keyless
+evaluation mode. Local browser and automated checks are documented in
+[analytics evaluation verification](18-analytics-evaluation.md). No extension
+request has been sent.
