@@ -1,9 +1,12 @@
-# AgentMeter — final local English draft
+# AgentMeter — submission review package
 
-Status: draft only. Nothing has been sent to Devpost. Prepared from implemented
-behavior and recorded verification on 2026-10-24. Devpost authentication was
-unavailable in this pass; headings below organize the copy and are not a claim
-about the current official form. Final video and judge-access checks remain open.
+Status: not submitted. The official Devpost form, requirements, rules, registration,
+and dates were read on 2026-11-09. The existing empty project is 1536626.
+The final public video and project thumbnail are prepared. The participant has
+authorized public repository release; final rules review and submission approval
+remain pending. The concise project story to be uploaded is
+[docs/15-devpost-project.md](docs/15-devpost-project.md). The longer notes below
+retain the build evidence and historical preparation context.
 
 ## Title
 
@@ -144,14 +147,18 @@ See README and the evidence documents for reproducible verification boundaries.
 
 ## Public Repository Link
 
-https://github.com/Gareji-AI/agentmeter — currently private. The event requires a
-public, open-source repository; publish it only after an explicit release decision
-and a committed-history secret review. MIT license is present. Private judge access
-alone does not satisfy that requirement.
+https://github.com/Gareji-AI/agentmeter — public release authorized by the owner on
+2026-11-09 after a committed-history credential-pattern audit. MIT license is present.
+Live public visibility must be confirmed before submitting.
 
 ## Demo Video
 
-YouTube URL: **pending presenter face/voice recording, composition, final inspection and public upload**.
+YouTube URL: https://youtu.be/5jLyQqJBsPA — publicly uploaded on 2026-11-09.
+Final presenter composition: `agentmeter-final-v2.mp4`, measured 168.533 seconds,
+1920×1080, H.264/AAC. Presenter face appears during the introduction and close;
+demonstration screens remain unobstructed. YouTube copyright checks found no issues.
+
+Historical source/edit record follows:
 A completely new Chrome recording is edited to a measured **162-second (2:42)
 silent 1080p master**. The filmed flow uses one new provider and its own newly
 registered invoice tool: 0:00 introduction; 0:06 registration/test/publication;
@@ -205,13 +212,20 @@ Grid/Charts trial expires 2026-11-23 and Studio trial 2026-12-08; the applicatio
 suppresses expired keys and retains its fallback. Gemini/CDN availability and
 free-tier quotas can affect optional analytics. Use synthetic model questions.
 
-## TODO Official Form Fields
+## Current Official Form Preparation
 
-Reconnect Devpost to read the actual requirements, criteria, dates and questions.
-Map this copy to those fields, check any length limits and confirm the intended
-single sponsor target (AG Grid). Add the real public video URL, arrange code/demo
-access and review required acknowledgments. No registration, rule acknowledgment,
-team membership or form-specific answer is inferred here.
+Official requirements and all 22 questions were read through Devpost on 2026-11-09.
+Registration is already complete; the existing project has no submitted_at value.
+The participant confirmed individual entry, Japan, eligibility attestations,
+permission for feedback contact, PayPal experience 10/10, significant learning,
+and useful career value from AI. Narrative feedback is drafted from recorded build
+experience. Used sponsor tools: AG Grid, APIMatic, Render; AG Grid remains the
+primary presentation emphasis. No additional opt-in prize IDs are assumed.
+
+The submission includes the public video, source repository, hosted personal
+sandbox entry, and complete offline testing instructions. A generated cover built
+around the actual analytics screen was uploaded as the project's thumbnail.
+Final rules review and the real-submit confirmation are still required.
 
 ## Verified provider demonstration
 

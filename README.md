@@ -10,8 +10,11 @@ webhooks, author payout and Transaction Search reconciliation have also passed.
 See the evidence table below.
 
 GitHub uses the organization's Free plan with $0 stop-usage budgets. Repository
-metadata, CI permissions and the private-repository branch protection limitation
-are documented in [repository settings](docs/11-repository-settings.md).
+metadata and CI permissions are documented in [repository settings](docs/11-repository-settings.md).
+
+Watch the [2:48.5 presenter demo](https://youtu.be/5jLyQqJBsPA), or try the
+complete offline mock below. The hosted personal sandbox starts at
+[Create a workspace](https://agentmeter-sandbox.onrender.com/join).
 
 ## Run in one minute
 
@@ -25,7 +28,6 @@ npm start
 
 Open **http://localhost:8787**. Startup seeds one consumer, one provider, six tools,
 180 synthetic calls across the previous 30 days, and **$5.0000 simulated credit**.
-The repository is currently private, so cloning requires repository access.
 `npm install` is unnecessary: there are zero runtime npm dependencies.
 
 1. Open **Buyer** and click **Run 3 calls**. Balance becomes **$4.9700**.
@@ -155,8 +157,11 @@ Fresh Gemini/Studio and the themed Grid complete the story. See [retake evidence
 The [presenter packet](docs/video/presenter-guide-ja.md) has updated English copy
 and an offline rehearsal player. A [provisional narrated edit](docs/14-narrated-demo-edit.md)
 adds Open Design chapter motion, English captions, a replaceable generic narrator
-and original Earshot sound. Real presenter footage/narration, public YouTube
-upload, judge access and the live Devpost form check remain open.
+and original Earshot sound. The [final presenter version](https://youtu.be/5jLyQqJBsPA)
+was published on November 9, 2026: 168.533 seconds, 1920×1080, with the participant's
+face visible only during the introduction and close. The local mock instructions
+above provide free judge access without payment credentials; the hosted personal
+sandbox requires the judge's own sandbox accounts for payment operations.
 
 ```sh
 npm run verify:recording
